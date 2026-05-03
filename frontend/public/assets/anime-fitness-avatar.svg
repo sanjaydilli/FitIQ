@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 720" role="img" aria-labelledby="title desc">
+  <title id="title">Anime Fitness Avatar</title>
+  <desc id="desc">A clean vector-style full-body anime avatar in gym wear for a fitness mobile app.</desc>
+  <defs>
+    <linearGradient id="appBackground" x1="70" y1="0" x2="442" y2="720" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#061832" />
+      <stop offset="0.52" stop-color="#172563" />
+      <stop offset="1" stop-color="#6B2DA8" />
+    </linearGradient>
+
+    <radialGradient id="softFocus" cx="50%" cy="23%" r="72%">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.2" />
+      <stop offset="0.55" stop-color="#FFFFFF" stop-opacity="0.05" />
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0" />
+    </radialGradient>
+
+    <linearGradient id="skin" x1="256" y1="118" x2="256" y2="620" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F6C59B" />
+      <stop offset="0.58" stop-color="#E9A878" />
+      <stop offset="1" stop-color="#C77C54" />
+    </linearGradient>
+
+    <linearGradient id="skinSoft" x1="170" y1="150" x2="340" y2="340" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFD4B2" />
+      <stop offset="1" stop-color="#E7A270" />
+    </linearGradient>
+
+    <linearGradient id="hair" x1="168" y1="75" x2="360" y2="292" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#202A46" />
+      <stop offset="0.5" stop-color="#111626" />
+      <stop offset="1" stop-color="#080A13" />
+    </linearGradient>
+
+    <linearGradient id="hairLight" x1="192" y1="92" x2="308" y2="166" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#374A7A" stop-opacity="0.9" />
+      <stop offset="1" stop-color="#182037" stop-opacity="0" />
+    </linearGradient>
+
+    <linearGradient id="tank" x1="206" y1="326" x2="306" y2="462" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#57F2D0" />
+      <stop offset="1" stop-color="#14A8C8" />
+    </linearGradient>
+
+    <linearGradient id="shorts" x1="192" y1="456" x2="320" y2="536" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#222A52" />
+      <stop offset="1" stop-color="#15172B" />
+    </linearGradient>
+
+    <linearGradient id="iris" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7AF3FF" />
+      <stop offset="0.62" stop-color="#6C5CFF" />
+      <stop offset="1" stop-color="#2A1B79" />
+    </linearGradient>
+
+    <filter id="softDrop" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#050713" flood-opacity="0.28" />
+    </filter>
+  </defs>
+
+  <rect width="512" height="720" fill="url(#appBackground)" />
+  <rect width="512" height="720" fill="url(#softFocus)" />
+
+  <g opacity="0.24" fill="none" stroke="#8CEBFF" stroke-linecap="round">
+    <path d="M86 126h82" stroke-width="2" />
+    <path d="M356 142h70" stroke-width="2" />
+    <path d="M76 578h88" stroke-width="2" />
+    <path d="M350 590h72" stroke-width="2" />
+  </g>
+
+  <ellipse cx="256" cy="646" rx="116" ry="18" fill="#020511" opacity="0.35" />
+
+  <g filter="url(#softDrop)" stroke="#151725" stroke-linecap="round" stroke-linejoin="round">
+    <g id="legs" stroke-width="7">
+      <path d="M212 504c-9 36-11 74-7 113 1 12 9 19 21 19h11c11 0 17-6 18-18l6-113z" fill="url(#skin)" />
+      <path d="M300 504c9 36 11 74 7 113-1 12-9 19-21 19h-11c-11 0-17-6-18-18l-6-113z" fill="url(#skin)" />
+      <path d="M207 620c7 8 25 9 42 4l8 20c-10 8-46 10-62 1-5-3-4-17 12-25z" fill="#F9FBFF" />
+      <path d="M305 620c-7 8-25 9-42 4l-8 20c10 8 46 10 62 1 5-3 4-17-12-25z" fill="#F9FBFF" />
+      <path d="M198 644c18 11 50 8 62-1l8 15c-16 14-74 13-88-1 1-10 6-14 18-13z" fill="#171A2A" />
+      <path d="M314 644c-18 11-50 8-62-1l-8 15c16 14 74 13 88-1-1-10-6-14-18-13z" fill="#171A2A" />
+      <path d="M225 536c9 9 24 10 36 4" fill="none" stroke="#C77C54" stroke-width="3" opacity="0.45" />
+      <path d="M287 536c-9 9-24 10-36 4" fill="none" stroke="#C77C54" stroke-width="3" opacity="0.45" />
+    </g>
+
+    <g id="arms" stroke-width="7">
+      <path d="M202 338c-26 15-42 42-49 79-4 22-9 40-17 55-5 10 3 22 17 23 13 0 22-7 25-18 5-20 12-44 20-70 5-17 16-31 31-40z" fill="url(#skin)" />
+      <path d="M310 338c26 15 42 42 49 79 4 22 9 40 17 55 5 10-3 22-17 23-13 0-22-7-25-18-5-20-12-44-20-70-5-17-16-31-31-40z" fill="url(#skin)" />
+      <path d="M159 432c13 3 27 0 39-9" fill="none" stroke="#C87B55" stroke-width="3" opacity="0.55" />
+      <path d="M353 432c-13 3-27 0-39-9" fill="none" stroke="#C87B55" stroke-width="3" opacity="0.55" />
+      <path d="M136 472c8 6 26 6 37-2" fill="none" stroke="#151725" stroke-width="4" />
+      <path d="M376 472c-8 6-26 6-37-2" fill="none" stroke="#151725" stroke-width="4" />
+    </g>
+
+    <g id="torso" stroke-width="7">
+      <path d="M220 300h72l8 39c28 19 43 62 42 128-21 19-153 19-174 0-1-66 14-109 42-128z" fill="url(#skin)" />
+      <path d="M202 325c12-19 31-29 54-29s42 10 54 29c-3 45-8 91-6 135-24 14-72 14-96 0 2-44-3-90-6-135z" fill="url(#tank)" />
+      <path d="M226 304c6 28 16 45 30 50 14-5 24-22 30-50" fill="none" stroke="#151725" stroke-width="6" />
+      <path d="M226 304c6 27 16 43 30 49 14-6 24-22 30-49" fill="#F3B98D" />
+      <path d="M215 364c10 9 24 13 41 13s31-4 41-13" fill="none" stroke="#A8FFF0" stroke-width="3" opacity="0.45" />
+      <path d="M256 384v51" fill="none" stroke="#087F9E" stroke-width="3" opacity="0.4" />
+      <path d="M226 414c19 8 41 8 60 0" fill="none" stroke="#087F9E" stroke-width="3" opacity="0.35" />
+      <path d="M192 456c31 18 97 18 128 0 13 16 14 43 5 70-32 15-106 15-138 0-9-27-8-54 5-70z" fill="url(#shorts)" />
+      <path d="M256 464v68" fill="none" stroke="#0C1020" stroke-width="4" opacity="0.7" />
+      <path d="M198 484c18 8 38 11 58 10" fill="none" stroke="#4EDDD0" stroke-width="3" opacity="0.45" />
+      <path d="M314 484c-18 8-38 11-58 10" fill="none" stroke="#4EDDD0" stroke-width="3" opacity="0.45" />
+      <path d="M234 339c6 16 14 27 22 33 8-6 16-17 22-33" fill="none" stroke="#FFFFFF" stroke-width="3" opacity="0.35" />
+    </g>
+
+    <g id="neck-and-head" stroke-width="7">
+      <path d="M232 260h48v56c-14 16-34 16-48 0z" fill="url(#skin)" />
+      <ellipse cx="256" cy="307" rx="48" ry="14" fill="#965D42" opacity="0.3" stroke="none" />
+      <path d="M167 184c0-66 37-105 89-105s89 39 89 105c0 65-38 112-89 112s-89-47-89-112z" fill="url(#skinSoft)" />
+      <path d="M177 199c-19-5-30 9-27 28 3 18 17 29 34 24z" fill="url(#skin)" />
+      <path d="M335 199c19-5 30 9 27 28-3 18-17 29-34 24z" fill="url(#skin)" />
+      <path d="M163 226c6 3 12 8 16 17" fill="none" stroke="#C77C54" stroke-width="3" opacity="0.5" />
+      <path d="M349 226c-6 3-12 8-16 17" fill="none" stroke="#C77C54" stroke-width="3" opacity="0.5" />
+      <ellipse cx="209" cy="238" rx="16" ry="8" fill="#FF8FA3" opacity="0.28" stroke="none" />
+      <ellipse cx="303" cy="238" rx="16" ry="8" fill="#FF8FA3" opacity="0.28" stroke="none" />
+    </g>
+
+    <g id="hair-back" stroke-width="7">
+      <path d="M170 183c-8-67 31-123 86-123s94 56 86 123c-9-37-39-64-86-64s-77 27-86 64z" fill="url(#hair)" />
+      <path d="M174 182c-17 38-10 85 18 118-7-35-1-72 17-105z" fill="url(#hair)" />
+      <path d="M338 182c17 38 10 85-18 118 7-35 1-72-17-105z" fill="url(#hair)" />
+    </g>
+
+    <g id="hair-front" stroke-width="7">
+      <path d="M163 195c4-55 34-101 88-111 50-9 89 21 99 87-26-30-61-45-105-42-35 2-62 24-82 66z" fill="url(#hair)" />
+      <path d="M165 184c24-53 65-82 122-88-21 19-37 42-49 68-18-14-45-9-73 20z" fill="url(#hair)" />
+      <path d="M218 92c24-18 59-23 91-7-25 8-43 26-56 54-8-20-19-36-35-47z" fill="url(#hair)" />
+      <path d="M294 98c28 4 50 29 58 73-24-22-48-30-73-24 13-17 18-33 15-49z" fill="url(#hair)" />
+      <path d="M192 122c31-36 74-52 117-36" fill="none" stroke="url(#hairLight)" stroke-width="8" opacity="0.5" />
+      <path d="M220 126c-11 28-14 53-8 75" fill="none" stroke="#070912" stroke-width="5" opacity="0.35" />
+      <path d="M280 123c14 26 18 50 13 72" fill="none" stroke="#070912" stroke-width="5" opacity="0.35" />
+    </g>
+
+    <g id="face" stroke-width="5">
+      <path d="M199 179c17-12 36-12 51 0" fill="none" stroke="#11131F" stroke-width="6" />
+      <path d="M313 179c-17-12-36-12-51 0" fill="none" stroke="#11131F" stroke-width="6" />
+
+      <path d="M189 208c10-20 44-26 65-2-8 25-50 29-65 2z" fill="#FFFFFF" />
+      <path d="M323 208c-10-20-44-26-65-2 8 25 50 29 65 2z" fill="#FFFFFF" />
+      <path d="M189 208c10-20 44-26 65-2-8 25-50 29-65 2z" fill="none" />
+      <path d="M323 208c-10-20-44-26-65-2 8 25 50 29 65 2z" fill="none" />
+
+      <ellipse cx="225" cy="208" rx="16" ry="20" fill="url(#iris)" />
+      <ellipse cx="287" cy="208" rx="16" ry="20" fill="url(#iris)" />
+      <ellipse cx="225" cy="210" rx="8" ry="12" fill="#10111C" />
+      <ellipse cx="287" cy="210" rx="8" ry="12" fill="#10111C" />
+      <circle cx="231" cy="199" r="5" fill="#FFFFFF" stroke="none" />
+      <circle cx="293" cy="199" r="5" fill="#FFFFFF" stroke="none" />
+      <circle cx="219" cy="216" r="2.5" fill="#FFFFFF" opacity="0.8" stroke="none" />
+      <circle cx="281" cy="216" r="2.5" fill="#FFFFFF" opacity="0.8" stroke="none" />
+
+      <path d="M256 222c-5 11-6 20-2 27" fill="none" stroke="#A8664C" stroke-width="4" opacity="0.75" />
+      <path d="M226 259c15 18 45 18 60 0" fill="none" stroke="#5E2A31" stroke-width="6" />
+      <path d="M236 261c12 8 28 8 40 0" fill="none" stroke="#FFFFFF" stroke-width="3" opacity="0.72" />
+    </g>
+  </g>
+</svg>

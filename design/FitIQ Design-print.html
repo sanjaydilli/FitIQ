@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>FitIQ — Print</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #f0eee9; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  * { box-sizing: border-box; }
+  @page { size: A4 landscape; margin: 0; }
+
+  .page { width: 297mm; height: 210mm; padding: 10mm 12mm; background: #f0eee9; page-break-after: always; break-after: page; display: flex; flex-direction: column; overflow: hidden; }
+  .page:last-child { page-break-after: auto; }
+
+  .head { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid rgba(0,0,0,0.15); padding-bottom: 4mm; margin-bottom: 5mm; font-family: "Inter", system-ui, sans-serif; }
+  .head .t { font-size: 16pt; font-weight: 600; letter-spacing: -0.4px; color: #221c14; }
+  .head .s { font-size: 9pt; color: #6b6258; max-width: 130mm; text-align: right; }
+  .head .m { font-family: "JetBrains Mono", monospace; font-size: 7pt; letter-spacing: 1px; color: #888; margin-bottom: 1mm; }
+
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5mm; flex: 1; align-content: start; }
+  .cell { display: flex; flex-direction: column; align-items: center; gap: 2mm; }
+  .lbl { font-family: "JetBrains Mono", monospace; font-size: 7pt; letter-spacing: 0.5px; color: #5a4f42; }
+
+  /* Kill phone drop-shadow in print — at scale it renders as visible arcs */
+  .phone-clip { overflow: hidden; border-radius: 0; }
+  .phone-clip > div > div { box-shadow: none !important; }
+
+  .cover { width: 297mm; height: 210mm; padding: 18mm; background: #f0eee9; page-break-after: always; display: flex; flex-direction: column; justify-content: space-between; font-family: "Inter", system-ui, sans-serif; overflow: hidden; }
+  .cover .eb { font-family: "JetBrains Mono", monospace; font-size: 9pt; letter-spacing: 2px; color: #888; }
+  .cover h1 { font-size: 56pt; font-weight: 700; letter-spacing: -2px; line-height: 1; margin: 0; color: #1a1410; }
+  .cover h1 em { font-style: italic; font-weight: 500; }
+  .cover .row { display: flex; gap: 6mm; margin-top: 5mm; }
+  .cover .pill { padding: 4mm 5mm; border-radius: 3mm; flex: 1; }
+  .cover .pill .n { font-weight: 700; font-size: 12pt; margin-bottom: 1mm; }
+  .cover .pill .d { font-size: 8pt; opacity: 0.78; }
+  .cover footer { font-family: "JetBrains Mono", monospace; font-size: 8pt; color: #999; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="primitives.jsx"></script>
+<script type="text/babel" src="ios-frame.jsx"></script>
+<script type="text/babel" src="direction-a-aurora.jsx"></script>
+<script type="text/babel" src="direction-b-graphite.jsx"></script>
+<script type="text/babel" src="direction-c-neon.jsx"></script>
+
+<script type="text/babel">
+  // Render phone at native size, then wrap in a fixed-size box and scale down so layout matches.
+  const PHONE_W = 290;
+  const PHONE_H = 628;
+  const TARGET_PX = 165;       // ~ 44mm wide, fits 5 in row of A4 landscape
+  const SCALE = TARGET_PX / PHONE_W;
+  const BOX_W = PHONE_W * SCALE;
+  const BOX_H = PHONE_H * SCALE;
+
+  function PrintPhone({ children }) {
+    return (
+      <div className="phone-clip" style={{ width: BOX_W, height: BOX_H, position: 'relative', overflow: 'hidden' }}>
+        <div style={{ width: PHONE_W, height: PHONE_H, transform: `scale(${SCALE})`, transformOrigin: 'top left' }}>
+          <IOSDevice width={PHONE_W} height={PHONE_H} dark={true}>{children}</IOSDevice>
+        </div>
+      </div>
+    );
+  }
+
+  const directions = [
+    { id: 'aurora',   t: 'Direction A · Aurora',       s: 'Indigo + violet glassmorphism, electric cyan accent. Whoop × Apple Fitness premium feel.',
+      list: [['01 · Splash',<ASplash/>],['02 · Goal',<AOnboardGoal/>],['03 · Body Stats',<AOnboardStats/>],['04 · Diet',<AOnboardDiet/>],['05 · AI Analysis',<AAnalyzing/>],['06 · Home Dashboard',<AHome/>],['07 · Workout Plan',<AWorkout/>],['08 · Food Scan',<AFoodScan/>],['09 · Leaderboard',<AFriends/>],['10 · Profile',<AProfile/>]] },
+    { id: 'graphite', t: 'Direction B · Graphite',     s: 'Linear-inspired charcoal & electric blue. Scientific instrument data UI.',
+      list: [['01 · Splash',<BSplash/>],['02 · Goal',<BOnboardGoal/>],['03 · Body Stats',<BOnboardStats/>],['04 · Diet',<BOnboardDiet/>],['05 · AI Analysis',<BAnalyzing/>],['06 · Home Dashboard',<BHome/>],['07 · Workout Plan',<BWorkout/>],['08 · Food Scan',<BFoodScan/>],['09 · Leaderboard',<BFriends/>],['10 · Profile',<BProfile/>]] },
+    { id: 'neon',     t: 'Direction C · Neon Saffron', s: 'Brutalist black canvas, acid green primary, saffron accent. Bold display type.',
+      list: [['01 · Splash',<CSplash/>],['02 · Goal',<COnboardGoal/>],['03 · Body Stats',<COnboardStats/>],['04 · Diet',<COnboardDiet/>],['05 · AI Analysis',<CAnalyzing/>],['06 · Home Dashboard',<CHome/>],['07 · Workout Plan',<CWorkout/>],['08 · Food Scan',<CFoodScan/>],['09 · Leaderboard',<CFriends/>],['10 · Profile',<CProfile/>]] },
+  ];
+
+  function Cover() {
+    return (
+      <div className="cover">
+        <div className="eb">FITIQ · HI-FI CONCEPT · MAY 2026</div>
+        <div>
+          <h1>Your AI fitness coach<br/>that <em>gets</em> you.</h1>
+          <div style={{ fontSize: '11pt', color: '#5a4f42', marginTop: '5mm', maxWidth: '170mm', lineHeight: 1.5 }}>
+            Premium mobile app for Indian gym-goers, 22–35. Three directions explore distinct visual takes on the same product across 10 screens.
+          </div>
+          <div className="row">
+            <div className="pill" style={{ background: '#1a1330', color: '#E8E0FF' }}>
+              <div className="n">A · Aurora</div><div className="d">Indigo + violet glass · electric cyan</div>
+            </div>
+            <div className="pill" style={{ background: '#0A0B0D', color: '#E8EAED', border: '1px solid #2D3138' }}>
+              <div className="n">B · Graphite</div><div className="d">Linear charcoal · electric blue · data UI</div>
+            </div>
+            <div className="pill" style={{ background: '#050505', color: '#F5F5F2' }}>
+              <div className="n" style={{ color: '#C8FF3D' }}>C · Neon Saffron</div><div className="d">Brutalist black · acid green + saffron</div>
+            </div>
+          </div>
+        </div>
+        <footer>10 SCREENS × 3 DIRECTIONS · 30 ARTBOARDS</footer>
+      </div>
+    );
+  }
+
+  function Page({ d }) {
+    return (
+      <div className="page">
+        <div className="head">
+          <div>
+            <div className="m">FITIQ · {d.id.toUpperCase()}</div>
+            <div className="t">{d.t}</div>
+          </div>
+          <div className="s">{d.s}</div>
+        </div>
+        <div className="grid">
+          {d.list.map(([label, el], i) => (
+            <div key={i} className="cell">
+              <PrintPhone>{el}</PrintPhone>
+              <div className="lbl">{label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    <><Cover/>{directions.map(d => <Page key={d.id} d={d}/>)}</>
+  );
+
+  (async () => {
+    try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch(e) {}
+    await new Promise(r => setTimeout(r, 1500));
+    window.print();
+  })();
+</script>
+</body>
+</html>
