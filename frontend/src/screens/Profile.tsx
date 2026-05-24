@@ -8,7 +8,6 @@ import { themes, themeOrder } from '../themes/tokens';
 import { Background } from '../components/Background';
 import { Card, Pill } from '../components/Card';
 import { TabBar } from '../components/TabBar';
-import { BitmojiAvatar } from '../components/BitmojiAvatar';
 import { Icon, IconName } from '../components/Icon';
 import { useWorkoutLog } from '../hooks/useWorkoutLog';
 import { useFoodLog } from '../hooks/useFoodLog';
@@ -85,17 +84,16 @@ export function Profile() {
           <Card style={{ padding: 18, borderRadius: 22, position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(circle at 30% 30%, ${theme.accent2}30, transparent 70%)` }} />
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 12 }}>
-              <motion.div whileTap={{ scale: 0.96 }} onClick={() => navigate('/avatar')}
-                style={{ flexShrink: 0, cursor: 'pointer', position: 'relative' }}>
-                <BitmojiAvatar config={user.avatar} size={92} level={user.level} showBackground={false} />
-                <div style={{
-                  position: 'absolute', bottom: 4, right: -2,
-                  width: 24, height: 24, borderRadius: 12,
-                  background: theme.accent, color: theme.onAccent,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 12, boxShadow: `0 0 8px ${theme.accent}80`,
-                }}>✎</div>
-              </motion.div>
+              <div style={{
+                flexShrink: 0,
+                width: 72, height: 72, borderRadius: 36,
+                background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 28, fontWeight: 800, color: theme.onAccent,
+                boxShadow: `0 4px 20px ${theme.accent}50`,
+              }}>
+                {(user.name?.[0] ?? '?').toUpperCase()}
+              </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 17, fontWeight: 700 }}>{user.name}</div>
                 <div style={{ fontSize: 12, color: theme.textDim, marginBottom: 6 }}>

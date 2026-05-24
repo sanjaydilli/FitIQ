@@ -6,7 +6,6 @@ import { useUser } from '../context/UserContext';
 import { Background } from '../components/Background';
 import { Card, Pill } from '../components/Card';
 import { TabBar } from '../components/TabBar';
-import { BitmojiAvatar } from '../components/BitmojiAvatar';
 import { WaterTimeline } from '../components/WaterTimeline';
 import { Reveal, Shimmer } from '../components/Reveal';
 import { WarningCard } from '../components/warnings/WarningCard';
@@ -164,15 +163,17 @@ export function Home() {
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 12 }}>
               <motion.div
                 whileTap={{ scale: 0.96 }}
-                onClick={() => navigate('/avatar')}
-                style={{ flexShrink: 0, cursor: 'pointer' }}
+                onClick={() => navigate('/profile')}
+                style={{
+                  flexShrink: 0, cursor: 'pointer',
+                  width: 72, height: 72, borderRadius: 36,
+                  background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 28, fontWeight: 800, color: theme.onAccent,
+                  boxShadow: `0 4px 20px ${theme.accent}50`,
+                }}
               >
-                <BitmojiAvatar
-                  config={user.avatar}
-                  size={120}
-                  level={user.level}
-                  showBackground={false}
-                />
+                {(user.name?.[0] ?? '?').toUpperCase()}
               </motion.div>
               <div style={{ flex: 1 }}>
                 <div
@@ -218,6 +219,11 @@ export function Home() {
         <div style={{ padding: '0 20px', marginBottom: 14 }}>
           <WaterTimeline />
         </div>
+        </Reveal>
+
+        {/* Steps card */}
+        <Reveal index={2}>
+        <StepsCard />
         </Reveal>
 
         {/* Metric grid */}
@@ -606,5 +612,96 @@ export function Home() {
       </div>
       <TabBar />
     </Background>
+  );
+}
+
+function StepsCard() {
+  const { theme } = useTheme();
+  const { user, update } = useUser();
+  const [editing, setEditing] = React.useState(false);
+  const [input, setInput] = React.useState('');
+
+  const pct = Math.min(100, Math.round((user.steps / user.stepGoal) * 100));
+  const done = user.steps >= user.stepGoal;
+
+  function commit() {
+    const v = parseInt(input, 10);
+    if (!isNaN(v) && v >= 0) update({ steps: v });
+    setEditing(false);
+  }
+
+  return (
+    <div style={{ padding: '0 20px', marginBottom: 14 }}>
+      <Card style={{ padding: '14px 16px', borderRadius: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: 10,
+              background: done ? 'rgba(74,222,128,0.15)' : `${theme.accent}15`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Icon name="run" size={16} color={done ? '#4ade80' : theme.accent} />
+            </div>
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 700 }}>Steps Today</div>
+              <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono }}>GOAL: {user.stepGoal.toLocaleString()}</div>
+            </div>
+          </div>
+          {editing ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <input
+                autoFocus
+                type="number"
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onBlur={commit}
+                onKeyDown={e => e.key === 'Enter' && commit()}
+                style={{
+                  width: 80, padding: '5px 8px', borderRadius: 8,
+                  background: 'rgba(255,255,255,0.08)', border: `1px solid ${theme.accent}`,
+                  color: theme.text, fontSize: 14, fontFamily: theme.mono, outline: 'none',
+                }}
+              />
+            </div>
+          ) : (
+            <motion.button
+              whileTap={{ scale: 0.93 }}
+              onClick={() => { setInput(String(user.steps)); setEditing(true); }}
+              style={{
+                padding: '5px 12px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                background: 'rgba(255,255,255,0.07)', color: theme.textDim, fontSize: 11,
+              }}
+            >
+              + Log Steps
+            </motion.button>
+          )}
+        </div>
+
+        {/* Progress bar */}
+        <div style={{ height: 8, borderRadius: 4, background: 'rgba(255,255,255,0.07)', overflow: 'hidden', marginBottom: 6 }}>
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${pct}%` }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+            style={{
+              height: '100%', borderRadius: 4,
+              background: done
+                ? 'linear-gradient(90deg, #4ade80, #22d3ee)'
+                : `linear-gradient(90deg, ${theme.accent}, ${theme.accent2})`,
+            }}
+          />
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5, color: done ? '#4ade80' : theme.text }}>
+            {user.steps.toLocaleString()}
+            <span style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, marginLeft: 4 }}>steps</span>
+          </div>
+          <div style={{ fontSize: 11, color: done ? '#4ade80' : theme.textMute, fontFamily: theme.mono }}>
+            {done ? '✓ GOAL HIT' : `${pct}%`}
+          </div>
+        </div>
+      </Card>
+    </div>
   );
 }

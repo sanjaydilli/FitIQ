@@ -49,6 +49,9 @@ export interface UserState {
   avatarStage: number;
   waterDrops: number[];
   waterDate: string;
+  steps: number;
+  stepsDate: string;
+  stepGoal: number;
   avatar: AvatarConfig;
   isPremium: boolean;
 }
@@ -78,6 +81,9 @@ const defaultUser: UserState = {
   avatarStage: 1,
   waterDrops: EMPTY_WATER,
   waterDate: '',
+  steps: 0,
+  stepsDate: '',
+  stepGoal: 8000,
   avatar: defaultAvatar,
   isPremium: false,
 };
@@ -159,12 +165,19 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Daily water reset
+  // Daily water + steps reset
   useEffect(() => {
     const check = () => {
       const today = new Date().toISOString().slice(0, 10);
-      setUser(u => u.waterDate !== today ? { ...u, waterDrops: EMPTY_WATER, waterDate: today } : u);
+      setUser(u => ({
+        ...u,
+        waterDrops: u.waterDate !== today ? EMPTY_WATER : u.waterDrops,
+        waterDate: today,
+        steps: u.stepsDate !== today ? 0 : u.steps,
+        stepsDate: today,
+      }));
     };
+    check();
     const t = setInterval(check, 60000);
     return () => clearInterval(t);
   }, []);

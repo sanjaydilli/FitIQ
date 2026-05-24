@@ -20,8 +20,6 @@ import { Login } from './screens/auth/Login';
 import { Signup } from './screens/auth/Signup';
 
 // Lazy loaded — heavy routes
-const AvatarStudio      = lazy(() => import('./screens/AvatarStudio').then(m => ({ default: m.AvatarStudio })));
-const AvatarStyleCompare = lazy(() => import('./screens/AvatarStyleCompare').then(m => ({ default: m.AvatarStyleCompare })));
 const FoodSearch        = lazy(() => import('./screens/FoodSearch').then(m => ({ default: m.FoodSearch })));
 const FoodDetail        = lazy(() => import('./screens/FoodDetail').then(m => ({ default: m.FoodDetail })));
 const CustomRecipe      = lazy(() => import('./screens/CustomRecipe').then(m => ({ default: m.CustomRecipe })));
@@ -96,8 +94,6 @@ function AnimatedRoutes() {
             <Route path="/food-log"   element={<RequireAuth><FoodLog /></RequireAuth>} />
             <Route path="/friends"    element={<RequireAuth><Leaderboard /></RequireAuth>} />
             <Route path="/profile"    element={<RequireAuth><Profile /></RequireAuth>} />
-            <Route path="/avatar"     element={<RequireAuth><AvatarStudio /></RequireAuth>} />
-            <Route path="/avatar-styles" element={<RequireAuth><AvatarStyleCompare /></RequireAuth>} />
             <Route path="/food"       element={<RequireAuth><FoodSearch /></RequireAuth>} />
             <Route path="/food/:id"   element={<RequireAuth><FoodDetail /></RequireAuth>} />
             <Route path="/recipe"     element={<RequireAuth><CustomRecipe /></RequireAuth>} />
