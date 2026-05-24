@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { Capacitor } from '@capacitor/core';
 import StepCounter from '../plugins/StepCounter';
 import { useUser } from '../context/UserContext';
@@ -10,7 +10,9 @@ const BASELINE_DATE_KEY = 'fitiq.stepBaselineDate';
 // TYPE_STEP_COUNTER is a cumulative sensor (steps since reboot).
 // We store today's "start value" as baseline and compute: today = current - baseline.
 export function useStepCounter() {
-  const { update } = useUser();
+  const { update, user } = useUser();
+  const stepsRef = useRef(user.steps);
+  stepsRef.current = user.steps;
 
   const sync = useCallback(async () => {
     if (!Capacitor.isNativePlatform()) return;
@@ -28,10 +30,17 @@ export function useStepCounter() {
         baseline = steps;
         localStorage.setItem(BASELINE_KEY, String(steps));
         localStorage.setItem(BASELINE_DATE_KEY, today);
+      } else if (steps < baseline) {
+        // Device rebooted — sensor reset to 0, restart baseline from current value
+        baseline = steps;
+        localStorage.setItem(BASELINE_KEY, String(steps));
       }
 
       const todaySteps = Math.max(0, steps - baseline);
-      update({ steps: todaySteps, stepsDate: today });
+      // Only update (and trigger Firestore write) when the count actually changed
+      if (todaySteps !== stepsRef.current) {
+        update({ steps: todaySteps, stepsDate: today });
+      }
     } catch {
       // Sensor not available on this device
     }

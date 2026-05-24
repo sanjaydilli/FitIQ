@@ -3,7 +3,6 @@ import { Capacitor } from '@capacitor/core';
 import { FirebaseFirestore } from '@capacitor-firebase/firestore';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db, firebaseConfigured } from '../firebase';
-import { AvatarConfig, defaultAvatar } from '../avatar/config';
 
 const isNative = Capacitor.isNativePlatform();
 
@@ -52,7 +51,6 @@ export interface UserState {
   steps: number;
   stepsDate: string;
   stepGoal: number;
-  avatar: AvatarConfig;
   isPremium: boolean;
 }
 
@@ -60,7 +58,6 @@ interface UserContextValue {
   user: UserState;
   update: (patch: Partial<UserState>) => void;
   setWaterSlot: (slotIndex: number, filled: number) => void;
-  setAvatar: (patch: Partial<AvatarConfig>) => void;
   awardXP: (amount: number) => void;
 }
 
@@ -84,7 +81,6 @@ const defaultUser: UserState = {
   steps: 0,
   stepsDate: '',
   stepGoal: 8000,
-  avatar: defaultAvatar,
   isPremium: false,
 };
 
@@ -103,7 +99,6 @@ function loadFromStorage(): UserState {
       ...parsed,
       waterDrops: isToday ? (parsed.waterDrops ?? EMPTY_WATER) : EMPTY_WATER,
       waterDate: today,
-      avatar: { ...defaultAvatar, ...(parsed.avatar ?? {}) },
     };
   } catch {
     return { ...defaultUser, waterDate: today };
@@ -131,7 +126,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             ...defaultUser, ...data,
             waterDrops: isToday ? (data.waterDrops ?? EMPTY_WATER) : EMPTY_WATER,
             waterDate: today,
-            avatar: { ...defaultAvatar, ...(data.avatar ?? {}) },
             name: data.name || displayName || '',
           });
         } else if (displayName) {
@@ -210,10 +204,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const setAvatar = useCallback((patch: Partial<AvatarConfig>) => {
-    setUser(u => ({ ...u, avatar: { ...u.avatar, ...patch } }));
-  }, []);
-
   const awardXP = useCallback((amount: number) => {
     setUser(u => {
       const newXP = u.xp + amount;
@@ -223,7 +213,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, update, setWaterSlot, setAvatar, awardXP }}>
+    <UserContext.Provider value={{ user, update, setWaterSlot, awardXP }}>
       {children}
     </UserContext.Provider>
   );

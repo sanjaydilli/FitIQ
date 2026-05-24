@@ -1,18 +1,30 @@
 package com.fitiq.app;
 
+import android.Manifest;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
+import com.getcapacitor.annotation.Permission;
+import com.getcapacitor.annotation.PermissionCallback;
 
-@CapacitorPlugin(name = "StepCounter")
+@CapacitorPlugin(
+    name = "StepCounter",
+    permissions = {
+        @Permission(
+            alias = "activityRecognition",
+            strings = { Manifest.permission.ACTIVITY_RECOGNITION }
+        )
+    }
+)
 public class StepCounterPlugin extends Plugin implements SensorEventListener {
 
     private SensorManager sensorManager;
@@ -43,6 +55,28 @@ public class StepCounterPlugin extends Plugin implements SensorEventListener {
             call.resolve(ret);
             return;
         }
+        // Android 10+ requires runtime ACTIVITY_RECOGNITION permission
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
+                !getPermissionState("activityRecognition").toString().equals("granted")) {
+            requestPermissionForAlias("activityRecognition", call, "activityRecognitionResult");
+            return;
+        }
+        readSteps(call);
+    }
+
+    @PermissionCallback
+    private void activityRecognitionResult(PluginCall call) {
+        if (getPermissionState("activityRecognition").toString().equals("granted")) {
+            readSteps(call);
+        } else {
+            JSObject ret = new JSObject();
+            ret.put("steps", 0);
+            ret.put("available", false);
+            call.resolve(ret);
+        }
+    }
+
+    private void readSteps(PluginCall call) {
         call.setKeepAlive(true);
         pendingCall = call;
         sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL);

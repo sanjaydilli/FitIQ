@@ -4,7 +4,6 @@ import { useUser } from '../context/UserContext';
 import { Background } from '../components/Background';
 import { Card, Pill } from '../components/Card';
 import { TabBar } from '../components/TabBar';
-import { BitmojiAvatar } from '../components/BitmojiAvatar';
 
 interface Friend {
   r: number;
@@ -220,25 +219,18 @@ export function Leaderboard() {
                       width: 36,
                       height: 36,
                       borderRadius: 18,
-                      overflow: 'hidden',
+                      background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
+                      color: '#0a0612',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontWeight: 700,
+                      fontSize: 13,
                       border: `2px solid ${theme.accent}`,
                       flexShrink: 0,
-                      background: '#0a0612',
-                      display: 'flex',
-                      alignItems: 'flex-end',
-                      justifyContent: 'center',
                     }}
                   >
-                    <div style={{ transform: 'translateY(6px)' }}>
-                      <BitmojiAvatar
-                        config={user.avatar}
-                        size={44}
-                        level={0}
-                        showBackground={false}
-                        showAura={false}
-                        rounded={false}
-                      />
-                    </div>
+                    {user.name ? user.name[0].toUpperCase() : 'Y'}
                   </div>
                 ) : (
                   <div

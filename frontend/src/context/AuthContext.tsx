@@ -8,6 +8,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   updateProfile,
+  sendEmailVerification,
   GoogleAuthProvider,
   signInWithPopup,
   signOut,
@@ -83,9 +84,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (isNative) {
       await FirebaseAuthentication.createUserWithEmailAndPassword({ email, password });
       await FirebaseAuthentication.updateProfile({ displayName });
+      await FirebaseAuthentication.sendEmailVerification();
     } else {
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(cred.user, { displayName });
+      await sendEmailVerification(cred.user);
     }
   }
 
