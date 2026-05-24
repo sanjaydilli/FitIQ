@@ -3,6 +3,7 @@ import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
 import StepCounter from '../plugins/StepCounter';
 import { useUser } from '../context/UserContext';
+import { localDateStr } from '../utils/date';
 
 const BASELINE_KEY = 'fitiq.stepBaseline';
 const BASELINE_DATE_KEY = 'fitiq.stepBaselineDate';
@@ -27,7 +28,7 @@ export function useStepCounter() {
       }
       setPermissionDenied(false);
 
-      const today = new Date().toISOString().slice(0, 10);
+      const today = localDateStr();
       const savedDate = localStorage.getItem(BASELINE_DATE_KEY);
       const savedBaseline = parseInt(localStorage.getItem(BASELINE_KEY) ?? '0', 10);
 

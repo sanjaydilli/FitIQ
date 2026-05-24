@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
+import { localDateStr } from '../utils/date';
 
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 
@@ -39,7 +40,7 @@ function save(entries: FoodEntry[]) {
 }
 
 function todayStr(): string {
-  return new Date().toISOString().slice(0, 10);
+  return localDateStr();
 }
 
 export function useFoodLog() {

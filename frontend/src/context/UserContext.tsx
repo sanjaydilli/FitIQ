@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { localDateStr } from '../utils/date';
 import { Capacitor } from '@capacitor/core';
 import { FirebaseFirestore } from '@capacitor-firebase/firestore';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -85,7 +86,7 @@ const defaultUser: UserState = {
 const STORAGE_KEY = 'fitiq.user';
 
 function loadFromStorage(): UserState {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateStr();
   if (typeof window === 'undefined') return { ...defaultUser, waterDate: today };
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
@@ -117,7 +118,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       setFirebaseUid(uid);
       try {
         const data = await firestoreGet(uid) as Partial<UserState> | null;
-        const today = new Date().toISOString().slice(0, 10);
+        const today = localDateStr();
         if (data) {
           const isToday = data.waterDate === today;
           setUser({
@@ -160,7 +161,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   // Daily water + steps reset
   useEffect(() => {
     const check = () => {
-      const today = new Date().toISOString().slice(0, 10);
+      const today = localDateStr();
       setUser(u => ({
         ...u,
         waterDrops: u.waterDate !== today ? EMPTY_WATER : u.waterDrops,

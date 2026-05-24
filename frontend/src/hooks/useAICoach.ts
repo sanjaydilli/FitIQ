@@ -1,7 +1,12 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useUser } from '../context/UserContext';
+import { useFoodLog } from './useFoodLog';
+import { useBodyComp } from './useBodyComp';
+import { useWorkoutLog } from './useWorkoutLog';
 import { askFitIQCoach, FoodLogItem } from '../services/aiService';
 import { UserStats } from '../utils/warnings/warningTypes';
+import { goalCalorieAdjust } from '../utils/bodyComposition';
+import { WATER_DROP_ML, WATER_SLOT_CAPACITY } from '../context/UserContext';
 
 export interface ChatMessage {
   id: string;
@@ -13,7 +18,6 @@ export interface ChatMessage {
 
 const STORAGE_KEY = 'fitiq.coach.history';
 
-// Module-scoped maps — never recreated on hook calls
 const GOAL_MAP: Record<string, UserStats['goal']> = {
   lose: 'fatLoss', gain: 'muscle', endur: 'maintain', main: 'maintain',
 };
@@ -37,63 +41,87 @@ function saveHistory(msgs: ChatMessage[]): void {
   } catch { /* ignore quota errors */ }
 }
 
-type UserState = ReturnType<typeof useUser>['user'];
-
-function buildUserStats(user: UserState): UserStats {
-  const now = new Date();
-  return {
-    gender: user.sex,
-    weight: user.weightKg,
-    goal: GOAL_MAP[user.goal] ?? 'maintain',
-    dietType: DIET_MAP[user.diet] ?? 'vegetarian',
-    // Placeholder nutrition until food log is wired up
-    calories: 1847,
-    targetCalories: 2340,
-    protein: 102,
-    targetProtein: 142,
-    carbs: 210,
-    fat: 58,
-    fiber: 22,
-    water: 1.75,
-    targetWater: 3.5,
-    mealCount: 3,
-    lastMealMinutesAgo: 90,
-    ironIntake: 12,
-    magnesiumIntake: 280,
-    omega3Intake: 0.8,
-    zincIntake: 7,
-    teaLoggedMinutesAgo: 0,
-    ironRichMealLogged: true,
-    postWorkoutMealLogged: false,
-    oilTracked: true,
-    takingB12: false,
-    takingVitaminD: false,
-    muscleCramps: false,
-    sleepQuality: 'good',
-    consecutiveLowIronDays: 0,
-    consecutiveLowMagDays: 0,
-    consecutiveLowOmega3Days: 2,
-    consecutiveLowZincDays: 1,
-    steps: 7420,
-    targetSteps: 10000,
-    workoutMinutesAgo: 0,
-    nextWorkoutMinutes: 480,
-    consecutiveWorkoutDays: 3,
-    weeksSinceDeload: 4,
-    lastNightSleep: 7,
-    strengthTrend: 'up',
-    currentHour: now.getHours(),
-    currentMonth: now.getMonth() + 1,
-  };
-}
-
 const EMPTY_FOOD_LOG: FoodLogItem[] = [];
 
 export function useAICoach(liveStats?: Partial<UserStats>) {
   const { user } = useUser();
+  const { todayTotals } = useFoodLog();
+  const { tdee } = useBodyComp();
+  const { sessions } = useWorkoutLog();
   const [messages, setMessages] = useState<ChatMessage[]>(() => loadHistory());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const stats = useMemo((): UserStats => {
+    const now = new Date();
+    const targetCalories = (tdee || Math.round(user.weightKg * 30)) + goalCalorieAdjust(user.goal);
+    const targetProtein = Math.round(user.weightKg * 2);
+    const totalWaterCups = WATER_SLOT_CAPACITY.reduce((a, b) => a + b, 0);
+    const filledCups = user.waterDrops.reduce((a, b) => a + b, 0);
+    const waterLitres = Math.round((filledCups * WATER_DROP_ML) / 100) / 10;
+    const targetWater = Math.round((user.weightKg * 35) / 100) / 10; // ~35ml/kg
+    const mealCount = new Set(todayTotals.entries.map(e => e.meal)).size;
+
+    // Estimate minutes since last meal from most recent food log entry timestamp
+    const lastMealMs = todayTotals.entries.reduce((max, e) => {
+      const ts = (e as { timestamp?: number }).timestamp;
+      return ts && ts > max ? ts : max;
+    }, 0);
+    const lastMealMinutesAgo = lastMealMs > 0
+      ? Math.round((Date.now() - lastMealMs) / 60000)
+      : 120;
+
+    const todayISO = now.toISOString().slice(0, 10);
+    const lastSession = sessions.filter(s => s.date === todayISO)[0];
+    const workoutMinutesAgo = lastSession
+      ? Math.round((Date.now() - new Date(lastSession.date + 'T12:00:00').getTime()) / 60000)
+      : 0;
+
+    return {
+      gender: user.sex,
+      weight: user.weightKg,
+      goal: GOAL_MAP[user.goal] ?? 'maintain',
+      dietType: DIET_MAP[user.diet] ?? 'vegetarian',
+      calories: todayTotals.calories,
+      targetCalories,
+      protein: todayTotals.protein,
+      targetProtein,
+      carbs: todayTotals.carbs,
+      fat: todayTotals.fat,
+      fiber: 0,
+      water: waterLitres,
+      targetWater,
+      mealCount,
+      lastMealMinutesAgo,
+      ironIntake: 0,
+      magnesiumIntake: 0,
+      omega3Intake: 0,
+      zincIntake: 0,
+      teaLoggedMinutesAgo: 0,
+      ironRichMealLogged: false,
+      postWorkoutMealLogged: false,
+      oilTracked: false,
+      takingB12: false,
+      takingVitaminD: false,
+      muscleCramps: false,
+      sleepQuality: 'good',
+      consecutiveLowIronDays: 0,
+      consecutiveLowMagDays: 0,
+      consecutiveLowOmega3Days: 0,
+      consecutiveLowZincDays: 0,
+      steps: user.steps,
+      targetSteps: user.stepGoal,
+      workoutMinutesAgo,
+      nextWorkoutMinutes: 480,
+      consecutiveWorkoutDays: user.streak,
+      weeksSinceDeload: 4,
+      lastNightSleep: 7,
+      strengthTrend: 'up',
+      currentHour: now.getHours(),
+      currentMonth: now.getMonth() + 1,
+      ...liveStats,
+    };
+  }, [user, todayTotals, tdee, sessions, liveStats]);
 
   const sendMessage = useCallback(
     async (question: string) => {
@@ -116,7 +144,6 @@ export function useAICoach(liveStats?: Partial<UserStats>) {
       setError(null);
 
       try {
-        const stats = { ...buildUserStats(user), ...liveStats };
         const reply = await askFitIQCoach(stats, EMPTY_FOOD_LOG, trimmed);
 
         const aiMsg: ChatMessage = {
@@ -150,7 +177,7 @@ export function useAICoach(liveStats?: Partial<UserStats>) {
         setLoading(false);
       }
     },
-    [user, loading, liveStats]
+    [stats, loading]
   );
 
   const clearHistory = useCallback(() => {
