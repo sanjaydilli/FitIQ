@@ -259,7 +259,6 @@ export function FoodSearch() {
 
 const FoodRow = memo(function FoodRow({ food, index, onClickId }: { food: IndianFood; index: number; onClickId: (id: string) => void }) {
   const { theme } = useTheme();
-  const def = food.servingSizes.find(s => s.isDefault) ?? food.servingSizes[0];
   const dot =
     food.isVegan ? '#5EEAD4'
     : food.isVegetarian ? '#4ade80'
