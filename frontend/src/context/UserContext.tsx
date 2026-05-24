@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
-import { auth, db } from '../firebase';
+import { auth, db, firebaseConfigured } from '../firebase';
 import { AvatarConfig, defaultAvatar } from '../avatar/config';
 
 export type Goal = 'lose' | 'gain' | 'endur' | 'main';
@@ -90,12 +90,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserState>(loadFromStorage);
   const [firebaseUid, setFirebaseUid] = useState<string | null>(null);
 
-  // Track logged-in Firebase user
+  // Track logged-in Firebase user (skip in guest mode)
   useEffect(() => {
+    if (!firebaseConfigured) return;
     const unsub = onAuthStateChanged(auth, fbUser => {
       setFirebaseUid(fbUser?.uid ?? null);
       if (fbUser) {
-        // Load profile from Firestore on sign-in
         getDoc(doc(db, 'users', fbUser.uid)).then(snap => {
           if (snap.exists()) {
             const data = snap.data() as Partial<UserState>;
@@ -110,10 +110,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
               name: data.name || fbUser.displayName || '',
             });
           } else if (fbUser.displayName) {
-            // New Google sign-in — prefill name
             setUser(u => ({ ...u, name: fbUser.displayName! }));
           }
-        }).catch(() => {/* offline — use local state */});
+        }).catch(() => {});
       }
     });
     return unsub;
@@ -138,7 +137,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     if (writeTimer.current) clearTimeout(writeTimer.current);
     writeTimer.current = setTimeout(() => {
       try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(latestUser.current)); } catch { /* quota */ }
-      if (firebaseUid) {
+      if (firebaseConfigured && firebaseUid) {
         setDoc(doc(db, 'users', firebaseUid), latestUser.current, { merge: true }).catch(() => {});
       }
     }, 800);

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { useUser, Goal, Sex, Diet, Activity } from '../context/UserContext';
+import { useAuth } from '../context/AuthContext';
 import { getApiUrl, setApiUrl } from '../services/aiService';
 import { Background } from '../components/Background';
 import { Card } from '../components/Card';
@@ -63,6 +64,7 @@ function PillSelect<T extends string>({ options, value, onChange }: { options: {
 export function Settings() {
   const { theme } = useTheme();
   const { user, update } = useUser();
+  const { guestMode } = useAuth();
   const navigate = useNavigate();
   const [saved, setSaved] = useState(false);
   const [apiInput, setApiInput] = useState(() => getApiUrl());
@@ -111,6 +113,25 @@ export function Settings() {
       </div>
 
       <div style={{ paddingTop: 64, paddingBottom: 40, height: '100%', overflowY: 'auto' }}>
+        {/* Guest mode banner */}
+        {guestMode && (
+          <div style={{
+            margin: '12px 16px 0',
+            padding: '12px 14px',
+            borderRadius: 14,
+            background: 'rgba(251,191,36,0.08)',
+            border: '1px solid rgba(251,191,36,0.2)',
+          }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#FBBF24', marginBottom: 4 }}>
+              Guest Mode — Data saved locally
+            </div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>
+              Add Firebase credentials to sync across devices and enable accounts.
+              Set REACT_APP_FIREBASE_* variables and rebuild.
+            </div>
+          </div>
+        )}
+
         {/* Personal */}
         <div style={{ padding: '12px 16px 6px' }}>
           <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.5, marginBottom: 6 }}>PERSONAL</div>
