@@ -1,11 +1,12 @@
 package com.fitiq.app;
 
+import android.os.Bundle;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
     @Override
-    public void registerPlugins() {
-        super.registerPlugins();
+    public void onCreate(Bundle savedInstanceState) {
         registerPlugin(StepCounterPlugin.class);
+        super.onCreate(savedInstanceState);
     }
 }
