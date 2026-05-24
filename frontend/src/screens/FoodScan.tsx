@@ -1,28 +1,20 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { Background } from '../components/Background';
 import { Card, Pill, PrimaryButton } from '../components/Card';
 import { TabBar } from '../components/TabBar';
 
-const FOODS = [
-  { n: 'Sambar', g: '180g', k: 120, c: 95 },
-  { n: 'Steamed rice', g: '150g', k: 195, c: 88 },
-  { n: 'Coconut chutney', g: '40g', k: 85, c: 72 },
-  { n: 'Idli (3)', g: '120g', k: 220, c: 96 },
-];
-
 export function FoodScan() {
   const { theme } = useTheme();
+  const navigate = useNavigate();
   const [scanning, setScanning] = useState(true);
-  const [logged, setLogged] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setScanning(false), 1800);
     return () => clearTimeout(t);
   }, []);
-
-  const total = FOODS.reduce((acc, f) => acc + f.k, 0);
 
   return (
     <Background>
@@ -123,7 +115,7 @@ export function FoodScan() {
             alignItems: 'center',
           }}
         >
-          <Card style={{ width: 38, height: 38, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Card onClick={() => navigate(-1)} style={{ width: 38, height: 38, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={theme.text} strokeWidth="2.2">
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
@@ -139,16 +131,12 @@ export function FoodScan() {
                 display: 'inline-block',
               }}
             />
-            {scanning ? 'ANALYZING' : 'DETECTED'}
+            {scanning ? 'ANALYZING' : 'COMING SOON'}
           </Pill>
-          <Card style={{ width: 38, height: 38, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={theme.text} strokeWidth="2">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-          </Card>
+          <div style={{ width: 38 }} />
         </div>
 
-        {/* Bottom sheet */}
+        {/* Bottom sheet — shown after scanning animation */}
         <motion.div
           initial={{ y: 200 }}
           animate={{ y: scanning ? 200 : 0 }}
@@ -157,105 +145,22 @@ export function FoodScan() {
         >
           <Card
             style={{
-              padding: 18,
+              padding: 24,
               borderRadius: 26,
               background: 'rgba(20,16,32,0.85)',
               backdropFilter: 'blur(30px) saturate(180%)',
               WebkitBackdropFilter: 'blur(30px) saturate(180%)',
+              textAlign: 'center',
             }}
           >
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: 12,
-              }}
-            >
-              <div>
-                <div
-                  style={{
-                    fontSize: 11,
-                    color: theme.accent,
-                    fontFamily: theme.mono,
-                    letterSpacing: 1.5,
-                  }}
-                >
-                  DETECTED · {FOODS.length} ITEMS
-                </div>
-                <div style={{ fontSize: 18, fontWeight: 700 }}>South Indian Thali</div>
-              </div>
-              <div
-                style={{
-                  fontSize: 22,
-                  fontWeight: 800,
-                  fontFamily: theme.mono,
-                  color: theme.accent,
-                  fontFeatureSettings: '"tnum"',
-                }}
-              >
-                {total}
-                <span style={{ fontSize: 11, color: theme.textDim }}>kcal</span>
-              </div>
+            <div style={{ fontSize: 36, marginBottom: 12 }}>📸</div>
+            <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 6 }}>AI Food Scanner</div>
+            <div style={{ fontSize: 13, color: theme.textDim, lineHeight: 1.6, marginBottom: 20 }}>
+              Vision-based meal scanning is coming soon.{'\n'}
+              For now, search our database of 542 Indian foods.
             </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
-              {FOODS.map((f, i) => (
-                <div
-                  key={i}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 10,
-                    padding: '8px 0',
-                    borderBottom: i < FOODS.length - 1 ? `1px solid ${theme.cardBorder}` : 'none',
-                  }}
-                >
-                  <div style={{ width: 30, height: 30, borderRadius: 8, background: 'rgba(255,255,255,0.06)' }} />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600 }}>{f.n}</div>
-                    <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono }}>
-                      {f.g} · {f.c}% match
-                    </div>
-                  </div>
-                  <div style={{ fontSize: 13, fontWeight: 700, fontFamily: theme.mono }}>{f.k} kcal</div>
-                </div>
-              ))}
-            </div>
-
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(4,1fr)',
-                gap: 6,
-                marginBottom: 14,
-              }}
-            >
-              {[
-                { l: 'P', v: '18g', c: theme.accent },
-                { l: 'C', v: '102g', c: '#FB923C' },
-                { l: 'F', v: '14g', c: theme.warn },
-                { l: 'Fib', v: '8g', c: theme.accent2 },
-              ].map((m, i) => (
-                <div
-                  key={i}
-                  style={{
-                    background: 'rgba(255,255,255,0.04)',
-                    borderRadius: 10,
-                    padding: '8px 6px',
-                    textAlign: 'center',
-                  }}
-                >
-                  <div style={{ fontSize: 9, color: m.c, fontFamily: theme.mono, letterSpacing: 1 }}>
-                    {m.l}
-                  </div>
-                  <div style={{ fontSize: 13, fontWeight: 700, fontFeatureSettings: '"tnum"' }}>{m.v}</div>
-                </div>
-              ))}
-            </div>
-
-            <PrimaryButton onClick={() => setLogged(true)} style={{ width: '100%', padding: 14, fontSize: 14 }}>
-              {logged ? '✓ Logged to today' : "Log to today's intake"}
+            <PrimaryButton onClick={() => navigate('/food')} style={{ width: '100%', padding: 14, fontSize: 14 }}>
+              Search Food Database →
             </PrimaryButton>
           </Card>
         </motion.div>

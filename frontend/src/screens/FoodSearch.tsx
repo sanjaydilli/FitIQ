@@ -1,12 +1,16 @@
-import React, { useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { memo, useMemo, useCallback, useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { Background } from '../components/Background';
 import { Card } from '../components/Card';
 import { TabBar } from '../components/TabBar';
+import { Icon } from '../components/Icon';
 import { indianFoods, FOOD_CATEGORIES, IndianFood } from '../data/indianFoods';
 import { searchFoods, filterFoods } from '../utils/foodCalculator';
+import { useCustomRecipes, SavedRecipe } from '../hooks/useCustomRecipes';
+import { useFoodLog, MealType } from '../hooks/useFoodLog';
+import { useUser } from '../context/UserContext';
 
 const DIET_FILTERS = [
   { id: 'all',  label: 'All' },
@@ -19,11 +23,36 @@ type DietFilter = typeof DIET_FILTERS[number]['id'];
 export function FoodSearch() {
   const { theme } = useTheme();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const mealParam = searchParams.get('meal') ?? '';
   const inputRef = useRef<HTMLInputElement>(null);
+  const { recipes } = useCustomRecipes();
+  const { addEntry } = useFoodLog();
+  const { awardXP } = useUser();
 
   const [query, setQuery]           = useState('');
   const [category, setCategory]     = useState('');
   const [diet, setDiet]             = useState<DietFilter>('all');
+  const [loggedRecipeId, setLoggedRecipeId] = useState<string | null>(null);
+
+  const handleRowClick = useCallback((id: string) => {
+    navigate(`/food/${id}${mealParam ? `?meal=${mealParam}` : ''}`);
+  }, [navigate, mealParam]);
+
+  const handleLogRecipe = useCallback((recipe: SavedRecipe) => {
+    const meal: MealType = (['breakfast','lunch','snack','dinner'].includes(mealParam) ? mealParam : 'lunch') as MealType;
+    addEntry({ meal, name: recipe.name, ...recipe.perServing });
+    awardXP(10);
+    setLoggedRecipeId(recipe.id);
+    setTimeout(() => setLoggedRecipeId(null), 2000);
+  }, [mealParam, addEntry, awardXP]);
+
+  const filteredRecipes = useMemo(() =>
+    query.trim().length >= 2
+      ? recipes.filter(r => r.name.toLowerCase().includes(query.toLowerCase()))
+      : recipes,
+    [recipes, query]
+  );
 
   const results = useMemo(() => {
     const filtered = filterFoods(indianFoods, {
@@ -42,18 +71,34 @@ export function FoodSearch() {
         {/* Header */}
         <div style={{ padding: '56px 20px 0', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-            <motion.div
+            <motion.button
               whileTap={{ scale: 0.92 }}
               onClick={() => navigate(-1)}
-              style={{ cursor: 'pointer', color: theme.textMute, fontSize: 22, lineHeight: 1 }}
+              style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 10, padding: '6px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
             >
-              ‹
-            </motion.div>
-            <div>
+              <Icon name="chevron-left" size={16} color={theme.text} />
+            </motion.button>
+            <div style={{ flex: 1 }}>
               <div style={{ fontSize: 9, color: theme.accent, fontFamily: theme.mono, letterSpacing: 2.5 }}>
                 IFCT 2017 · 542 FOODS
               </div>
               <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: -0.4 }}>Food Search</div>
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <motion.button
+                whileTap={{ scale: 0.92 }}
+                onClick={() => navigate('/recipes')}
+                style={{ background: `${theme.accent2}18`, border: `1px solid ${theme.accent2}30`, borderRadius: 10, padding: '6px 12px', cursor: 'pointer', fontSize: 11, fontWeight: 700, color: theme.accent2 }}
+              >
+                🍛 Browse
+              </motion.button>
+              <motion.button
+                whileTap={{ scale: 0.92 }}
+                onClick={() => navigate('/recipe')}
+                style={{ background: `${theme.accent}18`, border: `1px solid ${theme.accent}30`, borderRadius: 10, padding: '6px 12px', cursor: 'pointer', fontSize: 11, fontWeight: 700, color: theme.accent }}
+              >
+                + Recipe
+              </motion.button>
             </div>
           </div>
 
@@ -163,17 +208,45 @@ export function FoodSearch() {
 
         {/* Results list */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '0 20px 110px' }}>
+          {/* Saved recipes section */}
+          {filteredRecipes.length > 0 && (
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ fontSize: 10, color: theme.accent, fontFamily: theme.mono, letterSpacing: 1.5, marginBottom: 6 }}>MY RECIPES</div>
+              {filteredRecipes.map(recipe => (
+                <div key={recipe.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: `1px solid ${theme.cardBorder}` }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600 }}>{recipe.name}</div>
+                    <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono }}>
+                      {recipe.ingredientCount} ingredients · {recipe.perServing.calories} kcal/serving
+                    </div>
+                  </div>
+                  <motion.button
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => handleLogRecipe(recipe)}
+                    style={{
+                      padding: '5px 12px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700,
+                      background: loggedRecipeId === recipe.id ? 'rgba(74,222,128,0.15)' : `${theme.accent}20`,
+                      color: loggedRecipeId === recipe.id ? '#4ade80' : theme.accent,
+                    }}
+                  >
+                    {loggedRecipeId === recipe.id ? '✓' : '+ Log'}
+                  </motion.button>
+                </div>
+              ))}
+            </div>
+          )}
+
           <AnimatePresence mode="popLayout">
             {results.map((food, i) => (
               <FoodRow
                 key={food.id}
                 food={food}
                 index={i}
-                onClick={() => navigate(`/food/${food.id}`)}
+                onClickId={handleRowClick}
               />
             ))}
           </AnimatePresence>
-          {results.length === 0 && (
+          {results.length === 0 && filteredRecipes.length === 0 && (
             <div style={{ textAlign: 'center', color: theme.textMute, fontSize: 13, paddingTop: 48 }}>
               No results for "{query}"
             </div>
@@ -185,7 +258,7 @@ export function FoodSearch() {
   );
 }
 
-function FoodRow({ food, index, onClick }: { food: IndianFood; index: number; onClick: () => void }) {
+const FoodRow = memo(function FoodRow({ food, index, onClickId }: { food: IndianFood; index: number; onClickId: (id: string) => void }) {
   const { theme } = useTheme();
   const def = food.servingSizes.find(s => s.isDefault) ?? food.servingSizes[0];
   const servingCal = Math.round(food.per100g.calories * (def?.grams ?? 100) / 100);
@@ -203,7 +276,7 @@ function FoodRow({ food, index, onClick }: { food: IndianFood; index: number; on
       exit={{ opacity: 0, scale: 0.96 }}
       transition={{ delay: Math.min(index * 0.018, 0.3), duration: 0.22 }}
       whileTap={{ scale: 0.98 }}
-      onClick={onClick}
+      onClick={() => onClickId(food.id)}
       style={{
         display: 'flex', alignItems: 'center', gap: 12,
         padding: '11px 0',
@@ -247,4 +320,4 @@ function FoodRow({ food, index, onClick }: { food: IndianFood; index: number; on
       </svg>
     </motion.div>
   );
-}
+});

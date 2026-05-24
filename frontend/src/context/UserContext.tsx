@@ -1,4 +1,7 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth, db } from '../firebase';
 import { AvatarConfig, defaultAvatar } from '../avatar/config';
 
 export type Goal = 'lose' | 'gain' | 'endur' | 'main';
@@ -25,6 +28,7 @@ export interface UserState {
   level: number;
   avatarStage: number;
   waterDrops: number[];
+  waterDate: string;
   avatar: AvatarConfig;
   isPremium: boolean;
 }
@@ -34,72 +38,142 @@ interface UserContextValue {
   update: (patch: Partial<UserState>) => void;
   setWaterSlot: (slotIndex: number, filled: number) => void;
   setAvatar: (patch: Partial<AvatarConfig>) => void;
+  awardXP: (amount: number) => void;
 }
 
+const EMPTY_WATER = [0, 0, 0, 0, 0, 0];
+
 const defaultUser: UserState = {
-  name: 'Arjun',
+  name: '',
   goal: 'gain',
   sex: 'male',
-  heightCm: 178,
-  weightKg: 74.2,
-  age: 27,
+  heightCm: 170,
+  weightKg: 70,
+  age: 25,
   diet: 'veg',
   activity: 'moderate',
-  streak: 14,
-  xp: 4210,
-  level: 4,
-  avatarStage: 4,
-  waterDrops: [2, 2, 2, 1, 0, 0],
+  streak: 0,
+  xp: 0,
+  level: 1,
+  avatarStage: 1,
+  waterDrops: EMPTY_WATER,
+  waterDate: '',
   avatar: defaultAvatar,
   isPremium: false,
 };
 
 const STORAGE_KEY = 'fitiq.user';
 
+function loadFromStorage(): UserState {
+  const today = new Date().toISOString().slice(0, 10);
+  if (typeof window === 'undefined') return { ...defaultUser, waterDate: today };
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return { ...defaultUser, waterDate: today };
+    const parsed = JSON.parse(raw) as Partial<UserState>;
+    const isToday = parsed.waterDate === today;
+    return {
+      ...defaultUser,
+      ...parsed,
+      waterDrops: isToday ? (parsed.waterDrops ?? EMPTY_WATER) : EMPTY_WATER,
+      waterDate: today,
+      avatar: { ...defaultAvatar, ...(parsed.avatar ?? {}) },
+    };
+  } catch {
+    return { ...defaultUser, waterDate: today };
+  }
+}
+
 const UserContext = createContext<UserContextValue | null>(null);
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<UserState>(() => {
-    if (typeof window === 'undefined') return defaultUser;
-    try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (!raw) return defaultUser;
-      const parsed = JSON.parse(raw) as Partial<UserState>;
-      return {
-        ...defaultUser,
-        ...parsed,
-        avatar: { ...defaultAvatar, ...(parsed.avatar ?? {}) },
-      };
-    } catch {
-      return defaultUser;
-    }
-  });
+  const [user, setUser] = useState<UserState>(loadFromStorage);
+  const [firebaseUid, setFirebaseUid] = useState<string | null>(null);
+
+  // Track logged-in Firebase user
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, fbUser => {
+      setFirebaseUid(fbUser?.uid ?? null);
+      if (fbUser) {
+        // Load profile from Firestore on sign-in
+        getDoc(doc(db, 'users', fbUser.uid)).then(snap => {
+          if (snap.exists()) {
+            const data = snap.data() as Partial<UserState>;
+            const today = new Date().toISOString().slice(0, 10);
+            const isToday = data.waterDate === today;
+            setUser({
+              ...defaultUser,
+              ...data,
+              waterDrops: isToday ? (data.waterDrops ?? EMPTY_WATER) : EMPTY_WATER,
+              waterDate: today,
+              avatar: { ...defaultAvatar, ...(data.avatar ?? {}) },
+              name: data.name || fbUser.displayName || '',
+            });
+          } else if (fbUser.displayName) {
+            // New Google sign-in — prefill name
+            setUser(u => ({ ...u, name: fbUser.displayName! }));
+          }
+        }).catch(() => {/* offline — use local state */});
+      }
+    });
+    return unsub;
+  }, []);
+
+  // Daily water reset
+  useEffect(() => {
+    const check = () => {
+      const today = new Date().toISOString().slice(0, 10);
+      setUser(u => u.waterDate !== today ? { ...u, waterDrops: EMPTY_WATER, waterDate: today } : u);
+    };
+    const t = setInterval(check, 60000);
+    return () => clearInterval(t);
+  }, []);
+
+  // Debounced write — localStorage always, Firestore when logged in
+  const writeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const latestUser = useRef(user);
+  latestUser.current = user;
 
   useEffect(() => {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-    } catch {
-      // ignore quota errors
-    }
-  }, [user]);
+    if (writeTimer.current) clearTimeout(writeTimer.current);
+    writeTimer.current = setTimeout(() => {
+      try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(latestUser.current)); } catch { /* quota */ }
+      if (firebaseUid) {
+        setDoc(doc(db, 'users', firebaseUid), latestUser.current, { merge: true }).catch(() => {});
+      }
+    }, 800);
+    return () => { if (writeTimer.current) clearTimeout(writeTimer.current); };
+  }, [user, firebaseUid]);
 
-  const value = useMemo<UserContextValue>(
-    () => ({
-      user,
-      update: (patch) => setUser((u) => ({ ...u, ...patch })),
-      setWaterSlot: (slotIndex, filled) =>
-        setUser((u) => {
-          const next = [...u.waterDrops];
-          const cap = WATER_SLOT_CAPACITY[slotIndex];
-          next[slotIndex] = Math.max(0, Math.min(cap, filled));
-          return { ...u, waterDrops: next };
-        }),
-      setAvatar: (patch) =>
-        setUser((u) => ({ ...u, avatar: { ...u.avatar, ...patch } })),
-    }),
-    [user]
+  const update = useCallback((patch: Partial<UserState>) => {
+    setUser(u => ({ ...u, ...patch }));
+  }, []);
+
+  const setWaterSlot = useCallback((slotIndex: number, filled: number) => {
+    setUser(u => {
+      const next = [...u.waterDrops];
+      next[slotIndex] = Math.max(0, Math.min(WATER_SLOT_CAPACITY[slotIndex], filled));
+      return { ...u, waterDrops: next };
+    });
+  }, []);
+
+  const setAvatar = useCallback((patch: Partial<AvatarConfig>) => {
+    setUser(u => ({ ...u, avatar: { ...u.avatar, ...patch } }));
+  }, []);
+
+  const awardXP = useCallback((amount: number) => {
+    setUser(u => {
+      const newXP = u.xp + amount;
+      const newLevel = Math.floor(newXP / 1000) + 1;
+      return { ...u, xp: newXP, level: Math.max(u.level, newLevel) };
+    });
+  }, []);
+
+  return (
+    <UserContext.Provider value={{ user, update, setWaterSlot, setAvatar, awardXP }}>
+      {children}
+    </UserContext.Provider>
   );
-  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
 
 export function useUser(): UserContextValue {

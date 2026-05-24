@@ -6,6 +6,7 @@ import { Background } from '../components/Background';
 import { Card } from '../components/Card';
 import { indianFoods, IndianFood } from '../data/indianFoods';
 import { searchFoods, calcNutrition, sumNutrition, macroPct, NutritionResult } from '../utils/foodCalculator';
+import { useCustomRecipes } from '../hooks/useCustomRecipes';
 
 interface Ingredient {
   food: IndianFood;
@@ -15,6 +16,7 @@ interface Ingredient {
 export function CustomRecipe() {
   const { theme } = useTheme();
   const navigate = useNavigate();
+  const { addRecipe } = useCustomRecipes();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [recipeName, setRecipeName]     = useState('');
@@ -84,6 +86,19 @@ export function CustomRecipe() {
   }
 
   function handleSave() {
+    if (ingredients.length === 0 || !recipeName.trim()) return;
+    addRecipe({
+      name: recipeName.trim(),
+      servings,
+      perServing: {
+        calories: perServing.calories,
+        protein: perServing.protein,
+        carbs: perServing.carbs,
+        fat: perServing.fat,
+        fiber: perServing.fiber,
+      },
+      ingredientCount: ingredients.length,
+    });
     setSaved(true);
     setTimeout(() => { setSaved(false); navigate(-1); }, 1200);
   }
@@ -345,28 +360,36 @@ export function CustomRecipe() {
         )}
 
         {/* Save button */}
-        {ingredients.length > 0 && (
-          <div style={{ padding: '0 20px 20px' }}>
-            <motion.button
-              whileTap={{ scale: 0.97 }}
-              onClick={handleSave}
-              disabled={saved}
-              style={{
-                width: '100%', padding: '14px 0', borderRadius: 16, border: 'none',
-                background: saved
-                  ? `${theme.accent}40`
-                  : `linear-gradient(135deg, ${theme.accent2}, ${theme.accent})`,
-                color: saved ? theme.accent : theme.onAccent,
-                fontSize: 15, fontWeight: 800, cursor: saved ? 'default' : 'pointer',
-                fontFamily: theme.font,
-              }}
-            >
-              {saved
-                ? `✓ Saved — ${perServing.calories} kcal/serving`
-                : `Save Recipe · ${perServing.calories} kcal per serving`}
-            </motion.button>
-          </div>
-        )}
+        {ingredients.length > 0 && (() => {
+          const canSave = recipeName.trim().length > 0;
+          const inactive = saved || !canSave;
+          return (
+            <div style={{ padding: '0 20px 20px' }}>
+              <motion.button
+                whileTap={canSave && !saved ? { scale: 0.97 } : {}}
+                onClick={handleSave}
+                disabled={inactive}
+                style={{
+                  width: '100%', padding: '14px 0', borderRadius: 16, border: 'none',
+                  background: saved
+                    ? `${theme.accent}40`
+                    : canSave
+                      ? `linear-gradient(135deg, ${theme.accent2}, ${theme.accent})`
+                      : 'rgba(255,255,255,0.06)',
+                  color: saved ? theme.accent : canSave ? theme.onAccent : theme.textMute,
+                  fontSize: 15, fontWeight: 800, cursor: inactive ? 'default' : 'pointer',
+                  fontFamily: theme.font,
+                }}
+              >
+                {saved
+                  ? `✓ Saved — ${perServing.calories} kcal/serving`
+                  : canSave
+                    ? `Save Recipe · ${perServing.calories} kcal per serving`
+                    : 'Enter a recipe name to save'}
+              </motion.button>
+            </div>
+          );
+        })()}
       </div>
     </Background>
   );

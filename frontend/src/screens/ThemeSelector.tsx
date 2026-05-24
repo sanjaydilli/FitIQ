@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
+import { useUser } from '../context/UserContext';
 import { themes, themeOrder, ThemeId, ThemeTokens } from '../themes/tokens';
 import { Background } from '../components/Background';
 import { PrimaryButton } from '../components/Card';
@@ -70,7 +71,13 @@ function MiniPreview({ t, selected }: { t: ThemeTokens; selected: boolean }) {
 
 export function ThemeSelector() {
   const { themeId, setTheme } = useTheme();
+  const { user } = useUser();
   const navigate = useNavigate();
+
+  // Returning users skip theme selection and go straight to home
+  useEffect(() => {
+    if (user.name) navigate('/home', { replace: true });
+  }, [user.name, navigate]);
 
   return (
     <Background>

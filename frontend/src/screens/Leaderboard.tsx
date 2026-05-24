@@ -16,18 +16,30 @@ interface Friend {
   stage: number;
 }
 
+function getWeekInfo(): { weekNum: number; daysLeft: number } {
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const weekNum = Math.ceil(((now.getTime() - startOfYear.getTime()) / 86400000 + startOfYear.getDay() + 1) / 7);
+  const dayOfWeek = now.getDay(); // 0=Sun
+  const daysLeft = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
+  return { weekNum, daysLeft };
+}
+
 export function Leaderboard() {
   const { theme } = useTheme();
   const { user } = useUser();
+  const { weekNum, daysLeft } = getWeekInfo();
 
+  // Friends XP scaled relative to user's XP so ranking stays sensible at any progression
+  const base = Math.max(user.xp, 500);
   const friends: Friend[] = [
-    { r: 1, n: 'Riya Mehta', xp: 4820, avatar: '#F472B6', delta: '+340', me: false, stage: 6 },
-    { r: 2, n: 'You', xp: 4210, avatar: theme.accent, delta: '+240', me: true, stage: 4 },
-    { r: 3, n: 'Karan Joshi', xp: 3960, avatar: '#60A5FA', delta: '+180', me: false, stage: 4 },
-    { r: 4, n: 'Aditi Rao', xp: 3540, avatar: '#A78BFA', delta: '+120', me: false, stage: 3 },
-    { r: 5, n: 'Vikram S.', xp: 2890, avatar: '#FBBF24', delta: '+80', me: false, stage: 2 },
-    { r: 6, n: 'Neha P.', xp: 2410, avatar: '#FB923C', delta: '+60', me: false, stage: 2 },
-  ];
+    { r: 1, n: 'Riya Mehta',  xp: Math.round(base * 1.22), avatar: '#F472B6', delta: '+340', me: false, stage: Math.floor(base * 1.22 / 1000) + 1 },
+    { r: 2, n: 'You',         xp: user.xp,                  avatar: theme.accent, delta: `+${Math.min(user.xp % 1000, 999)}`, me: true, stage: user.level },
+    { r: 3, n: 'Karan Joshi', xp: Math.round(base * 1.01), avatar: '#60A5FA', delta: '+180', me: false, stage: Math.floor(base * 1.01 / 1000) + 1 },
+    { r: 4, n: 'Aditi Rao',   xp: Math.round(base * 0.90), avatar: '#A78BFA', delta: '+120', me: false, stage: Math.floor(base * 0.90 / 1000) + 1 },
+    { r: 5, n: 'Vikram S.',   xp: Math.round(base * 0.74), avatar: '#FBBF24', delta: '+80',  me: false, stage: Math.floor(base * 0.74 / 1000) + 1 },
+    { r: 6, n: 'Neha P.',     xp: Math.round(base * 0.62), avatar: '#FB923C', delta: '+60',  me: false, stage: Math.floor(base * 0.62 / 1000) + 1 },
+  ].sort((a, b) => b.xp - a.xp).map((f, i) => ({ ...f, r: i + 1 }));
 
   const podium = [friends[1], friends[0], friends[2]];
 
@@ -53,7 +65,7 @@ export function Leaderboard() {
                 marginBottom: 4,
               }}
             >
-              WEEK 18 · 4 DAYS LEFT
+              WEEK {weekNum} · {daysLeft === 0 ? 'LAST DAY' : `${daysLeft} DAYS LEFT`}
             </div>
             <div style={{ fontSize: 26, fontWeight: 700, letterSpacing: -0.6 }}>Squad League</div>
           </div>

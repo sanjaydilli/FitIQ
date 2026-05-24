@@ -20,11 +20,21 @@ export function AIAnalysis() {
   );
   const protein = Math.round(user.weightKg * 1.9);
 
+  const SPLIT_LABEL: Record<string, string> = {
+    lose: 'Upper/Lower · 4 days/wk',
+    gain: 'PPL split · 6 days/wk',
+    endur: 'Full Body + cardio · 5 days/wk',
+    main: 'Full Body · 3 days/wk',
+  };
+  const DIET_LABEL: Record<string, string> = {
+    veg: 'vegetarian', eggetarian: 'eggetarian', nveg: 'non-veg', vegan: 'vegan', jain: 'jain',
+  };
+
   const steps = [
     { t: 'Analyzing body composition', d: `${user.heightCm}cm · ${user.weightKg.toFixed(1)}kg · age ${user.age}` },
     { t: 'Calculating BMR & macros', d: `${tdee.toLocaleString()} kcal · ${protein}g protein` },
-    { t: 'Building 4-week plan', d: 'PPL split · 5 days/wk' },
-    { t: 'Curating Indian meal database', d: '1,247 meals · matched to diet' },
+    { t: 'Matching your training split', d: SPLIT_LABEL[user.goal] ?? 'Custom split' },
+    { t: 'Curating Indian meal database', d: `Filtered for ${DIET_LABEL[user.diet] ?? user.diet} · goal-matched` },
     { t: 'Personalizing daily quests', d: 'XP, streaks, social loops' },
   ];
 

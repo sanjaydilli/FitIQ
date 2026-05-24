@@ -1,24 +1,51 @@
-import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import React, { useMemo, useState } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
+import { useUser } from '../context/UserContext';
 import { Background } from '../components/Background';
 import { Card } from '../components/Card';
 import { indianFoods } from '../data/indianFoods';
 import { calcNutrition, macroPct } from '../utils/foodCalculator';
+import { useFoodLog, MealType } from '../hooks/useFoodLog';
 
 export function FoodDetail() {
   const { theme } = useTheme();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
 
-  const food = indianFoods.find(f => f.id === id);
+  // O(1) lookup — memoized once per id change instead of O(542) on every render
+  const food = useMemo(() => indianFoods.find(f => f.id === id), [id]);
+
+  const [searchParams] = useSearchParams();
+  const mealParam = searchParams.get('meal');
+
+  const { awardXP } = useUser();
+  const { addEntry } = useFoodLog();
 
   const [servingIdx, setServingIdx]   = useState(0);
   const [cookingIdx, setCookingIdx]   = useState(0);
   const [multiplier, setMultiplier]   = useState(1);
+  const [selectedMeal, setSelectedMeal] = useState<MealType>(() => {
+    const valid: MealType[] = ['breakfast', 'lunch', 'snack', 'dinner'];
+    return valid.includes(mealParam as MealType) ? (mealParam as MealType) : 'lunch';
+  });
+  const [loggedKey, setLoggedKey] = useState<string | null>(null);
 
-  if (!food) {
+  // Memoize all nutrition calculations — only recompute when inputs change
+  const { serving, cooking, nutrition, pct } = useMemo(() => {
+    if (!food) return { serving: null, cooking: null, nutrition: null, pct: null };
+    const s = food.servingSizes[servingIdx] ?? food.servingSizes[0];
+    const c = food.cookingMethods[cookingIdx] ?? food.cookingMethods[0];
+    const n = calcNutrition(food, {
+      grams: s.grams * multiplier,
+      calorieModifier: c.calorieModifier * multiplier,
+      fatModifier: c.fatModifier * multiplier,
+    });
+    return { serving: s, cooking: c, nutrition: n, pct: macroPct(n) };
+  }, [food, servingIdx, cookingIdx, multiplier]);
+
+  if (!food || !serving || !cooking || !nutrition || !pct) {
     return (
       <Background>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: theme.textMute }}>
@@ -27,15 +54,6 @@ export function FoodDetail() {
       </Background>
     );
   }
-
-  const serving  = food.servingSizes[servingIdx] ?? food.servingSizes[0];
-  const cooking  = food.cookingMethods[cookingIdx] ?? food.cookingMethods[0];
-  const nutrition = calcNutrition(food, {
-    grams: serving.grams * multiplier,
-    calorieModifier: cooking.calorieModifier * multiplier,
-    fatModifier: cooking.fatModifier * multiplier,
-  });
-  const pct = macroPct(nutrition);
 
   const dot = food.isVegan ? '#5EEAD4' : food.isVegetarian ? '#4ade80' : '#F87171';
   const dotLabel = food.isVegan ? 'Vegan' : food.isVegetarian ? 'Vegetarian' : 'Non-veg';
@@ -245,19 +263,77 @@ export function FoodDetail() {
           </Card>
         </div>
 
+        {/* Meal type selector */}
+        <div style={{ padding: '0 20px 14px' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, marginBottom: 8, color: theme.textDim }}>LOG AS</div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {(['breakfast', 'lunch', 'snack', 'dinner'] as MealType[]).map(m => (
+              <motion.div
+                key={m}
+                whileTap={{ scale: 0.94 }}
+                onClick={() => setSelectedMeal(m)}
+                style={{
+                  flex: 1, padding: '7px 4px', borderRadius: 10, fontSize: 10, fontWeight: 700,
+                  textAlign: 'center', cursor: 'pointer', fontFamily: theme.mono, textTransform: 'capitalize',
+                  background: selectedMeal === m ? theme.accent : theme.card,
+                  color: selectedMeal === m ? theme.onAccent : theme.textDim,
+                  border: `1px solid ${selectedMeal === m ? theme.accent : theme.cardBorder}`,
+                }}
+              >
+                {m === 'breakfast' ? '🌅' : m === 'lunch' ? '☀️' : m === 'snack' ? '🥜' : '🌙'}<br />{m}
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
         {/* Log button */}
         <div style={{ padding: '0 20px 20px' }}>
-          <motion.button
-            whileTap={{ scale: 0.97 }}
-            style={{
-              width: '100%', padding: '14px 0', borderRadius: 16, border: 'none',
-              background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
-              color: theme.onAccent, fontSize: 15, fontWeight: 800,
-              cursor: 'pointer', fontFamily: theme.font,
-            }}
-          >
-            + Log {serving.name} · {nutrition.calories} kcal
-          </motion.button>
+          <AnimatePresence mode="wait">
+            {loggedKey === `${selectedMeal}-${nutrition.calories}` ? (
+              <motion.div
+                key="logged"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                style={{
+                  width: '100%', padding: '14px 0', borderRadius: 16,
+                  background: 'rgba(74,222,128,0.15)', border: '1px solid rgba(74,222,128,0.3)',
+                  color: '#4ade80', fontSize: 15, fontWeight: 800,
+                  textAlign: 'center', fontFamily: theme.font,
+                }}
+              >
+                ✓ Logged to {selectedMeal}
+              </motion.div>
+            ) : (
+              <motion.button
+                key="log"
+                whileTap={{ scale: 0.97 }}
+                onClick={() => {
+                  if (!nutrition || !serving) return;
+                  addEntry({
+                    meal: selectedMeal,
+                    name: food.name,
+                    calories: nutrition.calories,
+                    protein: nutrition.protein,
+                    carbs: nutrition.carbs,
+                    fat: nutrition.fat,
+                    grams: serving.grams * multiplier,
+                  });
+                  awardXP(10);
+                  setLoggedKey(`${selectedMeal}-${nutrition.calories}`);
+                  setTimeout(() => navigate(`/food${mealParam ? `?meal=${selectedMeal}` : ''}`), 1500);
+                }}
+                style={{
+                  width: '100%', padding: '14px 0', borderRadius: 16, border: 'none',
+                  background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
+                  color: theme.onAccent, fontSize: 15, fontWeight: 800,
+                  cursor: 'pointer', fontFamily: theme.font,
+                }}
+              >
+                + Log {serving.name} · {nutrition.calories} kcal
+              </motion.button>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </Background>

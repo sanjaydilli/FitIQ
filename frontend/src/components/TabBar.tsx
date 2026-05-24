@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 
-type TabId = 'home' | 'workout' | 'scan' | 'friends' | 'profile';
+type TabId = 'home' | 'workout' | 'food-log' | 'coach' | 'profile';
 
 interface Tab {
   id: TabId;
@@ -12,11 +12,11 @@ interface Tab {
 }
 
 const TABS: Tab[] = [
-  { id: 'home', path: '/home', icon: 'M3 11l9-8 9 8v9a2 2 0 01-2 2h-4v-7H10v7H6a2 2 0 01-2-2v-9z' },
-  { id: 'workout', path: '/workout', icon: 'M6 6h2v12H6zM10 9h2v6h-2zM14 7h2v10h-2zM18 6h2v12h-2z' },
-  { id: 'scan', path: '/scan', icon: 'M4 7V5a1 1 0 011-1h2M20 7V5a1 1 0 00-1-1h-2M4 17v2a1 1 0 001 1h2M20 17v2a1 1 0 01-1 1h-2M7 12h10' },
-  { id: 'friends', path: '/friends', icon: 'M9 11a4 4 0 100-8 4 4 0 000 8zM17 11a3 3 0 100-6 3 3 0 000 6zM2 21v-2a4 4 0 014-4h6a4 4 0 014 4v2M16 15a4 4 0 014 4v2' },
-  { id: 'profile', path: '/profile', icon: 'M12 12a4 4 0 100-8 4 4 0 000 8zM4 21a8 8 0 1116 0' },
+  { id: 'home',     path: '/home',     icon: 'M3 11l9-8 9 8v9a2 2 0 01-2 2h-4v-7H10v7H6a2 2 0 01-2-2v-9z' },
+  { id: 'workout',  path: '/workout',  icon: 'M6 6h2v12H6zM10 9h2v6h-2zM14 7h2v10h-2zM18 6h2v12h-2z' },
+  { id: 'food-log', path: '/food-log', icon: 'M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2M7 2v20M21 15V2a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3zm-3 0v7' },
+  { id: 'coach',    path: '/coach',    icon: 'M12 2a7 7 0 017 7c0 2.5-1.3 4.7-3.3 6L15 21H9l-.7-6C6.3 13.7 5 11.5 5 9a7 7 0 017-7zm-1 5v4h2V7h-2zm0 5v2h2v-2h-2z' },
+  { id: 'profile',  path: '/profile',  icon: 'M12 12a4 4 0 100-8 4 4 0 000 8zM4 21a8 8 0 1116 0' },
 ];
 
 export function TabBar() {
@@ -36,21 +36,26 @@ export function TabBar() {
         paddingTop: 10,
         paddingLeft: 16,
         paddingRight: 16,
-        background: 'linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.6) 60%, transparent)',
+        background: 'linear-gradient(to top, rgba(0,0,0,0.96), rgba(0,0,0,0.65) 60%, transparent)',
         zIndex: 40,
+        perspective: '600px',
       }}
     >
-      <div
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: [0.22, 0.8, 0.22, 1] }}
         style={{
           display: 'flex',
           justifyContent: 'space-around',
           alignItems: 'center',
-          background: 'rgba(20,16,32,0.72)',
-          backdropFilter: 'blur(20px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+          background: 'rgba(16,12,28,0.78)',
+          backdropFilter: 'blur(24px) saturate(200%)',
+          WebkitBackdropFilter: 'blur(24px) saturate(200%)',
           border: `1px solid ${theme.cardBorder}`,
           borderRadius: 22,
           padding: '10px 6px',
+          boxShadow: `0 8px 32px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.05) inset, 0 -1px 0 rgba(0,0,0,0.3) inset`,
         }}
       >
         {TABS.map((t) => {
@@ -58,7 +63,9 @@ export function TabBar() {
           return (
             <motion.button
               key={t.id}
-              whileTap={{ scale: 0.88 }}
+              whileTap={{ scale: 0.82, rotateX: 18, translateY: 2 }}
+              whileHover={{ translateY: -2 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 22 }}
               onClick={() => navigate(t.path)}
               style={{
                 background: 'none',
@@ -71,17 +78,36 @@ export function TabBar() {
                 justifyContent: 'center',
                 position: 'relative',
                 padding: 0,
+                transformStyle: 'preserve-3d',
               }}
             >
+              {/* Active glow bg */}
+              {isActive && (
+                <motion.div
+                  layoutId="tabbar-glow"
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    borderRadius: 12,
+                    background: `${theme.accent}18`,
+                    boxShadow: `0 0 12px ${theme.accent}30`,
+                  }}
+                  transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+                />
+              )}
               <svg
                 width="22"
                 height="22"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke={isActive ? theme.accent : 'rgba(255,255,255,0.45)'}
+                stroke={isActive ? theme.accent : 'rgba(255,255,255,0.42)'}
                 strokeWidth="1.8"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                style={{
+                  filter: isActive ? `drop-shadow(0 0 6px ${theme.accent}80)` : 'none',
+                  transition: 'filter 0.3s, stroke 0.3s',
+                }}
               >
                 <path d={t.icon} />
               </svg>
@@ -95,14 +121,14 @@ export function TabBar() {
                     height: 4,
                     borderRadius: 2,
                     background: theme.accent,
-                    boxShadow: `0 0 8px ${theme.accent}`,
+                    boxShadow: `0 0 10px ${theme.accent}, 0 0 4px ${theme.accent}`,
                   }}
                 />
               )}
             </motion.button>
           );
         })}
-      </div>
+      </motion.div>
     </div>
   );
 }

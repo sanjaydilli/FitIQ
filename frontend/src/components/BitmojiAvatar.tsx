@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useState } from 'react';
+import React, { memo, useEffect, useId, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AvatarConfig } from '../avatar/config';
 import {
@@ -29,7 +29,7 @@ interface BitmojiAvatarProps {
   className?: string;
 }
 
-export function BitmojiAvatar({
+export const BitmojiAvatar = memo(function BitmojiAvatar({
   config,
   size = 220,
   level = 1,
@@ -41,60 +41,57 @@ export function BitmojiAvatar({
   const reactId = useId();
   const uid = reactId.replace(/[:]/g, '');
 
-  const ctx = buildCtx(config, uid);
+  // Memoize heavy derivations — only recompute when config or uid changes
+  const ctx = useMemo(() => buildCtx(config, uid), [config, uid]);
   const skin = ctx.skin;
   const skinShade = ctx.skinShade;
 
-  const auraIntensity = Math.max(0, Math.min(7, level)) / 7;
+  const auraIntensity = useMemo(() => Math.max(0, Math.min(7, level)) / 7, [level]);
   const auraColor = config.outfitColor;
 
-  // Blink loop
+  // Blink loop — outer timer cleaned up on unmount/pose change;
+  // inner 130ms close-eye timer tracked separately to avoid the leak
   const [blinking, setBlinking] = useState(false);
   useEffect(() => {
     if (config.pose === 'sleeping') return;
-    let timer: ReturnType<typeof setTimeout>;
+    let outer: ReturnType<typeof setTimeout>;
+    let inner: ReturnType<typeof setTimeout>;
     const loop = () => {
       const wait = 2400 + Math.random() * 2800;
-      timer = setTimeout(() => {
+      outer = setTimeout(() => {
         setBlinking(true);
-        setTimeout(() => setBlinking(false), 130);
+        inner = setTimeout(() => setBlinking(false), 130);
         loop();
       }, wait);
     };
     loop();
-    return () => clearTimeout(timer);
+    return () => { clearTimeout(outer); clearTimeout(inner); };
   }, [config.pose]);
 
-  // Pose-driven motion
-  const bobAnim =
-    config.pose === 'celebrating'
-      ? { y: [0, -8, 0], rotate: [0, -2, 2, 0] }
-      : config.pose === 'workout'
-      ? { y: [0, -3, 0] }
-      : config.pose === 'sleeping'
-      ? { y: [0, 1, 0] }
-      : { y: [0, -2.4, 0] };
 
-  const bobDur =
-    config.pose === 'celebrating' ? 0.7 :
-    config.pose === 'workout' ? 1.1 :
-    config.pose === 'sleeping' ? 4.5 : 3.4;
-
-  // Subtle hair sway
-  const hairSway =
-    config.pose === 'workout' || config.pose === 'celebrating'
-      ? { rotate: [-2, 2, -2] }
-      : { rotate: [-0.6, 0.6, -0.6] };
-
-  // Chest breathing
-  const breathe =
-    config.pose === 'workout'
-      ? { scale: [1, 1.04, 1] }
-      : config.pose === 'sleeping'
-      ? { scale: [1, 1.025, 1] }
-      : { scale: [1, 1.012, 1] };
-
-  const breatheDur = config.pose === 'sleeping' ? 4.2 : config.pose === 'workout' ? 1.0 : 3.0;
+  // Memoize pose-driven motion values — only recompute when pose changes
+  const { bobAnim, bobDur, hairSway, breathe, breatheDur } = useMemo(() => ({
+    bobAnim:
+      config.pose === 'celebrating' ? { y: [0, -8, 0], rotate: [0, -2, 2, 0] } :
+      config.pose === 'workout'     ? { y: [0, -3, 0] } :
+      config.pose === 'sleeping'    ? { y: [0, 1, 0] } :
+                                      { y: [0, -2.4, 0] },
+    bobDur:
+      config.pose === 'celebrating' ? 0.7 :
+      config.pose === 'workout'     ? 1.1 :
+      config.pose === 'sleeping'    ? 4.5 : 3.4,
+    hairSway:
+      config.pose === 'workout' || config.pose === 'celebrating'
+        ? { rotate: [-2, 2, -2] }
+        : { rotate: [-0.6, 0.6, -0.6] },
+    breathe:
+      config.pose === 'workout'  ? { scale: [1, 1.04, 1] } :
+      config.pose === 'sleeping' ? { scale: [1, 1.025, 1] } :
+                                   { scale: [1, 1.012, 1] },
+    breatheDur:
+      config.pose === 'sleeping' ? 4.2 :
+      config.pose === 'workout'  ? 1.0 : 3.0,
+  }), [config.pose]);
 
   const aspect = 280 / 200;
   const w = size;
@@ -337,4 +334,4 @@ export function BitmojiAvatar({
       </svg>
     </div>
   );
-}
+});

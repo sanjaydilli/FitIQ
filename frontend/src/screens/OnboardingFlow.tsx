@@ -230,6 +230,8 @@ function Slider({
 }
 
 function StatsStep({
+  name,
+  setName,
   sex,
   setSex,
   height,
@@ -239,6 +241,8 @@ function StatsStep({
   age,
   setAge,
 }: {
+  name: string;
+  setName: (s: string) => void;
   sex: Sex;
   setSex: (s: Sex) => void;
   height: number;
@@ -251,6 +255,19 @@ function StatsStep({
   const { theme } = useTheme();
   return (
     <>
+      <Card style={{ padding: '12px 16px', marginBottom: 16 }}>
+        <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.5, marginBottom: 6 }}>YOUR NAME</div>
+        <input
+          value={name}
+          onChange={e => setName(e.target.value)}
+          placeholder="e.g. Arjun"
+          style={{
+            width: '100%', background: 'transparent', border: 'none', outline: 'none',
+            fontSize: 18, fontWeight: 700, color: theme.text, fontFamily: theme.font,
+          }}
+        />
+      </Card>
+
       <div style={{ display: 'flex', gap: 10, marginBottom: 18 }}>
         {(['male', 'female'] as Sex[]).map((s) => {
           const sel = s === sex;
@@ -390,6 +407,7 @@ export function OnboardingFlow() {
   const { user, update } = useUser();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
+  const [name, setName] = useState(user.name);
   const [goal, setGoal] = useState<Goal>(user.goal);
   const [sex, setSex] = useState<Sex>(user.sex);
   const [height, setHeight] = useState(user.heightCm);
@@ -405,7 +423,7 @@ export function OnboardingFlow() {
     if (step < total - 1) {
       setStep(step + 1);
     } else {
-      update({ goal, sex, heightCm: height, weightKg: weight, age, diet, activity });
+      update({ name: name.trim() || 'You', goal, sex, heightCm: height, weightKg: weight, age, diet, activity, streak: 0, xp: 0, level: 1, avatarStage: 1 });
       navigate('/analysis');
     }
   };
@@ -442,6 +460,8 @@ export function OnboardingFlow() {
             {step === 0 && <GoalStep value={goal} onChange={setGoal} />}
             {step === 1 && (
               <StatsStep
+                name={name}
+                setName={setName}
                 sex={sex}
                 setSex={setSex}
                 height={height}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
@@ -10,29 +10,103 @@ import { BitmojiAvatar } from '../components/BitmojiAvatar';
 import { WaterTimeline } from '../components/WaterTimeline';
 import { Reveal, Shimmer } from '../components/Reveal';
 import { WarningCard } from '../components/warnings/WarningCard';
+import { Icon } from '../components/Icon';
+import { IconBadge } from '../components/IconBadge';
 import { useWarnings } from '../hooks/useWarnings';
+import { useBodyComp } from '../hooks/useBodyComp';
+import { useWorkoutLog } from '../hooks/useWorkoutLog';
+import { useFoodLog } from '../hooks/useFoodLog';
+import { bodyFatCategory, goalCalorieAdjust } from '../utils/bodyComposition';
+import { WATER_SLOT_CAPACITY, WATER_DROP_ML } from '../context/UserContext';
 
 const DATE_FMT = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
 
 export function Home() {
   const { theme } = useTheme();
-  const { user } = useUser();
+  const { user, update } = useUser();
   const navigate = useNavigate();
   const today = DATE_FMT.format(new Date()).toUpperCase();
 
   const { activeWarning, dismissWarning, snoozeActiveWarning, actOnWarning } = useWarnings();
+  const { latest: bodyCompLatest, trend: bodyCompTrend, tdee } = useBodyComp();
+  const { sessions } = useWorkoutLog();
+  const { todayTotals, activeDays } = useFoodLog();
+  const todaySession = sessions.find(s => s.date === todayISO) ?? null;
 
-  const metrics = [
-    { l: 'Calories', v: '1,847', max: '/2,340', col: '#FB923C', pct: 78, icon: '🔥' },
-    { l: 'Protein', v: '102g', max: '/142g', col: theme.accent, pct: 72, icon: '🥩' },
-    { l: 'Steps', v: '7,420', max: '/10k', col: theme.accent2, pct: 74, icon: '👣' },
-  ];
+  // Compute real streak from actual food/workout activity and sync to user.streak
+  const computedStreak = useMemo(() => {
+    const now = new Date();
+    const todayDS = now.toISOString().slice(0, 10);
+    const todayActive = activeDays.has(todayDS) || sessions.some(s => s.date === todayDS);
+    let count = 0;
+    for (let i = todayActive ? 0 : 1; i < 365; i++) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const ds = d.toISOString().slice(0, 10);
+      if (activeDays.has(ds) || sessions.some(s => s.date === ds)) count++;
+      else break;
+    }
+    return count;
+  }, [activeDays, sessions]);
 
-  const quests = [
-    { t: 'Hit 3.5L water', xp: 60, done: false },
-    { t: '10k steps', xp: 80, done: true },
-    { t: 'Complete Push Day workout', xp: 120, done: true },
-  ];
+  const lastSyncedStreak = useRef(user.streak);
+  useEffect(() => {
+    if (computedStreak !== lastSyncedStreak.current) {
+      lastSyncedStreak.current = computedStreak;
+      update({ streak: computedStreak });
+    }
+  }, [computedStreak, update]);
+  const bfCat = bodyCompLatest ? bodyFatCategory(user.sex, bodyCompLatest.bodyFatPct) : null;
+  const calTarget = (tdee || Math.round(user.weightKg * 30)) + goalCalorieAdjust(user.goal);
+  const proteinTarget = Math.round(user.weightKg * 2);
+  const todayISO = new Date().toISOString().slice(0, 10);
+
+  const metrics = useMemo(() => [
+    {
+      l: 'Calories', iconName: 'flame' as const, col: '#FB923C',
+      v: todayTotals.calories > 0 ? todayTotals.calories.toLocaleString() : '—',
+      max: `/${calTarget.toLocaleString()}`,
+      pct: calTarget > 0 ? Math.min(100, Math.round((todayTotals.calories / calTarget) * 100)) : 0,
+    },
+    {
+      l: 'Protein', iconName: 'utensils' as const, col: theme.accent,
+      v: todayTotals.protein > 0 ? `${todayTotals.protein}g` : '—',
+      max: `/${proteinTarget}g`,
+      pct: proteinTarget > 0 ? Math.min(100, Math.round((todayTotals.protein / proteinTarget) * 100)) : 0,
+    },
+    { l: 'Steps', v: '—', max: '', col: theme.accent2, pct: 0, iconName: 'run' as const },
+  ], [theme.accent, theme.accent2, todayTotals, calTarget, proteinTarget]);
+
+  const totalWaterCups = WATER_SLOT_CAPACITY.reduce((a, b) => a + b, 0);
+  const filledWaterCups = user.waterDrops.reduce((a, b) => a + b, 0);
+  const totalWaterL = (totalWaterCups * WATER_DROP_ML) / 1000;
+  const waterDone = filledWaterCups >= totalWaterCups;
+  const workoutDone = sessions.some(s => s.date === todayISO);
+  const caloriesOnTarget = todayTotals.calories > 0 &&
+    Math.abs(todayTotals.calories - calTarget) / calTarget < 0.15;
+
+  const healthScore = useMemo(() => {
+    let score = 0;
+    const waterPct = totalWaterCups > 0 ? filledWaterCups / totalWaterCups : 0;
+    score += Math.round(waterPct * 25);
+    if (todayTotals.calories > 0) {
+      const adh = 1 - Math.abs(todayTotals.calories - calTarget) / calTarget;
+      score += Math.round(Math.max(0, Math.min(1, adh)) * 25);
+    }
+    if (workoutDone) score += 20;
+    score += Math.min(15, user.streak);
+    if (bfCat) {
+      const s: Record<string, number> = { Athletic: 15, Fitness: 12, Average: 8, 'Above Average': 4 };
+      score += s[bfCat.label] ?? 0;
+    }
+    return Math.min(100, score);
+  }, [filledWaterCups, totalWaterCups, todayTotals.calories, calTarget, workoutDone, user.streak, bfCat]);
+
+  const quests = useMemo(() => [
+    { t: `Hit ${totalWaterL}L water`, xp: 60, done: waterDone },
+    { t: 'Log calories on target', xp: 80, done: caloriesOnTarget },
+    { t: 'Complete a workout', xp: 120, done: workoutDone },
+  ], [waterDone, caloriesOnTarget, workoutDone, totalWaterL]);
 
   return (
     <Background>
@@ -58,13 +132,13 @@ export function Home() {
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <Card style={{ width: 'auto', height: 38, borderRadius: 12, padding: '0 10px', display: 'flex', alignItems: 'center', gap: 4 }}>
-              <motion.span
+              <motion.div
                 animate={{ scale: [1, 1.15, 1], rotate: [-3, 3, -3] }}
                 transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
-                style={{ fontSize: 14, display: 'inline-block' }}
+                style={{ display: 'inline-flex' }}
               >
-                🔥
-              </motion.span>
+                <Icon name="flame" size={14} color="#FB923C" />
+              </motion.div>
               <span style={{ fontSize: 12, fontWeight: 700, fontFamily: theme.mono }}>{user.streak}</span>
             </Card>
             <Card style={{ width: 38, height: 38, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -126,14 +200,14 @@ export function Home() {
                       WebkitTextFillColor: 'transparent',
                     }}
                   >
-                    78
+                    {healthScore}
                   </div>
                   <div style={{ color: theme.textDim, fontSize: 14 }}>/100</div>
                 </div>
                 <div style={{ fontSize: 12, color: theme.textDim, marginBottom: 8 }}>
-                  Up 4 from yesterday ↗
+                  {healthScore >= 80 ? 'Looking great today 🔥' : healthScore >= 50 ? 'Keep going, almost there' : 'Log food & water to boost'}
                 </div>
-                <Pill>LVL {user.level} · LEAN</Pill>
+                <Pill>LVL {user.level}{bfCat ? ` · ${bfCat.label.toUpperCase()}` : ''}</Pill>
               </div>
             </div>
           </Card>
@@ -178,7 +252,7 @@ export function Home() {
                     >
                       {m.l.toUpperCase()}
                     </div>
-                    <div style={{ fontSize: 14 }}>{m.icon}</div>
+                    <Icon name={m.iconName} size={16} color={m.col} />
                   </div>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 3 }}>
                     <span
@@ -236,6 +310,112 @@ export function Home() {
           )}
         </AnimatePresence>
 
+        {/* Ask AI Coach */}
+        <div style={{ padding: '0 20px', marginBottom: 14 }}>
+          <motion.div
+            whileTap={{ scale: 0.97, rotateX: 4 }}
+            whileHover={{ y: -2 }}
+            onClick={() => navigate('/coach')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              padding: '14px 16px',
+              borderRadius: 18,
+              background: `linear-gradient(135deg, ${theme.accent}18, ${theme.accent2}12)`,
+              border: `1px solid ${theme.accent}30`,
+              cursor: 'pointer',
+            }}
+          >
+            <motion.div
+              animate={{ scale: [1, 1.12, 1], rotate: [0, 6, -6, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 12,
+                background: `linear-gradient(135deg, ${theme.accent}30, ${theme.accent2}20)`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Icon name="brain" size={20} color={theme.accent} />
+            </motion.div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2 }}>Ask AI Coach</div>
+              <div style={{ fontSize: 11, color: theme.textDim }}>
+                Powered by Llama 3.1 · Indian nutrition expert
+              </div>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke={theme.accent} strokeWidth="2" strokeLinecap="round">
+              <path d="M4.5 2.5L8 6l-3.5 3.5" />
+            </svg>
+          </motion.div>
+        </div>
+
+        {/* Today's Routine */}
+        <div style={{ padding: '0 20px', marginBottom: 14 }}>
+          <motion.div
+            whileTap={{ scale: 0.97, rotateX: 4 }}
+            whileHover={{ y: -2 }}
+            onClick={() => navigate('/routine')}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 12,
+              padding: '14px 16px', borderRadius: 18,
+              background: theme.card, border: `1px solid ${theme.cardBorder}`,
+              cursor: 'pointer', position: 'relative', overflow: 'hidden',
+            }}
+          >
+            {/* Gradient accent bar */}
+            <div style={{
+              position: 'absolute', left: 0, top: 0, bottom: 0, width: 3,
+              background: `linear-gradient(to bottom, #FBBF24, ${theme.accent})`,
+              borderRadius: '2px 0 0 2px',
+            }} />
+            <div style={{
+              width: 40, height: 40, borderRadius: 12, flexShrink: 0,
+              background: 'rgba(251,191,36,0.12)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Icon name="calendar" size={20} color="#FBBF24" />
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2 }}>Today's Routine</div>
+              <div style={{ fontSize: 11, color: theme.textDim }}>Schedule · track · earn XP</div>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke={theme.textMute} strokeWidth="2" strokeLinecap="round">
+              <path d="M4.5 2.5L8 6l-3.5 3.5" />
+            </svg>
+          </motion.div>
+        </div>
+
+        {/* Meal Planner + Activity + Wrapped quick links */}
+        <div style={{ padding: '0 20px', marginBottom: 14, display: 'flex', gap: 10 }}>
+          {[
+            { iconName: 'utensils' as const, label: 'Meal Plan', sub: 'AI-powered', path: '/meal-plan', color: '#FB923C' },
+            { iconName: 'leaf' as const,    label: 'Recipes',   sub: '3235 dishes', path: '/recipes',  color: '#4ade80' },
+            { iconName: 'calendar' as const, label: 'Activity', sub: 'Calendar', path: '/activity', color: theme.accent2 },
+            { iconName: 'trophy' as const, label: 'Wrapped', sub: 'This week', path: '/wrapped', color: '#FBBF24' },
+          ].map(({ iconName, label, sub, path, color }) => (
+            <motion.div
+              key={path}
+              whileTap={{ scale: 0.93 }}
+              whileHover={{ y: -2 }}
+              onClick={() => navigate(path)}
+              style={{ flex: 1, cursor: 'pointer' }}
+            >
+              <Card style={{ padding: '12px 10px', borderRadius: 18, textAlign: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6 }}>
+                  <Icon name={iconName} size={22} color={color} />
+                </div>
+                <div style={{ fontSize: 12, fontWeight: 700, color }}>{label}</div>
+                <div style={{ fontSize: 9, color: theme.textMute }}>{sub}</div>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+
         {/* Daily Quests */}
         <Reveal index={5}>
         <div style={{ padding: '0 20px', marginBottom: 14 }}>
@@ -249,7 +429,7 @@ export function Home() {
           >
             <div style={{ fontSize: 13, fontWeight: 700 }}>Daily Quests</div>
             <div style={{ fontSize: 11, color: theme.accent, fontFamily: theme.mono }}>
-              +240 XP TODAY
+              +{quests.filter(q => q.done).reduce((s, q) => s + q.xp, 0)} XP TODAY
             </div>
           </div>
           <Card style={{ borderRadius: 18, overflow: 'hidden' }}>
@@ -318,50 +498,110 @@ export function Home() {
         </div>
         </Reveal>
 
+        {/* Calorie deficit / surplus banner */}
+        {todayTotals.calories > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{ padding: '0 20px', marginBottom: 14 }}
+          >
+            <motion.div
+              whileTap={{ scale: 0.97 }}
+              onClick={() => navigate('/food-log')}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 12,
+                padding: '12px 16px', borderRadius: 16, cursor: 'pointer',
+                background: calTarget - todayTotals.calories >= 0
+                  ? 'rgba(74,222,128,0.08)' : 'rgba(248,113,113,0.08)',
+                border: `1px solid ${calTarget - todayTotals.calories >= 0
+                  ? 'rgba(74,222,128,0.25)' : 'rgba(248,113,113,0.25)'}`,
+              }}
+            >
+              <Icon name={calTarget - todayTotals.calories >= 0 ? 'check' : 'target'} size={20} color={calTarget - todayTotals.calories >= 0 ? '#4ade80' : '#F87171'} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 700 }}>
+                  {Math.abs(calTarget - todayTotals.calories)} kcal {calTarget - todayTotals.calories >= 0 ? 'remaining' : 'over target'}
+                </div>
+                <div style={{ fontSize: 11, color: theme.textDim }}>
+                  {todayTotals.calories} eaten · {calTarget} target
+                </div>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke={theme.textMute} strokeWidth="2" strokeLinecap="round">
+                <path d="M4.5 2.5L8 6l-3.5 3.5" />
+              </svg>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* Body Comp + Strength quick cards */}
+        {(bodyCompLatest || sessions.length > 0) && (
+          <div style={{ padding: '0 20px', marginBottom: 14 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: bodyCompLatest && sessions.length > 0 ? '1fr 1fr' : '1fr', gap: 10 }}>
+              {bodyCompLatest && bfCat && (
+                <motion.div whileTap={{ scale: 0.96 }} whileHover={{ y: -2 }} onClick={() => navigate('/body-comp')} style={{ cursor: 'pointer' }}>
+                  <Card style={{ padding: '12px 14px', borderRadius: 18, borderLeft: `3px solid ${bfCat.color}` }}>
+                    <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, marginBottom: 4 }}>BODY FAT</div>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: bfCat.color, letterSpacing: -0.5 }}>{bodyCompLatest.bodyFatPct}%</div>
+                    <div style={{ fontSize: 10, color: bfCat.color, fontFamily: theme.mono }}>{bfCat.label}</div>
+                    {bodyCompTrend && (
+                      <div style={{ fontSize: 10, color: theme.textMute, marginTop: 4 }}>
+                        {bodyCompTrend.fatPctDelta > 0 ? '↑' : bodyCompTrend.fatPctDelta < 0 ? '↓' : '→'} {Math.abs(bodyCompTrend.fatPctDelta)}% trend
+                      </div>
+                    )}
+                  </Card>
+                </motion.div>
+              )}
+              {sessions.length > 0 && (
+                <motion.div whileTap={{ scale: 0.96 }} whileHover={{ y: -2 }} onClick={() => navigate('/workout/history')} style={{ cursor: 'pointer' }}>
+                  <Card style={{ padding: '12px 14px', borderRadius: 18, borderLeft: `3px solid ${theme.accent}` }}>
+                    <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, marginBottom: 4 }}>WORKOUTS</div>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: theme.accent, letterSpacing: -0.5 }}>{sessions.length}</div>
+                    <div style={{ fontSize: 10, color: theme.textDim, fontFamily: theme.mono }}>sessions logged</div>
+                    <div style={{ fontSize: 10, color: theme.textMute, marginTop: 4 }}>View history →</div>
+                  </Card>
+                </motion.div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Today's workout */}
         <Reveal index={6}>
         <div style={{ padding: '0 20px', marginBottom: 14 }}>
           <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>Today's Workout</div>
-          <motion.div whileTap={{ scale: 0.97 }} whileHover={{ y: -2 }} onClick={() => navigate('/workout')}>
-            <Card style={{ padding: 14, borderRadius: 18, display: 'flex', alignItems: 'center', gap: 12, position: 'relative', overflow: 'hidden' }}>
-              <Shimmer color={`${theme.accent}40`} duration={2.6} delay={0.8} />
-              <div
-                style={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: 12,
-                  background: `linear-gradient(135deg, ${theme.accent2}40, ${theme.accent}30)`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 26,
-                }}
-              >
-                💪
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2 }}>
-                  Push Day · Chest + Triceps
+          {todaySession ? (
+            <motion.div whileTap={{ scale: 0.97 }} whileHover={{ y: -2 }} onClick={() => navigate('/workout/history')}>
+              <Card style={{ padding: 14, borderRadius: 18, display: 'flex', alignItems: 'center', gap: 12, position: 'relative', overflow: 'hidden' }}>
+                <Shimmer color="rgba(74,222,128,0.25)" duration={2.6} delay={0.8} />
+                <div style={{ width: 56, height: 56, borderRadius: 12, background: 'rgba(74,222,128,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon name="check" size={26} color="#4ade80" />
                 </div>
-                <div style={{ fontSize: 11, color: theme.textDim }}>6 exercises · 48 min · ~480 kcal</div>
-              </div>
-              <div
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 12,
-                  background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <svg width="14" height="14" viewBox="0 0 12 12" fill={theme.onAccent}>
-                  <path d="M3 1.5l7 4.5-7 4.5z" />
-                </svg>
-              </div>
-            </Card>
-          </motion.div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2 }}>{todaySession.name}</div>
+                  <div style={{ fontSize: 11, color: theme.textDim }}>
+                    {todaySession.exercises.length} exercises · {todaySession.totalVolume.toLocaleString()} kg volume
+                  </div>
+                </div>
+                <div style={{ fontSize: 11, fontFamily: theme.mono, fontWeight: 700, color: '#4ade80' }}>DONE ✓</div>
+              </Card>
+            </motion.div>
+          ) : (
+            <motion.div whileTap={{ scale: 0.97 }} whileHover={{ y: -2 }} onClick={() => navigate('/workout')}>
+              <Card style={{ padding: 14, borderRadius: 18, display: 'flex', alignItems: 'center', gap: 12, position: 'relative', overflow: 'hidden' }}>
+                <Shimmer color={`${theme.accent}40`} duration={2.6} delay={0.8} />
+                <div style={{ width: 56, height: 56, borderRadius: 12, background: `linear-gradient(135deg, ${theme.accent2}40, ${theme.accent}30)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon name="dumbbell" size={26} color={theme.accent} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2 }}>Start Today's Workout</div>
+                  <div style={{ fontSize: 11, color: theme.textDim }}>Push · Pull · Legs · Full Body</div>
+                </div>
+                <div style={{ width: 40, height: 40, borderRadius: 12, background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="14" height="14" viewBox="0 0 12 12" fill={theme.onAccent}><path d="M3 1.5l7 4.5-7 4.5z" /></svg>
+                </div>
+              </Card>
+            </motion.div>
+          )}
         </div>
         </Reveal>
       </div>
