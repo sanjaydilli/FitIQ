@@ -6,6 +6,7 @@ import { UserProvider } from './context/UserContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PhoneFrame } from './components/PhoneFrame';
 import { useAndroidBack } from './hooks/useAndroidBack';
+import { useStepCounter } from './hooks/useStepCounter';
 
 // Eagerly loaded — part of the initial shell
 import { ThemeSelector } from './screens/ThemeSelector';
@@ -69,6 +70,7 @@ function PublicOnly({ children }: { children: React.ReactNode }) {
 function AnimatedRoutes() {
   const location = useLocation();
   useAndroidBack();
+  useStepCounter();
   return (
     <AnimatePresence mode="wait">
       <motion.div

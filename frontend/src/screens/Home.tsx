@@ -1,4 +1,5 @@
 import React, { useMemo, useEffect, useRef } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
@@ -617,74 +618,56 @@ export function Home() {
 
 function StepsCard() {
   const { theme } = useTheme();
-  const { user, update } = useUser();
-  const [editing, setEditing] = React.useState(false);
-  const [input, setInput] = React.useState('');
+  const { user } = useUser();
+  const isNative = Capacitor.isNativePlatform();
 
   const pct = Math.min(100, Math.round((user.steps / user.stepGoal) * 100));
   const done = user.steps >= user.stepGoal;
-
-  function commit() {
-    const v = parseInt(input, 10);
-    if (!isNaN(v) && v >= 0) update({ steps: v });
-    setEditing(false);
-  }
+  const remaining = Math.max(0, user.stepGoal - user.steps);
 
   return (
     <div style={{ padding: '0 20px', marginBottom: 14 }}>
-      <Card style={{ padding: '14px 16px', borderRadius: 20 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{
-              width: 32, height: 32, borderRadius: 10,
-              background: done ? 'rgba(74,222,128,0.15)' : `${theme.accent}15`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <Icon name="run" size={16} color={done ? '#4ade80' : theme.accent} />
-            </div>
-            <div>
-              <div style={{ fontSize: 12, fontWeight: 700 }}>Steps Today</div>
-              <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono }}>GOAL: {user.stepGoal.toLocaleString()}</div>
+      <Card style={{ padding: '16px', borderRadius: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+          <div style={{
+            width: 38, height: 38, borderRadius: 12,
+            background: done ? 'rgba(74,222,128,0.15)' : `${theme.accent}15`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <Icon name="run" size={18} color={done ? '#4ade80' : theme.accent} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 700 }}>Steps Today</div>
+            <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono }}>
+              {isNative ? 'AUTO-TRACKING · UPDATES LIVE' : 'OPEN ON ANDROID TO AUTO-TRACK'}
             </div>
           </div>
-          {editing ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <input
-                autoFocus
-                type="number"
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                onBlur={commit}
-                onKeyDown={e => e.key === 'Enter' && commit()}
-                style={{
-                  width: 80, padding: '5px 8px', borderRadius: 8,
-                  background: 'rgba(255,255,255,0.08)', border: `1px solid ${theme.accent}`,
-                  color: theme.text, fontSize: 14, fontFamily: theme.mono, outline: 'none',
-                }}
-              />
-            </div>
-          ) : (
-            <motion.button
-              whileTap={{ scale: 0.93 }}
-              onClick={() => { setInput(String(user.steps)); setEditing(true); }}
-              style={{
-                padding: '5px 12px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                background: 'rgba(255,255,255,0.07)', color: theme.textDim, fontSize: 11,
-              }}
-            >
-              + Log Steps
-            </motion.button>
-          )}
+          <div style={{ fontSize: 10, color: done ? '#4ade80' : theme.textMute, fontFamily: theme.mono, fontWeight: 700 }}>
+            {done ? '✓ GOAL HIT' : `${pct}%`}
+          </div>
+        </div>
+
+        {/* Big step count */}
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 10 }}>
+          <div style={{
+            fontSize: 40, fontWeight: 900, letterSpacing: -2, lineHeight: 1,
+            color: done ? '#4ade80' : theme.text,
+          }}>
+            {user.steps.toLocaleString()}
+          </div>
+          <div style={{ fontSize: 13, color: theme.textMute }}>
+            / {user.stepGoal.toLocaleString()} steps
+          </div>
         </div>
 
         {/* Progress bar */}
-        <div style={{ height: 8, borderRadius: 4, background: 'rgba(255,255,255,0.07)', overflow: 'hidden', marginBottom: 6 }}>
+        <div style={{ height: 10, borderRadius: 5, background: 'rgba(255,255,255,0.07)', overflow: 'hidden', marginBottom: 8 }}>
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${pct}%` }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
+            transition={{ duration: 0.9, ease: 'easeOut' }}
             style={{
-              height: '100%', borderRadius: 4,
+              height: '100%', borderRadius: 5,
               background: done
                 ? 'linear-gradient(90deg, #4ade80, #22d3ee)'
                 : `linear-gradient(90deg, ${theme.accent}, ${theme.accent2})`,
@@ -692,14 +675,8 @@ function StepsCard() {
           />
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5, color: done ? '#4ade80' : theme.text }}>
-            {user.steps.toLocaleString()}
-            <span style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, marginLeft: 4 }}>steps</span>
-          </div>
-          <div style={{ fontSize: 11, color: done ? '#4ade80' : theme.textMute, fontFamily: theme.mono }}>
-            {done ? '✓ GOAL HIT' : `${pct}%`}
-          </div>
+        <div style={{ fontSize: 11, color: theme.textMute }}>
+          {done ? 'Amazing! Goal reached today 🎉' : `${remaining.toLocaleString()} more steps to reach your goal`}
         </div>
       </Card>
     </div>
