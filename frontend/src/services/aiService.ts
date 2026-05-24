@@ -10,7 +10,7 @@ export interface FoodLogItem {
 }
 
 const API_KEY = 'fitiq.server.api';
-const DEFAULT_API = process.env.REACT_APP_API_URL || 'https://fitiq-api.railway.app';
+const DEFAULT_API = process.env.REACT_APP_API_URL || 'https://fitiq-production-60af.up.railway.app';
 
 export function getApiUrl(): string {
   return localStorage.getItem(API_KEY)?.replace(/\/$/, '') || DEFAULT_API;
