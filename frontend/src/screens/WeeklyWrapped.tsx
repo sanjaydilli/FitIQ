@@ -5,7 +5,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useUser } from '../context/UserContext';
 import { Background } from '../components/Background';
 import { Card } from '../components/Card';
-import { Icon, IconName } from '../components/Icon';
+import { Icon } from '../components/Icon';
 import { useWorkoutLog } from '../hooks/useWorkoutLog';
 import { useFoodLog } from '../hooks/useFoodLog';
 import { useBodyComp } from '../hooks/useBodyComp';
@@ -43,7 +43,7 @@ export function WeeklyWrapped() {
   );
 
   // Calorie on-target days (within 10% of TDEE)
-  const { onTargetDays, totalCalories } = useMemo(() => {
+  const { onTargetDays } = useMemo(() => {
     let onTarget = 0;
     let total = 0;
     weekDates.forEach(date => {

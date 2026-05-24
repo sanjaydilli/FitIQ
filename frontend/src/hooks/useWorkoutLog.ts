@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { ExerciseTemplate, getExercise } from '../data/exercises';
+import { getExercise } from '../data/exercises';
 
 // ── Data model ────────────────────────────────────────────────────────────────
 

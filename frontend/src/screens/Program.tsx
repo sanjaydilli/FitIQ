@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
-import { useUser } from '../context/UserContext';
 import { Background } from '../components/Background';
 import { Card } from '../components/Card';
 import { Icon } from '../components/Icon';
@@ -209,7 +208,6 @@ function WorkoutDayCard({ day }: { day: DayPlan }) {
 
 export function Program() {
   const { theme } = useTheme();
-  const { user } = useUser();
   const navigate = useNavigate();
   const { latest } = useBodyComp();
   const {

@@ -51,7 +51,7 @@ export const ActivityCalendar = memo(function ActivityCalendar({
   weeks = 26,
   onDayPress,
 }: ActivityCalendarProps) {
-  const { grid, startDate, monthLabels } = useMemo(() => {
+  const { grid, monthLabels } = useMemo(() => {
     const today = new Date();
     // Align start to Sunday
     const end = new Date(today);

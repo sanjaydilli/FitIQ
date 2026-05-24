@@ -11,7 +11,6 @@ import { WaterTimeline } from '../components/WaterTimeline';
 import { Reveal, Shimmer } from '../components/Reveal';
 import { WarningCard } from '../components/warnings/WarningCard';
 import { Icon } from '../components/Icon';
-import { IconBadge } from '../components/IconBadge';
 import { useWarnings } from '../hooks/useWarnings';
 import { useBodyComp } from '../hooks/useBodyComp';
 import { useWorkoutLog } from '../hooks/useWorkoutLog';

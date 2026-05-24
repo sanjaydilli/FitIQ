@@ -27,20 +27,6 @@ export async function generateMealPlan(params: {
   targetCalories: number;
   targetProtein: number;
 }): Promise<MealPlan> {
-  const goalLabel: Record<string, string> = {
-    lose: 'fat loss (calorie deficit)',
-    gain: 'muscle gain (calorie surplus)',
-    main: 'maintenance',
-    endur: 'endurance training',
-  };
-  const dietLabel: Record<string, string> = {
-    veg: 'vegetarian',
-    eggetarian: 'eggetarian (eggs ok, no meat)',
-    nveg: 'non-vegetarian',
-    vegan: 'vegan',
-    jain: 'Jain (no root vegetables)',
-  };
-
   try {
     const res = await fetch(`${getApiUrl()}/api/meal-plan`, {
       method: 'POST',

@@ -199,7 +199,7 @@ export function projectTimeline(params: {
   sex: 'male' | 'female';
   measurements: { date: string; leanMass: number; bodyFatPct: number; weightKg: number }[];
 }): TimelineProjection[] {
-  const { type, currentLeanMass, currentBodyFatPct, currentWeight, sex, measurements } = params;
+  const { type, currentLeanMass, currentBodyFatPct, sex, measurements } = params;
 
   function observedMonthlyRate(getter: (m: typeof measurements[0]) => number): number | null {
     if (measurements.length < 2) return null;

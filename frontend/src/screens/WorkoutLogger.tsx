@@ -34,7 +34,7 @@ export function WorkoutLogger() {
     setElapsed(base);
     const id = setInterval(() => setElapsed(prev => prev + 1), 1000);
     return () => clearInterval(id);
-  }, [active?.startTime]);
+  }, [active?.startTime]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Rest timer tick
   useEffect(() => {
@@ -50,7 +50,7 @@ export function WorkoutLogger() {
       });
     }, 1000);
     return () => { if (restRef.current) clearInterval(restRef.current); };
-  }, [restTimer?.total]);
+  }, [restTimer?.total]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleComplete = useCallback((exIdx: number, setIdx: number, weight: number, reps: number, exerciseId: string, restSeconds: number) => {
     const isNew = isNewPR(exerciseId, weight, reps);

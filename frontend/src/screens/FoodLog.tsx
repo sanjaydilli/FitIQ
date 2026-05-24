@@ -35,7 +35,7 @@ export function FoodLog() {
   const { theme } = useTheme();
   const { user } = useUser();
   const navigate = useNavigate();
-  const { getEntriesForDate, getDailyTotals, removeEntry } = useFoodLog();
+  const { getDailyTotals, removeEntry } = useFoodLog();
   const { tdee } = useBodyComp();
 
   const today = new Date().toISOString().slice(0, 10);

@@ -10,7 +10,6 @@ import { Card } from '../components/Card';
 import { Icon, IconName } from '../components/Icon';
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
-  const { theme } = useTheme();
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: `1px solid rgba(255,255,255,0.05)` }}>
       <div style={{ width: 100, fontSize: 12, color: 'rgba(255,255,255,0.5)', flexShrink: 0 }}>{label}</div>

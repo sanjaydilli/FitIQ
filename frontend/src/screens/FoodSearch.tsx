@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { Background } from '../components/Background';
-import { Card } from '../components/Card';
 import { TabBar } from '../components/TabBar';
 import { Icon } from '../components/Icon';
 import { indianFoods, FOOD_CATEGORIES, IndianFood } from '../data/indianFoods';
@@ -261,8 +260,6 @@ export function FoodSearch() {
 const FoodRow = memo(function FoodRow({ food, index, onClickId }: { food: IndianFood; index: number; onClickId: (id: string) => void }) {
   const { theme } = useTheme();
   const def = food.servingSizes.find(s => s.isDefault) ?? food.servingSizes[0];
-  const servingCal = Math.round(food.per100g.calories * (def?.grams ?? 100) / 100);
-
   const dot =
     food.isVegan ? '#5EEAD4'
     : food.isVegetarian ? '#4ade80'
