@@ -1,8 +1,28 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { Capacitor } from '@capacitor/core';
+import { FirebaseFirestore } from '@capacitor-firebase/firestore';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth, db, firebaseConfigured } from '../firebase';
+import { db, firebaseConfigured } from '../firebase';
 import { AvatarConfig, defaultAvatar } from '../avatar/config';
+
+const isNative = Capacitor.isNativePlatform();
+
+async function firestoreGet(uid: string): Promise<Record<string, unknown> | null> {
+  if (isNative) {
+    const { snapshot } = await FirebaseFirestore.getDocument({ reference: `users/${uid}` });
+    return snapshot.data ?? null;
+  }
+  const snap = await getDoc(doc(db, 'users', uid));
+  return snap.exists() ? snap.data() as Record<string, unknown> : null;
+}
+
+async function firestoreSet(uid: string, data: object): Promise<void> {
+  if (isNative) {
+    await FirebaseFirestore.setDocument({ reference: `users/${uid}`, data, merge: true });
+  } else {
+    await setDoc(doc(db, 'users', uid), data, { merge: true });
+  }
+}
 
 export type Goal = 'lose' | 'gain' | 'endur' | 'main';
 export type Sex = 'male' | 'female';
@@ -90,32 +110,53 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserState>(loadFromStorage);
   const [firebaseUid, setFirebaseUid] = useState<string | null>(null);
 
-  // Track logged-in Firebase user (skip in guest mode)
+  // Listen to auth state and load Firestore profile on sign-in
   useEffect(() => {
     if (!firebaseConfigured) return;
-    const unsub = onAuthStateChanged(auth, fbUser => {
-      setFirebaseUid(fbUser?.uid ?? null);
-      if (fbUser) {
-        getDoc(doc(db, 'users', fbUser.uid)).then(snap => {
-          if (snap.exists()) {
-            const data = snap.data() as Partial<UserState>;
-            const today = new Date().toISOString().slice(0, 10);
-            const isToday = data.waterDate === today;
-            setUser({
-              ...defaultUser,
-              ...data,
-              waterDrops: isToday ? (data.waterDrops ?? EMPTY_WATER) : EMPTY_WATER,
-              waterDate: today,
-              avatar: { ...defaultAvatar, ...(data.avatar ?? {}) },
-              name: data.name || fbUser.displayName || '',
-            });
-          } else if (fbUser.displayName) {
-            setUser(u => ({ ...u, name: fbUser.displayName! }));
-          }
-        }).catch(() => {});
-      }
-    });
-    return unsub;
+
+    async function onUser(uid: string, displayName?: string | null) {
+      setFirebaseUid(uid);
+      try {
+        const data = await firestoreGet(uid) as Partial<UserState> | null;
+        const today = new Date().toISOString().slice(0, 10);
+        if (data) {
+          const isToday = data.waterDate === today;
+          setUser({
+            ...defaultUser, ...data,
+            waterDrops: isToday ? (data.waterDrops ?? EMPTY_WATER) : EMPTY_WATER,
+            waterDate: today,
+            avatar: { ...defaultAvatar, ...(data.avatar ?? {}) },
+            name: data.name || displayName || '',
+          });
+        } else if (displayName) {
+          setUser(u => ({ ...u, name: displayName }));
+        }
+      } catch { /* offline */ }
+    }
+
+    if (isNative) {
+      const { FirebaseAuthentication } = require('@capacitor-firebase/authentication');
+      let mounted = true;
+      FirebaseAuthentication.addListener('authStateChange', ({ user }: { user: { uid: string; displayName?: string } | null }) => {
+        if (!mounted) return;
+        if (user) onUser(user.uid, user.displayName);
+        else setFirebaseUid(null);
+      });
+      FirebaseAuthentication.getCurrentUser().then(({ user }: { user: { uid: string; displayName?: string } | null }) => {
+        if (!mounted || !user) return;
+        onUser(user.uid, user.displayName);
+      }).catch(() => {});
+      return () => { mounted = false; };
+    } else {
+      const { onAuthStateChanged } = require('firebase/auth');
+      const { auth: webAuth } = require('../firebase');
+      const unsub = onAuthStateChanged(webAuth, (fbUser: { uid: string; displayName?: string } | null) => {
+        if (fbUser) onUser(fbUser.uid, fbUser.displayName);
+        else setFirebaseUid(null);
+      });
+      return unsub;
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Daily water reset
@@ -138,7 +179,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     writeTimer.current = setTimeout(() => {
       try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(latestUser.current)); } catch { /* quota */ }
       if (firebaseConfigured && firebaseUid) {
-        setDoc(doc(db, 'users', firebaseUid), latestUser.current, { merge: true }).catch(() => {});
+        firestoreSet(firebaseUid, latestUser.current).catch(() => {});
       }
     }, 800);
     return () => { if (writeTimer.current) clearTimeout(writeTimer.current); };

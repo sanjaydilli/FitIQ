@@ -19,7 +19,7 @@ import { bodyFatCategory } from '../utils/bodyComposition';
 export function Profile() {
   const { theme, themeId, setTheme } = useTheme();
   const { user } = useUser();
-  const { logOut, firebaseUser } = useAuth();
+  const { logOut, currentUser } = useAuth();
   const navigate = useNavigate();
 
   async function handleLogOut() {
@@ -236,10 +236,10 @@ export function Profile() {
           </Card>
 
           {/* Account section */}
-          {firebaseUser && (
+          {currentUser && currentUser.uid !== 'guest' && (
             <div style={{ marginTop: 12 }}>
               <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.5, marginBottom: 6 }}>
-                ACCOUNT · {firebaseUser.email}
+                ACCOUNT · {currentUser.email}
               </div>
               <Card style={{ borderRadius: 14, overflow: 'hidden' }}>
                 <motion.div

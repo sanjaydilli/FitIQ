@@ -53,18 +53,18 @@ function RouteSpinner() {
 
 // Redirect to /login if not authenticated
 function RequireAuth({ children }: { children: React.ReactNode }) {
-  const { firebaseUser, authLoading } = useAuth();
+  const { currentUser, authLoading } = useAuth();
   const location = useLocation();
   if (authLoading) return <RouteSpinner />;
-  if (!firebaseUser) return <Navigate to="/login" state={{ from: location }} replace />;
+  if (!currentUser) return <Navigate to="/login" state={{ from: location }} replace />;
   return <>{children}</>;
 }
 
 // Redirect already-authed users away from login/signup
 function PublicOnly({ children }: { children: React.ReactNode }) {
-  const { firebaseUser, authLoading } = useAuth();
+  const { currentUser, authLoading } = useAuth();
   if (authLoading) return <RouteSpinner />;
-  if (firebaseUser) return <Navigate to="/home" replace />;
+  if (currentUser) return <Navigate to="/home" replace />;
   return <>{children}</>;
 }
 

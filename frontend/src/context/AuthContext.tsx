@@ -1,21 +1,35 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { Capacitor } from '@capacitor/core';
 import {
-  User,
-  createUserWithEmailAndPassword,
+  FirebaseAuthentication,
+  User as CapUser,
+} from '@capacitor-firebase/authentication';
+import {
   signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
+  createUserWithEmailAndPassword,
   updateProfile,
   GoogleAuthProvider,
   signInWithPopup,
+  signOut,
+  onAuthStateChanged,
+  User as WebUser,
 } from 'firebase/auth';
 import { auth, firebaseConfigured } from '../firebase';
 
-// Minimal stub that satisfies the User shape for guest mode
-const GUEST_USER = { uid: 'guest', displayName: 'Guest', email: null } as unknown as User;
+export interface AppUser {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+}
+
+function toAppUser(u: CapUser | WebUser): AppUser {
+  return { uid: u.uid, email: u.email ?? null, displayName: u.displayName ?? null };
+}
+
+const GUEST: AppUser = { uid: 'guest', email: null, displayName: 'Guest' };
 
 interface AuthContextValue {
-  firebaseUser: User | null;
+  currentUser: AppUser | null;
   authLoading: boolean;
   guestMode: boolean;
   signUp: (email: string, password: string, displayName: string) => Promise<void>;
@@ -25,50 +39,86 @@ interface AuthContextValue {
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
-const googleProvider = new GoogleAuthProvider();
+
+const isNative = Capacitor.isNativePlatform();
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<AppUser | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
     if (!firebaseConfigured) {
-      // Guest mode — treat as always signed in with local profile
-      setFirebaseUser(GUEST_USER);
+      setCurrentUser(GUEST);
       setAuthLoading(false);
       return;
     }
-    const unsub = onAuthStateChanged(auth, user => {
-      setFirebaseUser(user);
-      setAuthLoading(false);
-    });
-    return unsub;
+
+    if (isNative) {
+      // Native: listen via Capacitor plugin
+      let mounted = true;
+      FirebaseAuthentication.addListener('authStateChange', ({ user }) => {
+        if (!mounted) return;
+        setCurrentUser(user ? toAppUser(user) : null);
+        setAuthLoading(false);
+      });
+      // Get current user immediately in case already signed in
+      FirebaseAuthentication.getCurrentUser().then(({ user }) => {
+        if (!mounted) return;
+        setCurrentUser(user ? toAppUser(user) : null);
+        setAuthLoading(false);
+      }).catch(() => setAuthLoading(false));
+      return () => { mounted = false; };
+    } else {
+      // Web: use Firebase JS SDK
+      const unsub = onAuthStateChanged(auth, user => {
+        setCurrentUser(user ? toAppUser(user) : null);
+        setAuthLoading(false);
+      });
+      return unsub;
+    }
   }, []);
 
   async function signUp(email: string, password: string, displayName: string) {
     if (!firebaseConfigured) return;
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-    await updateProfile(cred.user, { displayName });
+    if (isNative) {
+      await FirebaseAuthentication.createUserWithEmailAndPassword({ email, password });
+      await FirebaseAuthentication.updateProfile({ displayName });
+    } else {
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(cred.user, { displayName });
+    }
   }
 
   async function signIn(email: string, password: string) {
     if (!firebaseConfigured) return;
-    await signInWithEmailAndPassword(auth, email, password);
+    if (isNative) {
+      await FirebaseAuthentication.signInWithEmailAndPassword({ email, password });
+    } else {
+      await signInWithEmailAndPassword(auth, email, password);
+    }
   }
 
   async function signInWithGoogle() {
     if (!firebaseConfigured) return;
-    await signInWithPopup(auth, googleProvider);
+    if (isNative) {
+      await FirebaseAuthentication.signInWithGoogle();
+    } else {
+      await signInWithPopup(auth, new GoogleAuthProvider());
+    }
   }
 
   async function logOut() {
     if (!firebaseConfigured) return;
-    await signOut(auth);
+    if (isNative) {
+      await FirebaseAuthentication.signOut();
+    } else {
+      await signOut(auth);
+    }
   }
 
   return (
     <AuthContext.Provider value={{
-      firebaseUser, authLoading,
+      currentUser, authLoading,
       guestMode: !firebaseConfigured,
       signUp, signIn, signInWithGoogle, logOut,
     }}>
