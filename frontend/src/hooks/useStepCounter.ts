@@ -1,5 +1,6 @@
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
+import { App } from '@capacitor/app';
 import StepCounter from '../plugins/StepCounter';
 import { useUser } from '../context/UserContext';
 
@@ -14,11 +15,17 @@ export function useStepCounter() {
   const stepsRef = useRef(user.steps);
   stepsRef.current = user.steps;
 
+  const [permissionDenied, setPermissionDenied] = useState(false);
+
   const sync = useCallback(async () => {
     if (!Capacitor.isNativePlatform()) return;
     try {
       const { steps, available } = await StepCounter.getSteps();
-      if (!available) return;
+      if (!available) {
+        setPermissionDenied(true);
+        return;
+      }
+      setPermissionDenied(false);
 
       const today = new Date().toISOString().slice(0, 10);
       const savedDate = localStorage.getItem(BASELINE_DATE_KEY);
@@ -48,8 +55,19 @@ export function useStepCounter() {
 
   useEffect(() => {
     sync();
-    // Re-sync every 60 seconds while app is open
     const interval = setInterval(sync, 60_000);
-    return () => clearInterval(interval);
+    // Re-sync immediately when app comes back to foreground
+    let resumeHandle: { remove: () => void } | null = null;
+    if (Capacitor.isNativePlatform()) {
+      App.addListener('appStateChange', ({ isActive }) => {
+        if (isActive) sync();
+      }).then(h => { resumeHandle = h; });
+    }
+    return () => {
+      clearInterval(interval);
+      resumeHandle?.remove();
+    };
   }, [sync]);
+
+  return { permissionDenied };
 }

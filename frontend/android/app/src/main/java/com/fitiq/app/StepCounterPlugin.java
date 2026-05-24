@@ -77,6 +77,12 @@ public class StepCounterPlugin extends Plugin implements SensorEventListener {
     }
 
     private void readSteps(PluginCall call) {
+        // Reject any previous pending call to avoid a Promise leak
+        if (pendingCall != null) {
+            sensorManager.unregisterListener(this);
+            pendingCall.reject("superseded");
+            pendingCall = null;
+        }
         call.setKeepAlive(true);
         pendingCall = call;
         sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL);

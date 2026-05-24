@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ThemeProvider } from './context/ThemeContext';
@@ -70,8 +70,32 @@ function PublicOnly({ children }: { children: React.ReactNode }) {
 function AnimatedRoutes() {
   const location = useLocation();
   useAndroidBack();
-  useStepCounter();
+  const { permissionDenied } = useStepCounter();
+  const [showStepBanner, setShowStepBanner] = useState(false);
+  useEffect(() => {
+    if (permissionDenied) {
+      setShowStepBanner(true);
+      const t = setTimeout(() => setShowStepBanner(false), 6000);
+      return () => clearTimeout(t);
+    }
+  }, [permissionDenied]);
+
   return (
+    <>
+    {showStepBanner && (
+      <motion.div
+        initial={{ opacity: 0, y: -40 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -40 }}
+        style={{
+          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999,
+          background: 'rgba(251,146,60,0.95)', color: '#0a0612',
+          padding: '12px 16px', fontSize: 13, fontWeight: 600, textAlign: 'center',
+        }}
+      >
+        Step tracking disabled — enable Activity Recognition in Settings
+      </motion.div>
+    )}
     <AnimatePresence mode="wait">
       <motion.div
         key={location.pathname}
@@ -119,6 +143,7 @@ function AnimatedRoutes() {
         </Suspense>
       </motion.div>
     </AnimatePresence>
+    </>
   );
 }
 

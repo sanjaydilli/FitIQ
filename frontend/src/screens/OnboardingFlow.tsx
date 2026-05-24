@@ -423,7 +423,7 @@ export function OnboardingFlow() {
     if (step < total - 1) {
       setStep(step + 1);
     } else {
-      update({ name: name.trim() || 'You', goal, sex, heightCm: height, weightKg: weight, age, diet, activity, streak: 0, xp: 0, level: 1, avatarStage: 1 });
+      update({ name: name.trim() || 'You', goal, sex, heightCm: height, weightKg: weight, age, diet, activity, streak: 0, xp: 0, level: 1 });
       navigate('/analysis');
     }
   };

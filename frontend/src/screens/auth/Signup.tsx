@@ -16,6 +16,7 @@ export function Signup() {
   const [confirm, setConfirm]   = useState('');
   const [error, setError]       = useState('');
   const [loading, setLoading]   = useState(false);
+  const [verifyEmail, setVerifyEmail] = useState('');
 
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault();
@@ -26,7 +27,8 @@ export function Signup() {
     setError('');
     try {
       await signUp(email, password, name);
-      navigate('/onboarding');
+      setVerifyEmail(email);
+      setTimeout(() => navigate('/onboarding'), 3000);
     } catch (err: unknown) {
       setError(err instanceof Error ? friendlyError(err.message) : 'Sign-up failed');
     } finally {
@@ -103,6 +105,21 @@ export function Signup() {
             <div style={{ fontSize: 12, color: '#F87171', textAlign: 'center' }}>
               {error}
             </div>
+          )}
+
+          {verifyEmail && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              style={{
+                padding: '12px 14px', borderRadius: 12,
+                background: 'rgba(74,222,128,0.12)',
+                border: '1px solid rgba(74,222,128,0.3)',
+                fontSize: 13, color: '#4ade80', textAlign: 'center', lineHeight: 1.5,
+              }}
+            >
+              ✉️ Verification email sent to <strong>{verifyEmail}</strong>. Check your inbox before logging in.
+            </motion.div>
           )}
 
           <motion.button

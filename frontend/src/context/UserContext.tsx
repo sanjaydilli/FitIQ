@@ -45,7 +45,6 @@ export interface UserState {
   streak: number;
   xp: number;
   level: number;
-  avatarStage: number;
   waterDrops: number[];
   waterDate: string;
   steps: number;
@@ -75,7 +74,6 @@ const defaultUser: UserState = {
   streak: 0,
   xp: 0,
   level: 1,
-  avatarStage: 1,
   waterDrops: EMPTY_WATER,
   waterDate: '',
   steps: 0,
