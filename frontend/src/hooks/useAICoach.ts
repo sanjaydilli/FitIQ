@@ -6,7 +6,7 @@ import { useWorkoutLog } from './useWorkoutLog';
 import { askFitIQCoach, FoodLogItem } from '../services/aiService';
 import { UserStats } from '../utils/warnings/warningTypes';
 import { goalCalorieAdjust } from '../utils/bodyComposition';
-import { WATER_DROP_ML, WATER_SLOT_CAPACITY } from '../context/UserContext';
+import { WATER_DROP_ML } from '../context/UserContext';
 
 export interface ChatMessage {
   id: string;
