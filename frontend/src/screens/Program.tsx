@@ -244,7 +244,7 @@ export function Program() {
           <div style={{ padding: '16px 16px 10px' }}>
             <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4 }}>Choose your program</div>
             <div style={{ fontSize: 12, color: theme.textDim, marginBottom: 16, lineHeight: 1.5 }}>
-              Ollama generates a new workout plan each month, automatically adjusting your TDEE, macros, and exercise selection based on your actual body composition changes.
+              AI generates a new workout plan each month, automatically adjusting your TDEE, macros, and exercise selection based on your actual body composition changes.
             </div>
 
             {/* No body comp warning */}
@@ -424,7 +424,7 @@ export function Program() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderRadius: 14, background: `${progColor}08`, border: `1px solid ${progColor}20` }}>
               <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
                 style={{ width: 20, height: 20, borderRadius: '50%', border: `2px solid ${progColor}25`, borderTopColor: progColor, flexShrink: 0 }} />
-              <div style={{ fontSize: 12, color: theme.textDim }}>Generating your personalised phase plan with Ollama…</div>
+              <div style={{ fontSize: 12, color: theme.textDim }}>Generating your personalised phase plan with AI…</div>
             </div>
           )}
 

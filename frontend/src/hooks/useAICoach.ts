@@ -137,7 +137,7 @@ export function useAICoach(liveStats?: Partial<UserStats>) {
           id: `e-${Date.now()}`,
           role: 'assistant',
           content:
-            'Unable to reach AI Coach. Please check your internet connection and try again.',
+            'Unable to reach FitIQ server. Please check your internet connection and try again.',
           timestamp: Date.now(),
           error: true,
         };

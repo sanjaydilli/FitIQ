@@ -1,7 +1,5 @@
 import { ProgramConfig, PhaseSpec, calcPhaseNutrition } from './programPhaseEngine';
-
-const OLLAMA_BASE = 'http://localhost:11434';
-const MODEL = 'llama3.1';
+import { getApiUrl } from './aiService';
 
 export interface PlannedExercise {
   exerciseId: string;
@@ -110,14 +108,14 @@ JSON format:
 }`;
 
   try {
-    const res = await fetch(`${OLLAMA_BASE}/api/generate`, {
+    const res = await fetch(`${getApiUrl()}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: MODEL, prompt, stream: false }),
+      body: JSON.stringify({ message: prompt, userStats: {} }),
     });
-    if (!res.ok) throw new Error(`Ollama ${res.status}`);
-    const data = await res.json() as { response: string };
-    const raw = data.response.trim();
+    if (!res.ok) throw new Error(`Server ${res.status}`);
+    const data = await res.json() as { reply: string };
+    const raw = data.reply.trim();
     const start = raw.indexOf('{');
     const end = raw.lastIndexOf('}');
     if (start === -1 || end === -1) throw new Error('No JSON');

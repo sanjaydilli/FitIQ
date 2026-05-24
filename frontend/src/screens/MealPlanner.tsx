@@ -56,7 +56,7 @@ export function MealPlanner() {
       });
       setPlan(result);
     } catch {
-      setError('Failed to generate meal plan. Check Ollama is running.');
+      setError('Failed to generate meal plan. Check your internet connection.');
     } finally {
       setLoading(false);
     }
@@ -176,7 +176,7 @@ export function MealPlanner() {
               Tap Generate to get a personalised full-day Indian meal plan built around your calorie and protein targets.
             </div>
             <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, background: 'rgba(255,255,255,0.04)', border: `1px solid ${theme.cardBorder}`, borderRadius: 10, padding: '8px 12px' }}>
-              Requires Ollama running locally on port 11434
+              Powered by Groq AI · LLaMA 3.3 70B
             </div>
             <motion.button
               whileTap={{ scale: 0.96 }}

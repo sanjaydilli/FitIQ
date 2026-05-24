@@ -99,7 +99,7 @@ export function useProgram() {
         return next;
       });
     } catch {
-      setError('Failed to generate plan. Make sure Ollama is running with llama3.1.');
+      setError('Failed to generate plan. Check your internet connection.');
     } finally {
       setGenerating(false);
     }
