@@ -111,7 +111,15 @@ JSON format:
     const res = await fetch(`${getApiUrl()}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: prompt, userStats: {} }),
+      body: JSON.stringify({
+        message: prompt,
+        userStats: {
+          gender: config.sex,
+          weightKg: config.startWeight,
+          goal: config.type,
+          dietType: DIET_LABEL[diet] ?? diet,
+        },
+      }),
     });
     if (!res.ok) throw new Error(`Server ${res.status}`);
     const data = await res.json() as { reply: string };
