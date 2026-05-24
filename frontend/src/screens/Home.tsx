@@ -79,7 +79,7 @@ export function Home() {
       max: `/${user.stepGoal.toLocaleString()}`,
       pct: user.stepGoal > 0 ? Math.min(100, Math.round((user.steps / user.stepGoal) * 100)) : 0,
     },
-  ], [theme.accent, theme.accent2, todayTotals, calTarget, proteinTarget]);
+  ], [theme.accent, theme.accent2, todayTotals, calTarget, proteinTarget, user.steps, user.stepGoal]);
 
   const totalWaterCups = WATER_SLOT_CAPACITY.reduce((a, b) => a + b, 0);
   const filledWaterCups = user.waterDrops.reduce((a, b) => a + b, 0);

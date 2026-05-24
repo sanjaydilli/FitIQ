@@ -56,7 +56,6 @@ export function useAICoach(liveStats?: Partial<UserStats>) {
     const now = new Date();
     const targetCalories = (tdee || Math.round(user.weightKg * 30)) + goalCalorieAdjust(user.goal);
     const targetProtein = Math.round(user.weightKg * 2);
-    const totalWaterCups = WATER_SLOT_CAPACITY.reduce((a, b) => a + b, 0);
     const filledCups = user.waterDrops.reduce((a, b) => a + b, 0);
     const waterLitres = Math.round((filledCups * WATER_DROP_ML) / 100) / 10;
     const targetWater = Math.round((user.weightKg * 35) / 100) / 10; // ~35ml/kg
