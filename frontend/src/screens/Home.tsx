@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useRef } from 'react';
+import React, { useMemo, useEffect, useRef, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -30,6 +30,7 @@ export function Home() {
   const { latest: bodyCompLatest, trend: bodyCompTrend, tdee } = useBodyComp();
   const { sessions } = useWorkoutLog();
   const { todayTotals, activeDays } = useFoodLog();
+  const todayISO = new Date().toISOString().slice(0, 10);
   const todaySession = sessions.find(s => s.date === todayISO) ?? null;
 
   // Compute real streak from actual food/workout activity and sync to user.streak
@@ -58,7 +59,6 @@ export function Home() {
   const bfCat = bodyCompLatest ? bodyFatCategory(user.sex, bodyCompLatest.bodyFatPct) : null;
   const calTarget = (tdee || Math.round(user.weightKg * 30)) + goalCalorieAdjust(user.goal);
   const proteinTarget = Math.round(user.weightKg * 2);
-  const todayISO = new Date().toISOString().slice(0, 10);
 
   const metrics = useMemo(() => [
     {
@@ -73,7 +73,12 @@ export function Home() {
       max: `/${proteinTarget}g`,
       pct: proteinTarget > 0 ? Math.min(100, Math.round((todayTotals.protein / proteinTarget) * 100)) : 0,
     },
-    { l: 'Steps', v: '—', max: '', col: theme.accent2, pct: 0, iconName: 'run' as const },
+    {
+      l: 'Steps', iconName: 'run' as const, col: theme.accent2,
+      v: user.steps > 0 ? user.steps.toLocaleString() : '—',
+      max: `/${user.stepGoal.toLocaleString()}`,
+      pct: user.stepGoal > 0 ? Math.min(100, Math.round((user.steps / user.stepGoal) * 100)) : 0,
+    },
   ], [theme.accent, theme.accent2, todayTotals, calTarget, proteinTarget]);
 
   const totalWaterCups = WATER_SLOT_CAPACITY.reduce((a, b) => a + b, 0);
@@ -107,12 +112,43 @@ export function Home() {
     { t: 'Complete a workout', xp: 120, done: workoutDone },
   ], [waterDone, caloriesOnTarget, workoutDone, totalWaterL]);
 
+  const [verifyBanner, setVerifyBanner] = useState(() => {
+    const email = sessionStorage.getItem('fitiq.pendingVerifyEmail');
+    if (email) { sessionStorage.removeItem('fitiq.pendingVerifyEmail'); }
+    return email;
+  });
+  useEffect(() => {
+    if (!verifyBanner) return;
+    const t = setTimeout(() => setVerifyBanner(null), 8000);
+    return () => clearTimeout(t);
+  }, [verifyBanner]);
+
   return (
     <Background>
       <div
         className="scroll-y"
         style={{ padding: '60px 0 110px', height: '100%', overflowY: 'auto' }}
       >
+        {/* Email verification banner — shown once after signup */}
+        <AnimatePresence>
+          {verifyBanner && (
+            <motion.div
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              style={{
+                margin: '0 16px 12px',
+                padding: '10px 14px', borderRadius: 12,
+                background: 'rgba(74,222,128,0.12)',
+                border: '1px solid rgba(74,222,128,0.3)',
+                fontSize: 12, color: '#4ade80', lineHeight: 1.5,
+              }}
+            >
+              ✉️ Verification email sent to <strong>{verifyBanner}</strong> — check your inbox.
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Header */}
         <div
           style={{
