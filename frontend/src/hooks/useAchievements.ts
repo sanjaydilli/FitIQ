@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { localDateStr, formatLocalDate } from '../utils/date';
 import { useWorkoutLog } from './useWorkoutLog';
 import { useFoodLog } from './useFoodLog';
 import { useBodyComp } from './useBodyComp';
@@ -35,7 +36,7 @@ export function useAchievements(): Achievement[] {
     for (let i = 0; i < 365; i++) {
       const d = new Date(today);
       d.setDate(d.getDate() - i);
-      const ds = d.toISOString().slice(0, 10);
+      const ds = formatLocalDate(d);
       if (activeDays.has(ds) || sessions.some(s => s.date === ds)) streak++;
       else if (i > 0) break;
     }

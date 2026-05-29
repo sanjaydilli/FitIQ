@@ -32,7 +32,7 @@ export function AICoach() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const targetCalories = tdee + goalCalorieAdjust(user.goal);
+  const targetCalories = (tdee || Math.round(user.weightKg * 30)) + goalCalorieAdjust(user.goal);
   const targetProtein = Math.round(user.weightKg * 2.0);
   const eatenWaterL = (user.waterDrops.reduce((a, b) => a + b, 0) * WATER_DROP_ML) / 1000;
 

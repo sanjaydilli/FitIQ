@@ -8,10 +8,17 @@ import {
   snoozeWarning,
 } from '../utils/warnings/warningCooldowns';
 import { useUser } from '../context/UserContext';
+import { useFoodLog } from './useFoodLog';
+import { useBodyComp } from './useBodyComp';
+import { goalCalorieAdjust } from '../utils/bodyComposition';
 
 // Build a UserStats snapshot from the UserContext + hardcoded demo values
 // In production these would come from tracked daily data
-function buildStats(user: ReturnType<typeof useUser>['user']): UserStats {
+function buildStats(
+  user: ReturnType<typeof useUser>['user'],
+  todayTotals: { calories: number; protein: number; carbs: number; fat: number; entries: { meal: string }[] },
+  tdee: number,
+): UserStats {
   const now = new Date();
   const waterLiters =
     (user.waterDrops.reduce((a, b) => a + b, 0) * 250) / 1000;
@@ -35,9 +42,8 @@ function buildStats(user: ReturnType<typeof useUser>['user']): UserStats {
     jain: 'jain',
   };
 
-  // Demo nutrition values — in production these come from food tracking
-  const targetCal = user.sex === 'male' ? 2340 : 1900;
-  const targetProt = user.sex === 'male' ? 142 : 115;
+  const targetCal = tdee + goalCalorieAdjust(user.goal);
+  const targetProt = Math.round(user.weightKg * 2);
 
   return {
     gender: genderMap[user.sex],
@@ -45,42 +51,42 @@ function buildStats(user: ReturnType<typeof useUser>['user']): UserStats {
     goal: goalMap[user.goal],
     dietType: dietMap[user.diet],
 
-    calories: 1847,
+    calories: todayTotals.calories,
     targetCalories: targetCal,
-    protein: 102,
+    protein: todayTotals.protein,
     targetProtein: targetProt,
-    carbs: 210,
-    fat: 58,
-    fiber: 18,
+    carbs: todayTotals.carbs,
+    fat: todayTotals.fat,
+    fiber: 0,
     water: waterLiters,
-    targetWater: 3.5,
-    mealCount: 3,
-    lastMealMinutesAgo: 95,
+    targetWater: Math.round(user.weightKg * 35) / 1000,
+    mealCount: new Set(todayTotals.entries.map(e => e.meal)).size,
+    lastMealMinutesAgo: 120,
 
-    ironIntake: user.diet === 'veg' || user.diet === 'vegan' ? 5 : 10,
-    magnesiumIntake: 240,
-    omega3Intake: 0.6,
-    zincIntake: user.diet === 'veg' || user.diet === 'vegan' ? 6 : 9,
+    ironIntake: 0,
+    magnesiumIntake: 0,
+    omega3Intake: 0,
+    zincIntake: 0,
 
-    teaLoggedMinutesAgo: 40,
-    ironRichMealLogged: true,
+    teaLoggedMinutesAgo: 0,
+    ironRichMealLogged: false,
     postWorkoutMealLogged: false,
-    oilTracked: true,
+    oilTracked: false,
     takingB12: false,
     takingVitaminD: false,
     muscleCramps: false,
     sleepQuality: 'average',
 
-    consecutiveLowIronDays: user.diet === 'veg' || user.diet === 'vegan' ? 4 : 0,
-    consecutiveLowMagDays: 3,
-    consecutiveLowOmega3Days: user.diet === 'veg' || user.diet === 'vegan' ? 6 : 2,
-    consecutiveLowZincDays: user.diet === 'veg' || user.diet === 'vegan' ? 6 : 1,
+    consecutiveLowIronDays: 0,
+    consecutiveLowMagDays: 0,
+    consecutiveLowOmega3Days: 0,
+    consecutiveLowZincDays: 0,
 
-    steps: 7420,
-    targetSteps: 10000,
-    workoutMinutesAgo: 75,
+    steps: user.steps,
+    targetSteps: user.stepGoal,
+    workoutMinutesAgo: 0,
     nextWorkoutMinutes: 0,
-    consecutiveWorkoutDays: user.streak > 6 ? 6 : user.streak,
+    consecutiveWorkoutDays: user.streak,
     weeksSinceDeload: 5,
 
     lastNightSleep: 7,
@@ -102,10 +108,15 @@ const REFRESH_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
 
 export function useWarnings(duringWorkout = false): UseWarningsResult {
   const { user, update } = useUser();
+  const { todayTotals } = useFoodLog();
+  const { tdee } = useBodyComp();
   const [activeWarning, setActiveWarning] = useState<Warning | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const stats = useMemo(() => buildStats(user), [user]);
+  const stats = useMemo(
+    () => buildStats(user, todayTotals, tdee || Math.round(user.weightKg * 30)),
+    [user, todayTotals, tdee],
+  );
 
   const evaluate = useCallback(() => {
     if (duringWorkout) {

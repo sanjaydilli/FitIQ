@@ -1,3 +1,4 @@
+import { localDateStr, formatLocalDate } from '../utils/date';
 import { useCallback, useMemo, useState } from 'react';
 import { getExercise } from '../data/exercises';
 
@@ -69,7 +70,7 @@ function saveActive(session: WorkoutSession | null) {
 }
 
 function today(): string {
-  return new Date().toISOString().slice(0, 10);
+  return localDateStr();
 }
 
 function calcVolume(exercises: ExerciseLog[]): number {

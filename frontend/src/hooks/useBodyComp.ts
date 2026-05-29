@@ -1,3 +1,4 @@
+import { localDateStr, formatLocalDate } from '../utils/date';
 import { useCallback, useMemo, useState } from 'react';
 import { useUser } from '../context/UserContext';
 import { navyBodyFat, calcBMR, calcTDEE, calcBodyComp } from '../utils/bodyComposition';
@@ -42,7 +43,7 @@ export function useBodyComp() {
     const bf = navyBodyFat({ sex: user.sex, heightCm: user.heightCm, ...params });
     const { leanMass, fatMass } = calcBodyComp(params.weightKg, bf);
     const entry: Measurement = {
-      date: new Date().toISOString().slice(0, 10),
+      date: localDateStr(),
       ...params,
       bodyFatPct: bf,
       leanMass,

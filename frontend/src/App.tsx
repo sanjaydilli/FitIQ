@@ -59,11 +59,19 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-// Redirect already-authed users away from login/signup
+// Redirect already-authed users away from login/signup.
+// New users (no name in localStorage) are sent to onboarding first.
 function PublicOnly({ children }: { children: React.ReactNode }) {
   const { currentUser, authLoading } = useAuth();
   if (authLoading) return <RouteSpinner />;
-  if (currentUser) return <Navigate to="/home" replace />;
+  if (currentUser) {
+    try {
+      const saved = JSON.parse(localStorage.getItem('fitiq.user') ?? '{}') as { name?: string };
+      return <Navigate to={saved.name ? '/home' : '/onboarding'} replace />;
+    } catch {
+      return <Navigate to="/onboarding" replace />;
+    }
+  }
   return <>{children}</>;
 }
 

@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { localDateStr, formatLocalDate } from '../utils/date';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
@@ -38,7 +39,7 @@ export function FoodLog() {
   const { getDailyTotals, removeEntry } = useFoodLog();
   const { tdee } = useBodyComp();
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateStr();
   const [viewDate, setViewDate] = useState(today);
 
   const targetCalories = (tdee || Math.round(user.weightKg * 30)) + goalCalorieAdjust(user.goal);
@@ -57,12 +58,12 @@ export function FoodLog() {
   const prevDay = () => {
     const d = new Date(viewDate + 'T00:00:00');
     d.setDate(d.getDate() - 1);
-    setViewDate(d.toISOString().slice(0, 10));
+    setViewDate(formatLocalDate(d));
   };
   const nextDay = () => {
     const d = new Date(viewDate + 'T00:00:00');
     d.setDate(d.getDate() + 1);
-    if (d <= new Date()) setViewDate(d.toISOString().slice(0, 10));
+    if (d <= new Date()) setViewDate(formatLocalDate(d));
   };
 
   return (

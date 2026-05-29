@@ -1,3 +1,4 @@
+import { localDateStr, formatLocalDate } from '../utils/date';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -21,7 +22,7 @@ export function Workout() {
   const navigate = useNavigate();
   const { active, sessions, startWorkout } = useWorkoutLog();
 
-  const todayISO = new Date().toISOString().slice(0, 10);
+  const todayISO = localDateStr();
   const todaySession = sessions.find(s => s.date === todayISO) ?? null;
   const lastSession = sessions.length > 0 ? sessions[sessions.length - 1] : null;
   const displaySession = todaySession ?? lastSession;

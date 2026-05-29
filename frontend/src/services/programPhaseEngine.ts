@@ -1,3 +1,4 @@
+import { localDateStr, formatLocalDate } from '../utils/date';
 // ── FitIQ 3-Month Program Phase Engine ───────────────────────────────────────
 // All science is here — Ollama just picks exercises and writes explanations.
 
@@ -150,7 +151,7 @@ const TEMPLATES: Record<ProgramType, Omit<PhaseSpec, 'startDate' | 'endDate'>[]>
 function addMonths(dateStr: string, months: number): string {
   const d = new Date(dateStr + 'T00:00:00');
   d.setMonth(d.getMonth() + months);
-  return d.toISOString().slice(0, 10);
+  return formatLocalDate(d);
 }
 
 export function buildPhaseSpecs(config: ProgramConfig): PhaseSpec[] {
@@ -162,7 +163,7 @@ export function buildPhaseSpecs(config: ProgramConfig): PhaseSpec[] {
 }
 
 export function getCurrentPhase(config: ProgramConfig): PhaseSpec | null {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateStr();
   return buildPhaseSpecs(config).find(s => today >= s.startDate && today < s.endDate) ?? null;
 }
 

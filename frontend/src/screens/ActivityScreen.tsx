@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { localDateStr, formatLocalDate } from '../utils/date';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
@@ -58,7 +59,7 @@ export function ActivityScreen() {
     for (let i = 0; i < 365; i++) {
       const d = new Date(today);
       d.setDate(d.getDate() - i);
-      const dateStr = d.toISOString().slice(0, 10);
+      const dateStr = formatLocalDate(d);
       const found = activityDays.find(a => a.date === dateStr);
       if (found && found.level > 0) streak++;
       else if (i > 0) break;

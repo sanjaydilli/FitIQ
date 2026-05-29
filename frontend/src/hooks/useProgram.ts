@@ -1,3 +1,4 @@
+import { localDateStr, formatLocalDate } from '../utils/date';
 import { useCallback, useMemo, useState } from 'react';
 import { useUser } from '../context/UserContext';
 import { useBodyComp } from './useBodyComp';
@@ -47,7 +48,7 @@ export function useProgram() {
     if (!config) return null;
     const d = new Date(config.startDate + 'T00:00:00');
     d.setMonth(d.getMonth() + 3);
-    return d.toISOString().slice(0, 10);
+    return formatLocalDate(d);
   }, [config]);
 
   const daysRemaining = useMemo(() => {
@@ -111,7 +112,7 @@ export function useProgram() {
       id: `prog_${Date.now()}`,
       type,
       durationMonths: 3,
-      startDate: new Date().toISOString().slice(0, 10),
+      startDate: localDateStr(),
       startWeight:     latest?.weightKg   ?? user.weightKg,
       startLeanMass:   latest?.leanMass   ?? Math.round(user.weightKg * 0.82),
       startBodyFatPct: latest?.bodyFatPct ?? 18,

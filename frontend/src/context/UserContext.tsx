@@ -104,6 +104,16 @@ function loadFromStorage(): UserState {
   }
 }
 
+const FITIQ_STORAGE_KEYS = [
+  'fitiq.user', 'fitiq.foodLog', 'fitiq.workoutLog', 'fitiq.bodyComp',
+  'fitiq.coach.history', 'fitiq.program.config', 'fitiq.program.plans',
+  'fitiq.recipes', 'fitiq.stepBaseline', 'fitiq.stepBaselineDate',
+];
+
+function clearUserData() {
+  FITIQ_STORAGE_KEYS.forEach(k => localStorage.removeItem(k));
+}
+
 const UserContext = createContext<UserContextValue | null>(null);
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
@@ -139,7 +149,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       FirebaseAuthentication.addListener('authStateChange', ({ user }: { user: { uid: string; displayName?: string } | null }) => {
         if (!mounted) return;
         if (user) onUser(user.uid, user.displayName);
-        else setFirebaseUid(null);
+        else { clearUserData(); setUser({ ...defaultUser, waterDate: localDateStr() }); setFirebaseUid(null); }
       });
       FirebaseAuthentication.getCurrentUser().then(({ user }: { user: { uid: string; displayName?: string } | null }) => {
         if (!mounted || !user) return;
@@ -151,7 +161,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       const { auth: webAuth } = require('../firebase');
       const unsub = onAuthStateChanged(webAuth, (fbUser: { uid: string; displayName?: string } | null) => {
         if (fbUser) onUser(fbUser.uid, fbUser.displayName);
-        else setFirebaseUid(null);
+        else { clearUserData(); setUser({ ...defaultUser, waterDate: localDateStr() }); setFirebaseUid(null); }
       });
       return unsub;
     }

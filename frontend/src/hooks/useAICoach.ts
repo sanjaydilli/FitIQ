@@ -1,3 +1,4 @@
+import { localDateStr, formatLocalDate } from '../utils/date';
 import { useState, useCallback, useMemo } from 'react';
 import { useUser } from '../context/UserContext';
 import { useFoodLog } from './useFoodLog';
@@ -70,7 +71,7 @@ export function useAICoach(liveStats?: Partial<UserStats>) {
       ? Math.round((Date.now() - lastMealMs) / 60000)
       : 120;
 
-    const todayISO = now.toISOString().slice(0, 10);
+    const todayISO = localDateStr();
     const lastSession = sessions.filter(s => s.date === todayISO)[0];
     const workoutMinutesAgo = lastSession
       ? Math.round((Date.now() - new Date(lastSession.date + 'T12:00:00').getTime()) / 60000)

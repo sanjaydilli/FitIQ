@@ -1,4 +1,5 @@
 import React, { memo, useMemo } from 'react';
+import { localDateStr, formatLocalDate } from '../utils/date';
 import { motion } from 'framer-motion';
 
 export interface DayActivity {
@@ -18,7 +19,7 @@ function datesBetween(start: Date, end: Date): string[] {
   const dates: string[] = [];
   const cur = new Date(start);
   while (cur <= end) {
-    dates.push(cur.toISOString().slice(0, 10));
+    dates.push(formatLocalDate(cur));
     cur.setDate(cur.getDate() + 1);
   }
   return dates;

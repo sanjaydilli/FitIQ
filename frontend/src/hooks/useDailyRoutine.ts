@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
+import { localDateStr, formatLocalDate } from '../utils/date';
 import { useUser } from '../context/UserContext';
 
 export type ActivityCategory = 'morning' | 'nutrition' | 'workout' | 'hydration' | 'evening' | 'sleep';
@@ -27,7 +28,7 @@ type DayStore = Record<string, boolean>; // activityId → completed
 type Store = Record<string, DayStore>;    // dateKey → DayStore
 
 function dateKey(date: Date): string {
-  return date.toISOString().slice(0, 10);
+  return formatLocalDate(date);
 }
 
 function loadStore(): Store {

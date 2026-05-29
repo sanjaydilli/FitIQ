@@ -38,7 +38,7 @@ export function MealPlanner() {
   const [error, setError] = useState<string | null>(null);
   const [logged, setLogged] = useState<Set<string>>(new Set());
 
-  const targetCalories = tdee + goalCalorieAdjust(user.goal);
+  const targetCalories = (tdee || Math.round(user.weightKg * 30)) + goalCalorieAdjust(user.goal);
   const targetProtein = Math.round(user.weightKg * 2.0);
 
   const generate = useCallback(async () => {

@@ -1,4 +1,5 @@
 import React, { useMemo, useEffect, useRef, useState } from 'react';
+import { localDateStr, formatLocalDate } from '../utils/date';
 import { Capacitor } from '@capacitor/core';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -30,19 +31,19 @@ export function Home() {
   const { latest: bodyCompLatest, trend: bodyCompTrend, tdee } = useBodyComp();
   const { sessions } = useWorkoutLog();
   const { todayTotals, activeDays } = useFoodLog();
-  const todayISO = new Date().toISOString().slice(0, 10);
+  const todayISO = localDateStr();
   const todaySession = sessions.find(s => s.date === todayISO) ?? null;
 
   // Compute real streak from actual food/workout activity and sync to user.streak
   const computedStreak = useMemo(() => {
     const now = new Date();
-    const todayDS = now.toISOString().slice(0, 10);
+    const todayDS = formatLocalDate(now);
     const todayActive = activeDays.has(todayDS) || sessions.some(s => s.date === todayDS);
     let count = 0;
     for (let i = todayActive ? 0 : 1; i < 365; i++) {
       const d = new Date(now);
       d.setDate(d.getDate() - i);
-      const ds = d.toISOString().slice(0, 10);
+      const ds = formatLocalDate(d);
       if (activeDays.has(ds) || sessions.some(s => s.date === ds)) count++;
       else break;
     }
