@@ -104,14 +104,10 @@ function loadFromStorage(): UserState {
   }
 }
 
-const FITIQ_STORAGE_KEYS = [
-  'fitiq.user', 'fitiq.foodLog', 'fitiq.workoutLog', 'fitiq.bodyComp',
-  'fitiq.coach.history', 'fitiq.program.config', 'fitiq.program.plans',
-  'fitiq.recipes', 'fitiq.stepBaseline', 'fitiq.stepBaselineDate',
-];
-
 function clearUserData() {
-  FITIQ_STORAGE_KEYS.forEach(k => localStorage.removeItem(k));
+  Object.keys(localStorage)
+    .filter(k => k.startsWith('fitiq.'))
+    .forEach(k => localStorage.removeItem(k));
 }
 
 const UserContext = createContext<UserContextValue | null>(null);

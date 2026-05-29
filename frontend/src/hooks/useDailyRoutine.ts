@@ -101,12 +101,12 @@ function buildDefaultRoutine(goal: Goal, activity: Activity): RoutineActivity[] 
   return base.sort((a, b) => a.hour * 60 + a.minute - (b.hour * 60 + b.minute));
 }
 
-// Custom activity counter (persisted)
-let _customCounter = parseInt(localStorage.getItem('fitiq.routine.counter') ?? '0', 10);
+// Custom activity counter — read fresh from localStorage each time
+// so logout+clear doesn't leave a stale in-memory counter
 function nextCustomId(): string {
-  _customCounter++;
-  localStorage.setItem('fitiq.routine.counter', String(_customCounter));
-  return `custom_${_customCounter}`;
+  const n = parseInt(localStorage.getItem('fitiq.routine.counter') ?? '0', 10) + 1;
+  localStorage.setItem('fitiq.routine.counter', String(n));
+  return `custom_${n}`;
 }
 
 // ── Hook ──────────────────────────────────────────────────────────────────────

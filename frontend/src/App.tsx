@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { PhoneFrame } from './components/PhoneFrame';
 import { useAndroidBack } from './hooks/useAndroidBack';
 import { useStepCounter } from './hooks/useStepCounter';
+import { useNotifications } from './hooks/useNotifications';
 
 // Eagerly loaded — part of the initial shell
 import { ThemeSelector } from './screens/ThemeSelector';
@@ -79,6 +80,7 @@ function AnimatedRoutes() {
   const location = useLocation();
   useAndroidBack();
   const { permissionDenied } = useStepCounter();
+  useNotifications();
   const [showStepBanner, setShowStepBanner] = useState(false);
   useEffect(() => {
     if (permissionDenied) {

@@ -7,6 +7,7 @@ import { Background } from '../components/Background';
 import { TabBar } from '../components/TabBar';
 import { Icon } from '../components/Icon';
 import { useAICoach, ChatMessage } from '../hooks/useAICoach';
+import { markCoachOpened } from '../hooks/useNotifications';
 import { useFoodLog } from '../hooks/useFoodLog';
 import { useBodyComp } from '../hooks/useBodyComp';
 import { goalCalorieAdjust } from '../utils/bodyComposition';
@@ -45,8 +46,9 @@ export function AICoach() {
     fat: todayTotals.fat,
     water: eatenWaterL,
     targetWater: TOTAL_WATER_L,
-    mealCount: todayTotals.entries.length,
   });
+
+  useEffect(() => { markCoachOpened(); }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
