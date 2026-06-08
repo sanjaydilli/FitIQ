@@ -71,18 +71,19 @@ export function FoodLog() {
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
         {/* Header */}
         <div style={{ padding: '56px 20px 0', flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
             <div>
-              <div style={{ fontSize: 9, color: theme.accent, fontFamily: theme.mono, letterSpacing: 2.5 }}>FOOD DIARY</div>
-              <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: -0.4 }}>Nutrition</div>
+              <div style={{ fontSize: 10, color: theme.accent, fontFamily: theme.mono, letterSpacing: 2, fontWeight: 700 }}>FOOD DIARY</div>
+              <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: -0.5, marginTop: 2 }}>Nutrition</div>
             </div>
             <motion.button
-              whileTap={{ scale: 0.93 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/food')}
               style={{
-                padding: '8px 16px', borderRadius: 12, border: 'none',
+                padding: '9px 16px', borderRadius: 12, border: 'none',
                 background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
                 color: theme.onAccent, fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                boxShadow: `0 4px 14px ${theme.accent}38, inset 0 1px 0 rgba(255,255,255,0.18)`,
               }}
             >
               + Add Food
@@ -90,12 +91,12 @@ export function FoodLog() {
           </div>
 
           {/* Date navigator */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
             <motion.button whileTap={{ scale: 0.9 }} onClick={prevDay}
               style={{ background: theme.card, border: `1px solid ${theme.cardBorder}`, borderRadius: 10, padding: '6px 12px', color: theme.text, cursor: 'pointer', fontSize: 14 }}>
               ‹
             </motion.button>
-            <div style={{ flex: 1, textAlign: 'center', fontSize: 13, fontWeight: 600 }}>
+            <div style={{ flex: 1, textAlign: 'center', fontSize: 13, fontWeight: 700, letterSpacing: -0.1 }}>
               {viewDate === today ? 'Today' : formatDate(viewDate)}
             </div>
             <motion.button whileTap={{ scale: 0.9 }} onClick={nextDay}
@@ -108,7 +109,7 @@ export function FoodLog() {
 
         <div style={{ flex: 1, overflowY: 'auto', padding: '0 20px 110px' }}>
           {/* Macro summary */}
-          <Card style={{ borderRadius: 20, padding: '16px', marginBottom: 12 }}>
+          <Card style={{ borderRadius: 20, padding: 16, marginBottom: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
               <MacroRing
                 calories={totals.calories}
@@ -118,16 +119,16 @@ export function FoodLog() {
                 fat={totals.fat}
                 size={100}
               />
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 {/* Calorie deficit/surplus */}
                 <div style={{ marginBottom: 10 }}>
-                  <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5 }}>
+                  <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5, fontFamily: theme.mono }}>
                     {totals.calories > 0 ? totals.calories.toLocaleString() : '—'}
-                    <span style={{ fontSize: 11, color: theme.textMute, fontWeight: 400 }}> / {targetCalories} kcal</span>
+                    <span style={{ fontSize: 11, color: theme.textMute, fontWeight: 400, fontFamily: theme.mono }}> / {targetCalories} kcal</span>
                   </div>
                   {totals.calories > 0 && (
                     <div style={{
-                      fontSize: 11, fontFamily: theme.mono, fontWeight: 700,
+                      fontSize: 11, fontFamily: theme.mono, fontWeight: 700, marginTop: 2,
                       color: deficit >= 0 ? '#4ade80' : '#F87171',
                     }}>
                       {deficit >= 0 ? `${deficit} kcal under target` : `${Math.abs(deficit)} kcal over target`}
@@ -161,23 +162,30 @@ export function FoodLog() {
           {MEAL_ORDER.map(meal => {
             const entries = byMeal[meal];
             const mealCal = entries.reduce((s, e) => s + e.calories, 0);
+            const color = MEAL_COLORS[meal];
             return (
-              <div key={meal} style={{ marginBottom: 12 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6, padding: '0 2px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Icon name={MEAL_ICONS[meal]} size={14} color={MEAL_COLORS[meal]} />
-                    <span style={{ fontSize: 12, fontWeight: 700, textTransform: 'capitalize' }}>{meal}</span>
+              <div key={meal} style={{ marginBottom: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, padding: '0 2px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{
+                      width: 22, height: 22, borderRadius: 7,
+                      background: `${color}18`, border: `1px solid ${color}30`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <Icon name={MEAL_ICONS[meal]} size={12} color={color} />
+                    </div>
+                    <span style={{ fontSize: 13, fontWeight: 700, textTransform: 'capitalize', letterSpacing: -0.2 }}>{meal}</span>
                     {mealCal > 0 && (
-                      <span style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono }}>{mealCal} kcal</span>
+                      <span style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono }}>· {mealCal} kcal</span>
                     )}
                   </div>
                   <motion.button
-                    whileTap={{ scale: 0.88 }}
+                    whileTap={{ scale: 0.9 }}
                     onClick={() => navigate(`/food?meal=${meal}`)}
                     style={{
-                      background: `${MEAL_COLORS[meal]}18`, border: `1px solid ${MEAL_COLORS[meal]}40`,
-                      borderRadius: 8, padding: '3px 10px', cursor: 'pointer',
-                      color: MEAL_COLORS[meal], fontSize: 13, fontWeight: 700, lineHeight: 1.4,
+                      background: `${color}18`, border: `1px solid ${color}40`,
+                      borderRadius: 8, padding: '4px 12px', cursor: 'pointer',
+                      color, fontSize: 12, fontWeight: 700, lineHeight: 1.4, letterSpacing: 0.2,
                     }}
                   >
                     + Add
@@ -194,13 +202,13 @@ export function FoodLog() {
                         exit={{ opacity: 0, height: 0 }}
                         style={{
                           display: 'flex', alignItems: 'center', gap: 10,
-                          padding: '10px 14px',
+                          padding: '12px 14px',
                           borderBottom: i < entries.length - 1 ? `1px solid ${theme.cardBorder}` : 'none',
                         }}
                       >
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 13, fontWeight: 600 }}>{entry.name}</div>
-                          <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 13, fontWeight: 600, letterSpacing: -0.2 }}>{entry.name}</div>
+                          <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, marginTop: 2 }}>
                             P:{entry.protein}g · C:{entry.carbs}g · F:{entry.fat}g
                           </div>
                         </div>
@@ -210,7 +218,7 @@ export function FoodLog() {
                         <motion.button
                           whileTap={{ scale: 0.88 }}
                           onClick={() => removeEntry(entry.id)}
-                          style={{ background: 'none', border: 'none', color: 'rgba(248,113,113,0.6)', cursor: 'pointer', fontSize: 16, padding: '0 4px', lineHeight: 1 }}
+                          style={{ background: 'none', border: 'none', color: 'rgba(248,113,113,0.6)', cursor: 'pointer', fontSize: 18, padding: '0 4px', lineHeight: 1 }}
                         >
                           ×
                         </motion.button>
@@ -218,14 +226,30 @@ export function FoodLog() {
                     )) : (
                       <motion.div
                         whileTap={{ scale: 0.97 }}
+                        whileHover={{ background: `${color}06` }}
                         onClick={() => navigate(`/food?meal=${meal}`)}
                         style={{
-                          padding: '12px 14px', cursor: 'pointer',
-                          display: 'flex', alignItems: 'center', gap: 8,
+                          padding: '16px 14px', cursor: 'pointer',
+                          display: 'flex', alignItems: 'center', gap: 12,
                         }}
                       >
-                        <span style={{ fontSize: 16, opacity: 0.4 }}>+</span>
-                        <span style={{ fontSize: 12, color: theme.textMute }}>Add {meal}</span>
+                        <div style={{
+                          width: 36, height: 36, borderRadius: 10,
+                          background: `${color}14`, border: `1px dashed ${color}45`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          flexShrink: 0,
+                        }}>
+                          <Icon name={MEAL_ICONS[meal]} size={16} color={color} />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: theme.textDim, textTransform: 'capitalize', letterSpacing: -0.1 }}>
+                            Log your {meal}
+                          </div>
+                          <div style={{ fontSize: 11, color: theme.textMute, marginTop: 1 }}>
+                            Tap to search or scan a barcode
+                          </div>
+                        </div>
+                        <div style={{ fontSize: 18, color: `${color}90`, fontWeight: 300, lineHeight: 1 }}>+</div>
                       </motion.div>
                     )}
                   </AnimatePresence>

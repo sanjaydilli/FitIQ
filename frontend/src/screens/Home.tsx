@@ -161,20 +161,14 @@ export function Home() {
           }}
         >
           <div>
-            <div style={{ fontSize: 12, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1 }}>
+            <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.5, fontWeight: 600 }}>
               {today}
             </div>
-            <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: -0.4 }}>Hey, {user.name}</div>
+            <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: -0.5, marginTop: 2 }}>Hey, {user.name}</div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <Card style={{ width: 'auto', height: 38, borderRadius: 12, padding: '0 10px', display: 'flex', alignItems: 'center', gap: 4 }}>
-              <motion.div
-                animate={{ scale: [1, 1.15, 1], rotate: [-3, 3, -3] }}
-                transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
-                style={{ display: 'inline-flex' }}
-              >
-                <Icon name="flame" size={14} color="#FB923C" />
-              </motion.div>
+            <Card style={{ width: 'auto', height: 38, borderRadius: 12, padding: '0 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Icon name="flame" size={14} color="#FB923C" />
               <span style={{ fontSize: 12, fontWeight: 700, fontFamily: theme.mono }}>{user.streak}</span>
             </Card>
             <Card style={{ width: 38, height: 38, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -189,16 +183,17 @@ export function Home() {
         {/* Hero */}
         <Reveal index={0}>
         <div style={{ padding: '0 20px', marginBottom: 16 }}>
-          <Card style={{ padding: 20, borderRadius: 26, position: 'relative', overflow: 'hidden' }}>
-            <Shimmer color={`${theme.accent2}30`} duration={3.2} delay={0.6} />
+          <Card style={{ padding: 20, borderRadius: 24, position: 'relative', overflow: 'hidden' }}>
+            <Shimmer color={`${theme.accent2}24`} duration={3.6} delay={1} />
             <div
               style={{
                 position: 'absolute',
                 inset: 0,
-                background: `radial-gradient(circle at 30% 50%, ${theme.accent2}30, transparent 60%)`,
+                background: `radial-gradient(circle at 30% 50%, ${theme.accent2}28, transparent 60%)`,
+                pointerEvents: 'none',
               }}
             />
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 14 }}>
               <motion.div
                 whileTap={{ scale: 0.96 }}
                 onClick={() => navigate('/profile')}
@@ -208,31 +203,33 @@ export function Home() {
                   background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 28, fontWeight: 800, color: theme.onAccent,
-                  boxShadow: `0 4px 20px ${theme.accent}50`,
+                  boxShadow: `0 4px 20px ${theme.accent}50, inset 0 1px 0 rgba(255,255,255,0.25)`,
                 }}
               >
                 {(user.name?.[0] ?? '?').toUpperCase()}
               </motion.div>
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <div
                   style={{
                     fontSize: 10,
                     color: theme.textMute,
                     fontFamily: theme.mono,
-                    letterSpacing: 1.2,
+                    letterSpacing: 1.5,
+                    fontWeight: 700,
                     marginBottom: 4,
                   }}
                 >
                   HEALTH SCORE
                 </div>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 4 }}>
                   <div
                     style={{
-                      fontSize: 56,
+                      fontSize: 52,
                       fontWeight: 800,
                       letterSpacing: -2,
                       lineHeight: 1,
                       fontFeatureSettings: '"tnum"',
+                      fontFamily: theme.mono,
                       background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
@@ -240,9 +237,9 @@ export function Home() {
                   >
                     {healthScore}
                   </div>
-                  <div style={{ color: theme.textDim, fontSize: 14 }}>/100</div>
+                  <div style={{ color: theme.textDim, fontSize: 14, fontFamily: theme.mono }}>/100</div>
                 </div>
-                <div style={{ fontSize: 12, color: theme.textDim, marginBottom: 8 }}>
+                <div style={{ fontSize: 12, color: theme.textDim, marginBottom: 10, lineHeight: 1.4 }}>
                   {healthScore >= 80 ? 'Looking great today 🔥' : healthScore >= 50 ? 'Keep going, almost there' : 'Log food & water to boost'}
                 </div>
                 <Pill>LVL {user.level}{bfCat ? ` · ${bfCat.label.toUpperCase()}` : ''}</Pill>
@@ -254,7 +251,7 @@ export function Home() {
 
         {/* Water timeline */}
         <Reveal index={1}>
-        <div style={{ padding: '0 20px', marginBottom: 14 }}>
+        <div style={{ padding: '0 20px', marginBottom: 16 }}>
           <WaterTimeline />
         </div>
         </Reveal>
@@ -264,71 +261,118 @@ export function Home() {
         <StepsCard />
         </Reveal>
 
-        {/* Metric grid */}
-        <div style={{ padding: '0 20px', marginBottom: 14 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
-            {metrics.map((m, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 12, scale: 0.96 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ delay: 0.18 + i * 0.07, type: 'spring', stiffness: 280, damping: 22 }}
-                whileTap={{ scale: 0.96 }}
-                whileHover={{ y: -2 }}
-              >
-                <Card style={{ padding: '12px 14px', borderRadius: 18 }}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      marginBottom: 8,
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: 11,
-                        color: theme.textDim,
-                        fontFamily: theme.mono,
-                        letterSpacing: 1,
-                      }}
-                    >
-                      {m.l.toUpperCase()}
+        {/* Metric grid — calories hero + 2 stacked */}
+        <div style={{ padding: '0 20px', marginBottom: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.35fr 1fr', gap: 10 }}>
+            {/* Calories hero */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.18, type: 'spring', stiffness: 280, damping: 22 }}
+              whileTap={{ scale: 0.97 }}
+              whileHover={{ y: -2 }}
+              onClick={() => navigate('/food-log')}
+              style={{ cursor: 'pointer' }}
+            >
+              <Card style={{ padding: '14px 16px', borderRadius: 20, position: 'relative', overflow: 'hidden', height: '100%' }}>
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  background: `radial-gradient(circle at 80% 20%, ${metrics[0].col}28, transparent 65%)`,
+                  pointerEvents: 'none',
+                }} />
+                <div style={{ position: 'relative' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                    <div style={{
+                      fontSize: 11, color: theme.textDim, fontFamily: theme.mono,
+                      letterSpacing: 1.5, fontWeight: 700,
+                    }}>
+                      CALORIES
                     </div>
-                    <Icon name={m.iconName} size={16} color={m.col} />
+                    <div style={{
+                      width: 32, height: 32, borderRadius: 10,
+                      background: `${metrics[0].col}1f`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <Icon name={metrics[0].iconName} size={16} color={metrics[0].col} />
+                    </div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 3 }}>
-                    <span
-                      style={{
-                        fontSize: 22,
-                        fontWeight: 700,
-                        letterSpacing: -0.5,
-                        fontFeatureSettings: '"tnum"',
-                      }}
-                    >
-                      {m.v}
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 10 }}>
+                    <span style={{
+                      fontSize: 34, fontWeight: 800, letterSpacing: -1,
+                      fontFeatureSettings: '"tnum"', fontFamily: theme.mono, lineHeight: 1,
+                    }}>
+                      {metrics[0].v}
                     </span>
-                    <span style={{ color: theme.textMute, fontSize: 11 }}>{m.max}</span>
+                    <span style={{ color: theme.textMute, fontSize: 12, fontFamily: theme.mono }}>{metrics[0].max}</span>
                   </div>
-                  <div
-                    style={{
-                      marginTop: 8,
-                      height: 3,
-                      borderRadius: 2,
-                      background: 'rgba(255,255,255,0.06)',
-                      overflow: 'hidden',
-                    }}
-                  >
+                  <div style={{
+                    height: 4, borderRadius: 2,
+                    background: 'rgba(255,255,255,0.06)', overflow: 'hidden',
+                  }}>
                     <motion.div
                       initial={{ width: 0 }}
-                      animate={{ width: `${m.pct}%` }}
-                      transition={{ duration: 0.8, delay: i * 0.08 }}
-                      style={{ height: '100%', background: m.col, borderRadius: 2 }}
+                      animate={{ width: `${metrics[0].pct}%` }}
+                      transition={{ duration: 0.8 }}
+                      style={{
+                        height: '100%', borderRadius: 2,
+                        background: `linear-gradient(90deg, ${metrics[0].col}, ${metrics[0].col}aa)`,
+                      }}
                     />
                   </div>
-                </Card>
-              </motion.div>
-            ))}
+                  <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, marginTop: 6 }}>
+                    {metrics[0].pct}% OF TARGET
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+
+            {/* Protein + Steps stacked */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {metrics.slice(1).map((m, i) => (
+                <motion.div
+                  key={m.l}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.22 + i * 0.06, type: 'spring', stiffness: 280, damping: 22 }}
+                  whileTap={{ scale: 0.96 }}
+                  whileHover={{ y: -2 }}
+                  onClick={() => navigate(m.l === 'Protein' ? '/food-log' : '/activity')}
+                  style={{ flex: 1, cursor: 'pointer' }}
+                >
+                  <Card style={{ padding: '10px 12px', borderRadius: 16, height: '100%' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                      <div style={{
+                        fontSize: 10, color: theme.textDim, fontFamily: theme.mono,
+                        letterSpacing: 1, fontWeight: 700,
+                      }}>
+                        {m.l.toUpperCase()}
+                      </div>
+                      <Icon name={m.iconName} size={14} color={m.col} />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 3 }}>
+                      <span style={{
+                        fontSize: 18, fontWeight: 700, letterSpacing: -0.4,
+                        fontFeatureSettings: '"tnum"', fontFamily: theme.mono,
+                      }}>
+                        {m.v}
+                      </span>
+                      <span style={{ color: theme.textMute, fontSize: 10, fontFamily: theme.mono }}>{m.max}</span>
+                    </div>
+                    <div style={{
+                      marginTop: 6, height: 3, borderRadius: 2,
+                      background: 'rgba(255,255,255,0.06)', overflow: 'hidden',
+                    }}>
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${m.pct}%` }}
+                        transition={{ duration: 0.8, delay: 0.1 + i * 0.06 }}
+                        style={{ height: '100%', background: m.col, borderRadius: 2 }}
+                      />
+                    </div>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -341,7 +385,7 @@ export function Home() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.3, ease: [0.22, 0.8, 0.22, 1] }}
-              style={{ padding: '0 20px', marginBottom: 14 }}
+              style={{ padding: '0 20px', marginBottom: 16 }}
             >
               <WarningCard
                 warning={activeWarning}
@@ -354,9 +398,9 @@ export function Home() {
         </AnimatePresence>
 
         {/* Ask AI Coach */}
-        <div style={{ padding: '0 20px', marginBottom: 14 }}>
+        <div style={{ padding: '0 20px', marginBottom: 16 }}>
           <motion.div
-            whileTap={{ scale: 0.97, rotateX: 4 }}
+            whileTap={{ scale: 0.97 }}
             whileHover={{ y: -2 }}
             onClick={() => navigate('/coach')}
             style={{
@@ -367,24 +411,25 @@ export function Home() {
               borderRadius: 18,
               background: `linear-gradient(135deg, ${theme.accent}18, ${theme.accent2}12)`,
               border: `1px solid ${theme.accent}30`,
+              boxShadow: `inset 0 1px 0 rgba(255,255,255,0.04)`,
               cursor: 'pointer',
             }}
           >
-            <motion.div
-              animate={{ scale: [1, 1.12, 1], rotate: [0, 6, -6, 0] }}
-              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            <div
               style={{
                 width: 40,
                 height: 40,
                 borderRadius: 12,
                 background: `linear-gradient(135deg, ${theme.accent}30, ${theme.accent2}20)`,
+                border: `1px solid ${theme.accent}30`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                flexShrink: 0,
               }}
             >
               <Icon name="brain" size={20} color={theme.accent} />
-            </motion.div>
+            </div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2 }}>Ask AI Coach</div>
               <div style={{ fontSize: 11, color: theme.textDim }}>
@@ -398,9 +443,9 @@ export function Home() {
         </div>
 
         {/* Today's Routine */}
-        <div style={{ padding: '0 20px', marginBottom: 14 }}>
+        <div style={{ padding: '0 20px', marginBottom: 16 }}>
           <motion.div
-            whileTap={{ scale: 0.97, rotateX: 4 }}
+            whileTap={{ scale: 0.97 }}
             whileHover={{ y: -2 }}
             onClick={() => navigate('/routine')}
             style={{
@@ -434,7 +479,7 @@ export function Home() {
         </div>
 
         {/* Meal Planner + Activity + Wrapped quick links */}
-        <div style={{ padding: '0 20px', marginBottom: 14, display: 'flex', gap: 10 }}>
+        <div style={{ padding: '0 20px', marginBottom: 16, display: 'flex', gap: 10 }}>
           {[
             { iconName: 'utensils' as const, label: 'Meal Plan', sub: 'AI-powered', path: '/meal-plan', color: '#FB923C' },
             { iconName: 'leaf' as const,    label: 'Recipes',   sub: '3235 dishes', path: '/recipes',  color: '#4ade80' },
@@ -448,12 +493,17 @@ export function Home() {
               onClick={() => navigate(path)}
               style={{ flex: 1, cursor: 'pointer' }}
             >
-              <Card style={{ padding: '12px 10px', borderRadius: 18, textAlign: 'center' }}>
-                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6 }}>
-                  <Icon name={iconName} size={22} color={color} />
+              <Card style={{ padding: '14px 10px 12px', borderRadius: 18, textAlign: 'center' }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: 10,
+                  background: `${color}18`, border: `1px solid ${color}25`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  margin: '0 auto 8px',
+                }}>
+                  <Icon name={iconName} size={18} color={color} />
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 700, color }}>{label}</div>
-                <div style={{ fontSize: 9, color: theme.textMute }}>{sub}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color, letterSpacing: -0.1 }}>{label}</div>
+                <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, marginTop: 1, letterSpacing: 0.4 }}>{sub}</div>
               </Card>
             </motion.div>
           ))}
@@ -461,17 +511,17 @@ export function Home() {
 
         {/* Daily Quests */}
         <Reveal index={5}>
-        <div style={{ padding: '0 20px', marginBottom: 14 }}>
+        <div style={{ padding: '0 20px', marginBottom: 16 }}>
           <div
             style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              marginBottom: 8,
+              marginBottom: 10,
             }}
           >
-            <div style={{ fontSize: 13, fontWeight: 700 }}>Daily Quests</div>
-            <div style={{ fontSize: 11, color: theme.accent, fontFamily: theme.mono }}>
+            <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: -0.2 }}>Daily Quests</div>
+            <div style={{ fontSize: 11, color: theme.accent, fontFamily: theme.mono, fontWeight: 700, letterSpacing: 0.5 }}>
               +{quests.filter(q => q.done).reduce((s, q) => s + q.xp, 0)} XP TODAY
             </div>
           </div>
@@ -546,7 +596,7 @@ export function Home() {
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            style={{ padding: '0 20px', marginBottom: 14 }}
+            style={{ padding: '0 20px', marginBottom: 16 }}
           >
             <motion.div
               whileTap={{ scale: 0.97 }}
@@ -578,7 +628,7 @@ export function Home() {
 
         {/* Body Comp + Strength quick cards */}
         {(bodyCompLatest || sessions.length > 0) && (
-          <div style={{ padding: '0 20px', marginBottom: 14 }}>
+          <div style={{ padding: '0 20px', marginBottom: 16 }}>
             <div style={{ display: 'grid', gridTemplateColumns: bodyCompLatest && sessions.length > 0 ? '1fr 1fr' : '1fr', gap: 10 }}>
               {bodyCompLatest && bfCat && (
                 <motion.div whileTap={{ scale: 0.96 }} whileHover={{ y: -2 }} onClick={() => navigate('/body-comp')} style={{ cursor: 'pointer' }}>
@@ -610,36 +660,44 @@ export function Home() {
 
         {/* Today's workout */}
         <Reveal index={6}>
-        <div style={{ padding: '0 20px', marginBottom: 14 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>Today's Workout</div>
+        <div style={{ padding: '0 20px', marginBottom: 16 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, letterSpacing: -0.2 }}>Today's Workout</div>
           {todaySession ? (
             <motion.div whileTap={{ scale: 0.97 }} whileHover={{ y: -2 }} onClick={() => navigate('/workout/history')}>
-              <Card style={{ padding: 14, borderRadius: 18, display: 'flex', alignItems: 'center', gap: 12, position: 'relative', overflow: 'hidden' }}>
-                <Shimmer color="rgba(74,222,128,0.25)" duration={2.6} delay={0.8} />
-                <div style={{ width: 56, height: 56, borderRadius: 12, background: 'rgba(74,222,128,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Icon name="check" size={26} color="#4ade80" />
+              <Card style={{ padding: 14, borderRadius: 18, display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 52, height: 52, borderRadius: 14, background: 'rgba(74,222,128,0.14)', border: '1px solid rgba(74,222,128,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Icon name="check" size={24} color="#4ade80" />
                 </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2 }}>{todaySession.name}</div>
-                  <div style={{ fontSize: 11, color: theme.textDim }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2, letterSpacing: -0.2 }}>{todaySession.name}</div>
+                  <div style={{ fontSize: 11, color: theme.textDim, fontFamily: theme.mono }}>
                     {todaySession.exercises.length} exercises · {todaySession.totalVolume.toLocaleString()} kg volume
                   </div>
                 </div>
-                <div style={{ fontSize: 11, fontFamily: theme.mono, fontWeight: 700, color: '#4ade80' }}>DONE ✓</div>
+                <div style={{
+                  fontSize: 10, fontFamily: theme.mono, fontWeight: 800, color: '#4ade80',
+                  background: 'rgba(74,222,128,0.12)', border: '1px solid rgba(74,222,128,0.3)',
+                  borderRadius: 8, padding: '3px 8px', letterSpacing: 0.8,
+                }}>DONE ✓</div>
               </Card>
             </motion.div>
           ) : (
             <motion.div whileTap={{ scale: 0.97 }} whileHover={{ y: -2 }} onClick={() => navigate('/workout')}>
               <Card style={{ padding: 14, borderRadius: 18, display: 'flex', alignItems: 'center', gap: 12, position: 'relative', overflow: 'hidden' }}>
-                <Shimmer color={`${theme.accent}40`} duration={2.6} delay={0.8} />
-                <div style={{ width: 56, height: 56, borderRadius: 12, background: `linear-gradient(135deg, ${theme.accent2}40, ${theme.accent}30)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Icon name="dumbbell" size={26} color={theme.accent} />
+                <Shimmer color={`${theme.accent}30`} duration={3.2} delay={1.2} />
+                <div style={{ width: 52, height: 52, borderRadius: 14, background: `linear-gradient(135deg, ${theme.accent2}38, ${theme.accent}28)`, border: `1px solid ${theme.accent}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Icon name="dumbbell" size={24} color={theme.accent} />
                 </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2 }}>Start Today's Workout</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2, letterSpacing: -0.2 }}>Start Today's Workout</div>
                   <div style={{ fontSize: 11, color: theme.textDim }}>Push · Pull · Legs · Full Body</div>
                 </div>
-                <div style={{ width: 40, height: 40, borderRadius: 12, background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{
+                  width: 40, height: 40, borderRadius: 12,
+                  background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: `0 4px 12px ${theme.accent}40`, flexShrink: 0,
+                }}>
                   <svg width="14" height="14" viewBox="0 0 12 12" fill={theme.onAccent}><path d="M3 1.5l7 4.5-7 4.5z" /></svg>
                 </div>
               </Card>
@@ -665,8 +723,8 @@ function StepsCard() {
   const remaining = Math.max(0, user.stepGoal - user.steps);
 
   return (
-    <div style={{ padding: '0 20px', marginBottom: 14 }}>
-      <Card style={{ padding: '16px', borderRadius: 20 }}>
+    <div style={{ padding: '0 20px', marginBottom: 16 }}>
+      <Card style={{ padding: 16, borderRadius: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
           <div style={{
             width: 38, height: 38, borderRadius: 12,
@@ -676,12 +734,12 @@ function StepsCard() {
             <Icon name="run" size={18} color={done ? '#4ade80' : theme.accent} />
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 13, fontWeight: 700 }}>Steps Today</div>
-            <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono }}>
+            <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: -0.2 }}>Steps Today</div>
+            <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 0.8 }}>
               {isNative ? 'AUTO-TRACKING · UPDATES LIVE' : 'OPEN ON ANDROID TO AUTO-TRACK'}
             </div>
           </div>
-          <div style={{ fontSize: 10, color: done ? '#4ade80' : theme.textMute, fontFamily: theme.mono, fontWeight: 700 }}>
+          <div style={{ fontSize: 10, color: done ? '#4ade80' : theme.textMute, fontFamily: theme.mono, fontWeight: 700, letterSpacing: 0.8 }}>
             {done ? '✓ GOAL HIT' : `${pct}%`}
           </div>
         </div>
@@ -689,12 +747,13 @@ function StepsCard() {
         {/* Big step count */}
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 10 }}>
           <div style={{
-            fontSize: 40, fontWeight: 900, letterSpacing: -2, lineHeight: 1,
+            fontSize: 36, fontWeight: 800, letterSpacing: -1.5, lineHeight: 1,
+            fontFamily: theme.mono,
             color: done ? '#4ade80' : theme.text,
           }}>
             {user.steps.toLocaleString()}
           </div>
-          <div style={{ fontSize: 13, color: theme.textMute }}>
+          <div style={{ fontSize: 12, color: theme.textMute, fontFamily: theme.mono }}>
             / {user.stepGoal.toLocaleString()} steps
           </div>
         </div>
@@ -714,7 +773,7 @@ function StepsCard() {
           />
         </div>
 
-        <div style={{ fontSize: 11, color: theme.textMute }}>
+        <div style={{ fontSize: 11, color: theme.textMute, lineHeight: 1.5 }}>
           {done ? 'Amazing! Goal reached today 🎉' : `${remaining.toLocaleString()} more steps to reach your goal`}
         </div>
       </Card>

@@ -210,42 +210,51 @@ const ActivityCard = memo(function ActivityCard({ entry, onToggle, onDelete, isN
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 12 }}
       transition={{ type: 'spring', stiffness: 340, damping: 28 }}
-      style={{ display: 'flex', alignItems: 'stretch', gap: 0, marginBottom: 4 }}
+      style={{ display: 'flex', alignItems: 'stretch', gap: 0, marginBottom: 0 }}
     >
       {/* Time column */}
-      <div style={{ width: 52, flexShrink: 0, paddingTop: 14, paddingRight: 8, textAlign: 'right' }}>
-        <div style={{ fontSize: 10, fontFamily: theme.mono, color: isNow ? meta.color : theme.textMute, fontWeight: isNow ? 700 : 400 }}>
+      <div style={{ width: 52, flexShrink: 0, paddingTop: 16, paddingRight: 8, textAlign: 'right' }}>
+        <div style={{ fontSize: 10, fontFamily: theme.mono, color: isNow ? meta.color : theme.textMute, fontWeight: isNow ? 700 : 400, letterSpacing: 0.3 }}>
           {fmtTime(entry.hour, entry.minute)}
         </div>
       </div>
 
-      {/* Timeline dot + line */}
-      <div style={{ width: 20, flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      {/* Timeline dot + continuous backbone */}
+      <div style={{ width: 20, flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
+        {/* Continuous vertical line behind the dot */}
         <div style={{
-          width: 1, height: 14, background: `${meta.color}30`,
+          position: 'absolute', top: 0, bottom: 0, width: 2,
+          background: `linear-gradient(to bottom, ${meta.color}38, ${meta.color}20)`,
+          borderRadius: 1,
         }} />
+        <div style={{ height: 16, flexShrink: 0 }} />
         <motion.div
-          animate={entry.completed ? { scale: [1, 1.3, 1] } : {}}
-          transition={{ duration: 0.3 }}
+          animate={entry.completed ? { scale: [1, 1.35, 1] } : {}}
+          transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
           style={{
-            width: isNow ? 12 : 8, height: isNow ? 12 : 8, borderRadius: '50%', flexShrink: 0,
-            background: entry.completed ? meta.color : isNow ? meta.color : `${meta.color}40`,
-            boxShadow: (entry.completed || isNow) ? `0 0 8px ${meta.color}80` : 'none',
+            width: isNow ? 14 : 10, height: isNow ? 14 : 10, borderRadius: '50%', flexShrink: 0,
+            background: entry.completed ? meta.color : isNow ? meta.color : `${meta.color}55`,
+            border: `2px solid ${entry.completed || isNow ? meta.color : meta.color + '70'}`,
+            boxShadow: (entry.completed || isNow)
+              ? `0 0 10px ${meta.color}90, 0 0 0 3px ${meta.color}20`
+              : `0 0 0 2px rgba(0,0,0,0.4)`,
             transition: 'all 0.3s',
+            zIndex: 1,
           }}
         />
-        <div style={{ flex: 1, width: 1, background: `${meta.color}20`, minHeight: 24 }} />
+        <div style={{ flex: 1, minHeight: 24 }} />
       </div>
 
       {/* Card body */}
-      <div style={{ flex: 1, paddingLeft: 10, paddingBottom: 12 }}>
+      <div style={{ flex: 1, paddingLeft: 10, paddingBottom: 12, minWidth: 0 }}>
         <motion.div
           whileTap={{ scale: 0.98 }}
           onClick={() => onToggle(entry.id)}
           style={{
             padding: '12px 14px', borderRadius: theme.radiusSm,
             background: entry.completed ? `${meta.color}10` : isNow ? `${meta.color}08` : theme.card,
-            border: `1px solid ${entry.completed ? meta.color + '30' : isNow ? meta.color + '25' : theme.cardBorder}`,
+            border: `1px solid ${entry.completed ? meta.color + '30' : isNow ? meta.color + '30' : theme.cardBorder}`,
+            boxShadow: `inset 0 1px 0 rgba(255,255,255,0.03)`,
             cursor: 'pointer', position: 'relative', overflow: 'hidden',
           }}
           onPointerDown={onPointerDown}
@@ -308,11 +317,13 @@ const ActivityCard = memo(function ActivityCard({ entry, onToggle, onDelete, isN
             <motion.div
               whileTap={{ scale: 0.85 }}
               style={{
-                width: 26, height: 26, borderRadius: 8, flexShrink: 0,
-                background: entry.completed ? meta.color : 'transparent',
-                border: `2px solid ${entry.completed ? meta.color : 'rgba(255,255,255,0.2)'}`,
+                width: 28, height: 28, borderRadius: 9, flexShrink: 0,
+                background: entry.completed ? meta.color : 'rgba(255,255,255,0.03)',
+                border: `2px solid ${entry.completed ? meta.color : 'rgba(255,255,255,0.18)'}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: entry.completed ? `0 0 10px ${meta.color}60` : 'none',
+                boxShadow: entry.completed
+                  ? `0 0 12px ${meta.color}60, inset 0 1px 0 rgba(255,255,255,0.2)`
+                  : `inset 0 1px 0 rgba(255,255,255,0.03)`,
                 transition: 'all 0.25s',
               }}
             >
@@ -320,13 +331,13 @@ const ActivityCard = memo(function ActivityCard({ entry, onToggle, onDelete, isN
                 {entry.completed && (
                   <motion.svg
                     key="check"
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
+                    initial={{ scale: 0, opacity: 0, rotate: -20 }}
+                    animate={{ scale: 1, opacity: 1, rotate: 0 }}
                     exit={{ scale: 0, opacity: 0 }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 20 }}
-                    width="13" height="13" viewBox="0 0 12 12" fill="none"
+                    transition={{ type: 'spring', stiffness: 520, damping: 18 }}
+                    width="14" height="14" viewBox="0 0 12 12" fill="none"
                   >
-                    <path d="M2 6.5L4.5 9L10 3.5" stroke={theme.onAccent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M2 6.5L4.5 9L10 3.5" stroke={theme.onAccent} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
                   </motion.svg>
                 )}
               </AnimatePresence>
@@ -450,12 +461,17 @@ export function DailyRoutine() {
 
         {/* ── Header ── */}
         <div style={{ padding: '52px 20px 0', flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
             <motion.div whileTap={{ scale: 0.88 }} onClick={() => navigate(-1)}
-              style={{ cursor: 'pointer', color: theme.textMute, fontSize: 22, lineHeight: 1 }}>‹</motion.div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 9, color: theme.accent, fontFamily: theme.mono, letterSpacing: 2 }}>DAILY ROUTINE</div>
-              <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: -0.4 }}>Schedule & Track</div>
+              style={{
+                cursor: 'pointer', color: theme.textDim, fontSize: 22, lineHeight: 1,
+                width: 32, height: 32, borderRadius: 10,
+                background: theme.card, border: `1px solid ${theme.cardBorder}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>‹</motion.div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 10, color: theme.accent, fontFamily: theme.mono, letterSpacing: 2, fontWeight: 700 }}>DAILY ROUTINE</div>
+              <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5, marginTop: 1 }}>Schedule & Track</div>
             </div>
           </div>
 
@@ -463,7 +479,8 @@ export function DailyRoutine() {
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             background: theme.card, border: `1px solid ${theme.cardBorder}`,
-            borderRadius: theme.radiusSm, padding: '10px 14px', marginBottom: 14,
+            borderRadius: theme.radiusSm, padding: '12px 14px', marginBottom: 16,
+            boxShadow: `inset 0 1px 0 rgba(255,255,255,0.03)`,
           }}>
             <motion.div whileTap={{ scale: 0.88 }} onClick={goToPrevDay}
               style={{ cursor: 'pointer', color: theme.textMute, fontSize: 20, lineHeight: 1, width: 28, textAlign: 'center' }}>‹</motion.div>
@@ -488,18 +505,18 @@ export function DailyRoutine() {
           </div>
 
           {/* ── Stats summary ── */}
-          <div style={{ display: 'flex', gap: 10, marginBottom: 14, alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 12, marginBottom: 16, alignItems: 'center' }}>
             <ProgressRing pct={stats.pct} accent={theme.accent} />
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', gap: 16, marginBottom: 8 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', gap: 16, marginBottom: 10 }}>
                 {[
                   { label: 'Completed', value: `${stats.done}/${stats.total}`, color: theme.accent },
                   { label: 'XP earned', value: `${stats.xpEarned}`, color: '#FBBF24' },
                   { label: 'XP total', value: `${stats.xpTotal}`, color: theme.textMute },
                 ].map(s => (
                   <div key={s.label}>
-                    <div style={{ fontSize: 16, fontWeight: 800, fontFamily: theme.mono, color: s.color }}>{s.value}</div>
-                    <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono }}>{s.label.toUpperCase()}</div>
+                    <div style={{ fontSize: 16, fontWeight: 800, fontFamily: theme.mono, color: s.color, letterSpacing: -0.3 }}>{s.value}</div>
+                    <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 0.8, marginTop: 1 }}>{s.label.toUpperCase()}</div>
                   </div>
                 ))}
               </div>

@@ -30,6 +30,7 @@ export function AICoach() {
   const { todayTotals } = useFoodLog();
   const { tdee } = useBodyComp();
   const [input, setInput] = useState('');
+  const [inputFocused, setInputFocused] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -99,11 +100,11 @@ export function AICoach() {
             >
               <Icon name="chevron-left" size={16} color={theme.text} />
             </motion.button>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 9, color: theme.accent, fontFamily: theme.mono, letterSpacing: 2 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 10, color: theme.accent, fontFamily: theme.mono, letterSpacing: 2, fontWeight: 700 }}>
                 LLAMA 3.1 70B · GROQ
               </div>
-              <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: -0.4 }}>AI Coach</div>
+              <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5, marginTop: 1 }}>AI Coach</div>
             </div>
             <motion.div
               whileTap={{ scale: 0.9 }}
@@ -158,15 +159,18 @@ export function AICoach() {
 
           {/* Suggested questions */}
           {messages.length === 0 && (
-            <div style={{ overflowX: 'auto', display: 'flex', gap: 6, paddingBottom: 4, marginBottom: 4 }}>
-              {SUGGESTED.map(q => (
+            <div style={{ overflowX: 'auto', display: 'flex', gap: 8, paddingBottom: 4, marginBottom: 4 }}>
+              {SUGGESTED.map((q, i) => (
                 <motion.div
                   key={q}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 + i * 0.05 }}
                   whileTap={{ scale: 0.94 }}
                   onClick={() => { sendMessage(q); }}
                   style={{
                     flexShrink: 0,
-                    padding: '6px 12px',
+                    padding: '7px 13px',
                     borderRadius: 20,
                     fontSize: 11,
                     fontWeight: 600,
@@ -175,6 +179,7 @@ export function AICoach() {
                     color: theme.accent,
                     border: `1px solid ${theme.accent}30`,
                     whiteSpace: 'nowrap',
+                    boxShadow: `inset 0 1px 0 rgba(255,255,255,0.04)`,
                   }}
                 >
                   {q}
@@ -192,7 +197,7 @@ export function AICoach() {
             padding: '8px 16px 8px',
             display: 'flex',
             flexDirection: 'column',
-            gap: 10,
+            gap: 12,
           }}
         >
           {messages.length === 0 && (
@@ -207,8 +212,8 @@ export function AICoach() {
             >
               {/* AI avatar */}
               <motion.div
-                animate={{ y: [0, -6, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                animate={{ y: [0, -4, 0] }}
+                transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
                 style={{
                   width: 72,
                   height: 72,
@@ -220,17 +225,18 @@ export function AICoach() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: 32,
+                  boxShadow: `0 6px 20px ${theme.accent}25, inset 0 1px 0 rgba(255,255,255,0.06)`,
                 }}
               >
                 🧠
               </motion.div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: theme.text, marginBottom: 6 }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: theme.text, marginBottom: 6, letterSpacing: -0.2 }}>
                 Hey {user.name}, I'm your FitIQ Coach
               </div>
               <div style={{ fontSize: 12, lineHeight: 1.6, maxWidth: 240, margin: '0 auto' }}>
                 Ask me anything about your diet, workout, or nutrition. I know your data.
               </div>
-              <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, background: 'rgba(255,255,255,0.04)', border: `1px solid ${theme.cardBorder}`, borderRadius: 10, padding: '6px 12px', marginTop: 8 }}>
+              <div style={{ display: 'inline-block', fontSize: 10, color: theme.textMute, fontFamily: theme.mono, background: 'rgba(255,255,255,0.04)', border: `1px solid ${theme.cardBorder}`, borderRadius: 10, padding: '6px 12px', marginTop: 12, letterSpacing: 0.4 }}>
                 LLaMA 3.1 · IFCT 2017 · ACSM
               </div>
             </motion.div>
@@ -295,10 +301,14 @@ export function AICoach() {
               display: 'flex',
               gap: 10,
               alignItems: 'center',
-              background: 'rgba(255,255,255,0.06)',
-              border: `1px solid ${theme.cardBorder}`,
+              background: inputFocused ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.06)',
+              border: `1px solid ${inputFocused ? theme.accent + '50' : theme.cardBorder}`,
               borderRadius: 24,
               padding: '6px 6px 6px 16px',
+              boxShadow: inputFocused
+                ? `0 0 0 3px ${theme.accent}18, inset 0 1px 0 rgba(255,255,255,0.04)`
+                : `inset 0 1px 0 rgba(255,255,255,0.03)`,
+              transition: 'box-shadow 0.2s, border-color 0.2s, background 0.2s',
             }}
           >
             <input
@@ -306,6 +316,8 @@ export function AICoach() {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKey}
+              onFocus={() => setInputFocused(true)}
+              onBlur={() => setInputFocused(false)}
               placeholder="Ask your coach…"
               disabled={loading}
               style={{
@@ -320,8 +332,8 @@ export function AICoach() {
               }}
             />
             <motion.button
-              whileTap={{ scale: 0.88, rotateX: 10 }}
-              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.9 }}
+              whileHover={input.trim() && !loading ? { scale: 1.05 } : {}}
               onClick={handleSend}
               disabled={!input.trim() || loading}
               style={{
@@ -332,12 +344,15 @@ export function AICoach() {
                 background: input.trim() && !loading
                   ? `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`
                   : 'rgba(255,255,255,0.08)',
+                boxShadow: input.trim() && !loading
+                  ? `0 4px 12px ${theme.accent}40, inset 0 1px 0 rgba(255,255,255,0.18)`
+                  : 'none',
                 cursor: input.trim() && !loading ? 'pointer' : 'default',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
-                transition: 'background 0.2s',
+                transition: 'background 0.2s, box-shadow 0.2s',
               }}
             >
               <svg
@@ -405,7 +420,7 @@ const MessageBubble = memo(function MessageBubble({ message }: { message: ChatMe
       <div
         style={{
           maxWidth: '78%',
-          padding: '10px 14px',
+          padding: '12px 16px',
           borderRadius: isUser
             ? '18px 18px 4px 18px'
             : '18px 18px 18px 4px',
@@ -419,19 +434,22 @@ const MessageBubble = memo(function MessageBubble({ message }: { message: ChatMe
             : `1px solid ${message.error ? 'rgba(248,113,113,0.3)' : 'rgba(255,255,255,0.09)'}`,
           color: isUser ? '#fff' : theme.text,
           fontSize: 13,
-          lineHeight: 1.55,
+          lineHeight: 1.6,
           fontWeight: isUser ? 600 : 400,
-          boxShadow: isUser ? `0 4px 16px ${theme.accent}30` : 'none',
+          boxShadow: isUser
+            ? `0 4px 16px ${theme.accent}30, inset 0 1px 0 rgba(255,255,255,0.15)`
+            : `inset 0 1px 0 rgba(255,255,255,0.03)`,
         }}
       >
         {message.content}
         <div
           style={{
             fontSize: 9,
-            marginTop: 4,
+            marginTop: 6,
             color: isUser ? 'rgba(255,255,255,0.55)' : theme.textMute,
             fontFamily: theme.mono,
             textAlign: isUser ? 'right' : 'left',
+            letterSpacing: 0.4,
           }}
         >
           {new Date(message.timestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}

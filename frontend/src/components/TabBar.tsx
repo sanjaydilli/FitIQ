@@ -24,6 +24,18 @@ export function TabBar() {
   const location = useLocation();
   const { theme } = useTheme();
   const active = TABS.find((t) => location.pathname.startsWith(t.path))?.id ?? 'home';
+  const isAurora = theme.id === 'aurora';
+  const isNeon = theme.id === 'neon';
+
+  const barBg = isAurora
+    ? 'rgba(20,16,32,0.72)'
+    : isNeon
+    ? 'rgba(10,10,10,0.88)'
+    : 'rgba(17,19,22,0.86)';
+
+  const inactiveStroke = isNeon ? 'rgba(245,245,242,0.45)' : theme.textDim;
+  const pillRadius = isNeon ? 10 : 14;
+  const outerRadius = isNeon ? 18 : 22;
 
   return (
     <div
@@ -36,9 +48,8 @@ export function TabBar() {
         paddingTop: 10,
         paddingLeft: 16,
         paddingRight: 16,
-        background: 'linear-gradient(to top, rgba(0,0,0,0.96), rgba(0,0,0,0.65) 60%, transparent)',
+        background: 'linear-gradient(to top, rgba(0,0,0,0.92), rgba(0,0,0,0.55) 60%, transparent)',
         zIndex: 40,
-        perspective: '600px',
       }}
     >
       <motion.div
@@ -49,13 +60,13 @@ export function TabBar() {
           display: 'flex',
           justifyContent: 'space-around',
           alignItems: 'center',
-          background: 'rgba(16,12,28,0.78)',
-          backdropFilter: 'blur(24px) saturate(200%)',
-          WebkitBackdropFilter: 'blur(24px) saturate(200%)',
+          background: barBg,
+          backdropFilter: 'blur(24px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(24px) saturate(180%)',
           border: `1px solid ${theme.cardBorder}`,
-          borderRadius: 22,
-          padding: '10px 6px',
-          boxShadow: `0 8px 32px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.05) inset, 0 -1px 0 rgba(0,0,0,0.3) inset`,
+          borderRadius: outerRadius,
+          padding: '8px 6px',
+          boxShadow: `0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05), inset 0 -1px 0 rgba(0,0,0,0.25)`,
         }}
       >
         {TABS.map((t) => {
@@ -63,34 +74,33 @@ export function TabBar() {
           return (
             <motion.button
               key={t.id}
-              whileTap={{ scale: 0.82, rotateX: 18, translateY: 2 }}
-              whileHover={{ translateY: -2 }}
-              transition={{ type: 'spring', stiffness: 500, damping: 22 }}
+              whileTap={{ scale: 0.9 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 26 }}
               onClick={() => navigate(t.path)}
               style={{
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                width: 44,
+                width: 48,
                 height: 44,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 position: 'relative',
                 padding: 0,
-                transformStyle: 'preserve-3d',
               }}
             >
-              {/* Active glow bg */}
+              {/* Active pill bg — stronger than before */}
               {isActive && (
                 <motion.div
                   layoutId="tabbar-glow"
                   style={{
                     position: 'absolute',
                     inset: 0,
-                    borderRadius: 12,
-                    background: `${theme.accent}18`,
-                    boxShadow: `0 0 12px ${theme.accent}30`,
+                    borderRadius: pillRadius,
+                    background: `linear-gradient(135deg, ${theme.accent}26, ${theme.accent2}1a)`,
+                    border: `1px solid ${theme.accent}44`,
+                    boxShadow: `0 0 16px ${theme.accent}30, inset 0 1px 0 rgba(255,255,255,0.06)`,
                   }}
                   transition={{ type: 'spring', stiffness: 380, damping: 28 }}
                 />
@@ -100,12 +110,14 @@ export function TabBar() {
                 height="22"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke={isActive ? theme.accent : 'rgba(255,255,255,0.42)'}
+                stroke={isActive ? theme.accent : inactiveStroke}
                 strokeWidth="1.8"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 style={{
-                  filter: isActive ? `drop-shadow(0 0 6px ${theme.accent}80)` : 'none',
+                  position: 'relative',
+                  zIndex: 1,
+                  filter: isActive ? `drop-shadow(0 0 6px ${theme.accent}70)` : 'none',
                   transition: 'filter 0.3s, stroke 0.3s',
                 }}
               >
@@ -116,12 +128,13 @@ export function TabBar() {
                   layoutId="tabbar-dot"
                   style={{
                     position: 'absolute',
-                    bottom: 4,
+                    bottom: 3,
                     width: 4,
                     height: 4,
                     borderRadius: 2,
                     background: theme.accent,
-                    boxShadow: `0 0 10px ${theme.accent}, 0 0 4px ${theme.accent}`,
+                    boxShadow: `0 0 8px ${theme.accent}, 0 0 3px ${theme.accent}`,
+                    zIndex: 1,
                   }}
                 />
               )}

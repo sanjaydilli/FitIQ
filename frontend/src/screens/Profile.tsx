@@ -79,24 +79,30 @@ export function Profile() {
     <Background>
       <div className="scroll-y" style={{ padding: '60px 0 110px', height: '100%', overflowY: 'auto' }}>
 
+        {/* Header */}
+        <div style={{ padding: '0 20px', marginBottom: 16 }}>
+          <div style={{ fontSize: 10, color: theme.accent, fontFamily: theme.mono, letterSpacing: 2, fontWeight: 700 }}>ACCOUNT</div>
+          <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: -0.5, marginTop: 2 }}>Profile</div>
+        </div>
+
         {/* Hero card */}
-        <div style={{ padding: '0 20px', marginBottom: 14 }}>
-          <Card style={{ padding: 18, borderRadius: 22, position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(circle at 30% 30%, ${theme.accent2}30, transparent 70%)` }} />
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ padding: '0 20px', marginBottom: 16 }}>
+          <Card style={{ padding: 20, borderRadius: 22, position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(circle at 30% 30%, ${theme.accent2}28, transparent 70%)`, pointerEvents: 'none' }} />
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 14 }}>
               <div style={{
                 flexShrink: 0,
                 width: 72, height: 72, borderRadius: 36,
                 background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 28, fontWeight: 800, color: theme.onAccent,
-                boxShadow: `0 4px 20px ${theme.accent}50`,
+                boxShadow: `0 4px 20px ${theme.accent}50, inset 0 1px 0 rgba(255,255,255,0.25)`,
               }}>
                 {(user.name?.[0] ?? '?').toUpperCase()}
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 17, fontWeight: 700 }}>{user.name}</div>
-                <div style={{ fontSize: 12, color: theme.textDim, marginBottom: 6 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: -0.3 }}>{user.name}</div>
+                <div style={{ fontSize: 12, color: theme.textDim, marginBottom: 8, marginTop: 1 }}>
                   {GOAL_LABEL[user.goal]} · {user.diet}
                 </div>
                 <div style={{ display: 'flex', gap: 6 }}>
@@ -107,10 +113,10 @@ export function Profile() {
             </div>
 
             {/* XP progress bar */}
-            <div style={{ position: 'relative', marginTop: 14 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                <span style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono }}>LVL {user.level}</span>
-                <span style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono }}>{xpInLevel} / {xpToNextLevel} XP → LVL {user.level + 1}</span>
+            <div style={{ position: 'relative', marginTop: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                <span style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, fontWeight: 700, letterSpacing: 0.6 }}>LVL {user.level}</span>
+                <span style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 0.4 }}>{xpInLevel} / {xpToNextLevel} XP → LVL {user.level + 1}</span>
               </div>
               <div style={{ height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
                 <motion.div
@@ -124,49 +130,58 @@ export function Profile() {
           </Card>
         </div>
 
-        {/* Stats row */}
-        <div style={{ padding: '0 20px', marginBottom: 14 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8 }}>
+        {/* Stats grid — 2x2 */}
+        <div style={{ padding: '0 20px', marginBottom: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             {[
-              { label: 'WORKOUTS', value: sessions.length, color: theme.accent },
-              { label: 'VOLUME', value: totalVolume >= 1000 ? `${(totalVolume / 1000).toFixed(1)}t` : `${Math.round(totalVolume)}kg`, color: '#FB923C' },
-              { label: 'STREAK', value: `${user.streak}d`, color: '#FBBF24' },
-              { label: 'BADGES', value: `${unlockedCount}/${achievements.length}`, color: theme.accent2 },
-            ].map(({ label, value, color }) => (
-              <Card key={label} style={{ padding: '10px 8px', borderRadius: 14, textAlign: 'center' }}>
-                <div style={{ fontSize: 16, fontWeight: 800, color, letterSpacing: -0.5 }}>{value}</div>
-                <div style={{ fontSize: 8, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 0.8, marginTop: 2 }}>{label}</div>
-              </Card>
+              { label: 'WORKOUTS', value: sessions.length, color: theme.accent, sub: 'logged' },
+              { label: 'VOLUME', value: totalVolume >= 1000 ? `${(totalVolume / 1000).toFixed(1)}t` : `${Math.round(totalVolume)}kg`, color: '#FB923C', sub: 'lifted' },
+              { label: 'STREAK', value: `${user.streak}d`, color: '#FBBF24', sub: 'current' },
+              { label: 'BADGES', value: `${unlockedCount}/${achievements.length}`, color: theme.accent2, sub: 'unlocked' },
+            ].map(({ label, value, color, sub }, i) => (
+              <motion.div
+                key={label}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.04, type: 'spring', stiffness: 300, damping: 24 }}
+              >
+                <Card style={{ padding: '12px 14px', borderRadius: 16 }}>
+                  <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.2, fontWeight: 700, marginBottom: 4 }}>{label}</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color, letterSpacing: -0.5, fontFamily: theme.mono, lineHeight: 1 }}>{value}</div>
+                  <div style={{ fontSize: 10, color: theme.textMute, marginTop: 4, fontFamily: theme.mono }}>{sub}</div>
+                </Card>
+              </motion.div>
             ))}
           </div>
         </div>
 
         {/* Body fat card (real data) */}
         {latest && bfCat && (
-          <div style={{ padding: '0 20px', marginBottom: 14 }}>
-            <motion.div whileTap={{ scale: 0.97 }} onClick={() => navigate('/body-comp')} style={{ cursor: 'pointer' }}>
-              <Card style={{ padding: 16, borderRadius: 20, borderLeft: `3px solid ${bfCat.color}` }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div style={{ padding: '0 20px', marginBottom: 16 }}>
+            <motion.div whileTap={{ scale: 0.97 }} whileHover={{ y: -2 }} onClick={() => navigate('/body-comp')} style={{ cursor: 'pointer' }}>
+              <Card style={{ padding: 16, borderRadius: 20, borderLeft: `3px solid ${bfCat.color}`, position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at right, ${bfCat.color}14, transparent 60%)`, pointerEvents: 'none' }} />
+                <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
-                    <div style={{ fontSize: 10, color: theme.textDim, fontFamily: theme.mono, letterSpacing: 1 }}>BODY FAT</div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 2 }}>
-                      <span style={{ fontSize: 38, fontWeight: 800, letterSpacing: -1.5, color: bfCat.color }}>{latest.bodyFatPct}</span>
-                      <span style={{ fontSize: 16, color: theme.textDim }}>%</span>
+                    <div style={{ fontSize: 10, color: theme.textDim, fontFamily: theme.mono, letterSpacing: 1.2, fontWeight: 700 }}>BODY FAT</div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 4 }}>
+                      <span style={{ fontSize: 38, fontWeight: 800, letterSpacing: -1.5, color: bfCat.color, fontFamily: theme.mono, lineHeight: 1 }}>{latest.bodyFatPct}</span>
+                      <span style={{ fontSize: 16, color: theme.textDim, fontFamily: theme.mono }}>%</span>
                     </div>
-                    <div style={{ fontSize: 11, color: bfCat.color, fontFamily: theme.mono, marginTop: 2 }}>{bfCat.label}</div>
+                    <div style={{ fontSize: 11, color: bfCat.color, fontFamily: theme.mono, marginTop: 4, fontWeight: 700, letterSpacing: 0.4 }}>{bfCat.label}</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: 10, color: theme.textDim, fontFamily: theme.mono }}>LEAN MASS</div>
-                    <div style={{ fontSize: 18, fontWeight: 700, marginTop: 2 }}>{latest.leanMass}kg</div>
-                    <div style={{ fontSize: 10, color: theme.textDim, fontFamily: theme.mono, marginTop: 4 }}>WEIGHT</div>
-                    <div style={{ fontSize: 18, fontWeight: 700 }}>{latest.weightKg}kg</div>
+                    <div style={{ fontSize: 10, color: theme.textDim, fontFamily: theme.mono, letterSpacing: 1.2, fontWeight: 700 }}>LEAN MASS</div>
+                    <div style={{ fontSize: 18, fontWeight: 700, marginTop: 2, fontFamily: theme.mono }}>{latest.leanMass}kg</div>
+                    <div style={{ fontSize: 10, color: theme.textDim, fontFamily: theme.mono, marginTop: 8, letterSpacing: 1.2, fontWeight: 700 }}>WEIGHT</div>
+                    <div style={{ fontSize: 18, fontWeight: 700, fontFamily: theme.mono, marginTop: 2 }}>{latest.weightKg}kg</div>
                   </div>
                 </div>
                 {measurements.length >= 2 && (() => {
                   const first = measurements[0];
                   const delta = Math.round((latest.bodyFatPct - first.bodyFatPct) * 10) / 10;
                   return (
-                    <div style={{ fontSize: 11, color: delta <= 0 ? '#4ade80' : '#F87171', fontFamily: theme.mono, marginTop: 8 }}>
+                    <div style={{ position: 'relative', fontSize: 11, color: delta <= 0 ? '#4ade80' : '#F87171', fontFamily: theme.mono, marginTop: 10, fontWeight: 700 }}>
                       {delta <= 0 ? '↓' : '↑'} {Math.abs(delta)}% since first measurement
                     </div>
                   );
@@ -177,8 +192,8 @@ export function Profile() {
         )}
 
         {/* Theme switcher */}
-        <div style={{ padding: '0 20px', marginBottom: 14 }}>
-          <div style={{ fontSize: 11, color: theme.textDim, fontFamily: theme.mono, letterSpacing: 1, marginBottom: 8 }}>THEME</div>
+        <div style={{ padding: '0 20px', marginBottom: 16 }}>
+          <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.5, fontWeight: 700, marginBottom: 10 }}>THEME</div>
           <Card style={{ borderRadius: 18, padding: 6, display: 'flex', gap: 4 }}>
             {themeOrder.map((id) => {
               const t = themes[id];
@@ -186,13 +201,14 @@ export function Profile() {
               return (
                 <motion.button key={id} whileTap={{ scale: 0.96 }} onClick={() => setTheme(id)}
                   style={{
-                    flex: 1, padding: '10px 8px',
+                    flex: 1, padding: '12px 8px',
                     background: sel ? `${theme.accent}15` : 'transparent',
                     border: sel ? `1px solid ${theme.accent}` : '1px solid transparent',
                     borderRadius: 12, color: theme.text, fontSize: 12, fontWeight: 700,
-                    cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                    cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7,
+                    boxShadow: sel ? `inset 0 1px 0 rgba(255,255,255,0.05)` : 'none',
                   }}>
-                  <div style={{ width: 26, height: 16, borderRadius: 4, background: `linear-gradient(135deg, ${t.accent}, ${t.accent2})` }} />
+                  <div style={{ width: 28, height: 18, borderRadius: 5, background: `linear-gradient(135deg, ${t.accent}, ${t.accent2})`, boxShadow: sel ? `0 2px 6px ${t.accent}40` : 'none' }} />
                   {t.name.split(' ')[0]}
                 </motion.button>
               );
@@ -210,23 +226,23 @@ export function Profile() {
                 onClick={() => navigate(it.path)}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '14px 14px', cursor: 'pointer',
+                  padding: '14px 16px', cursor: 'pointer',
                   borderBottom: i < a.length - 1 ? `1px solid ${theme.cardBorder}` : 'none',
                 }}
               >
-                <div style={{ width: 34, height: 34, borderRadius: 10, background: it.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: it.iconBg, border: `1px solid ${it.iconColor}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <Icon name={it.icon} size={16} color={it.iconColor} />
                 </div>
-                <div style={{ flex: 1 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700 }}>{it.t}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: -0.2 }}>{it.t}</div>
                     {it.badge && (
                       <div style={{ padding: '1px 6px', borderRadius: 6, background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`, fontSize: 8, fontWeight: 800, color: '#000', letterSpacing: 0.5 }}>
                         {it.badge}
                       </div>
                     )}
                   </div>
-                  <div style={{ fontSize: 11, color: theme.textMute }}>{it.d}</div>
+                  <div style={{ fontSize: 11, color: theme.textMute, marginTop: 1, lineHeight: 1.4 }}>{it.d}</div>
                 </div>
                 <Icon name="chevron-right" size={16} color={theme.textMute} />
               </motion.div>

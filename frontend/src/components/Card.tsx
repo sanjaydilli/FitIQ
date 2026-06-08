@@ -14,6 +14,12 @@ export function Card({ children, style, selected, onClick }: CardProps) {
   const isAurora = theme.id === 'aurora';
   const isNeon = theme.id === 'neon';
 
+  const insetHighlight = isAurora
+    ? 'inset 0 1px 0 rgba(255,255,255,0.05), 0 1px 2px rgba(0,0,0,0.25)'
+    : isNeon
+    ? 'inset 0 1px 0 rgba(255,255,255,0.03), 0 1px 2px rgba(0,0,0,0.4)'
+    : 'inset 0 1px 0 rgba(255,255,255,0.04), 0 1px 2px rgba(0,0,0,0.3)';
+
   const base: CSSProperties = isAurora
     ? {
         background: selected ? `${theme.accent}14` : theme.card,
@@ -21,34 +27,35 @@ export function Card({ children, style, selected, onClick }: CardProps) {
         WebkitBackdropFilter: 'blur(24px) saturate(150%)',
         border: `${selected ? 1.5 : 1}px solid ${selected ? theme.accent : theme.cardBorder}`,
         borderRadius: theme.radius,
+        boxShadow: insetHighlight,
       }
     : {
         background: selected ? `${theme.accent}10` : theme.card,
         border: `${selected ? 1.5 : 1}px solid ${selected ? theme.accent : theme.cardBorder}`,
         borderRadius: theme.radius,
+        boxShadow: insetHighlight,
       };
 
-  const tiltProps = onClick
+  const interactionProps = onClick
     ? {
-        whileHover: { rotateY: 3, rotateX: -2, translateZ: 6, scale: 1.01 },
-        whileTap: { rotateY: 0, rotateX: 0, scale: 0.98, translateZ: 0 },
-        transition: { type: 'spring' as const, stiffness: 400, damping: 22 },
+        whileHover: { y: -2 },
+        whileTap: { scale: 0.97 },
+        transition: { type: 'spring' as const, stiffness: 420, damping: 26 },
       }
     : {};
 
   return (
     <motion.div
       onClick={onClick}
-      {...tiltProps}
+      {...interactionProps}
       style={{
         ...base,
         ...style,
         cursor: onClick ? 'pointer' : undefined,
-        transformStyle: 'preserve-3d',
         position: 'relative',
       }}
     >
-      {/* Gloss overlay — absolutely positioned, never affects layout */}
+      {/* Subtle gloss overlay on hover — absolutely positioned, never affects layout */}
       {onClick && (isAurora || isNeon) && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -57,7 +64,7 @@ export function Card({ children, style, selected, onClick }: CardProps) {
             position: 'absolute',
             inset: 0,
             borderRadius: 'inherit',
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 55%)',
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 55%)',
             pointerEvents: 'none',
             zIndex: 0,
           }}
@@ -120,9 +127,9 @@ export function PrimaryButton({
     <motion.button
       onClick={onClick}
       disabled={disabled}
-      whileTap={{ scale: 0.96, rotateX: 6 }}
-      whileHover={{ scale: 1.02, translateY: -2 }}
-      transition={{ type: 'spring' as const, stiffness: 400, damping: 20 }}
+      whileTap={{ scale: 0.97 }}
+      whileHover={{ y: -2 }}
+      transition={{ type: 'spring' as const, stiffness: 420, damping: 26 }}
       style={{
         padding: '16px',
         borderRadius: isNeon ? 8 : 16,
@@ -134,12 +141,11 @@ export function PrimaryButton({
         fontWeight: 700,
         fontSize: 16,
         cursor: disabled ? 'not-allowed' : 'pointer',
-        boxShadow: `0 12px 32px ${theme.accent}40, 0 2px 8px ${theme.accent}20`,
+        boxShadow: `0 8px 24px ${theme.accent}38, 0 2px 6px ${theme.accent}1c, inset 0 1px 0 rgba(255,255,255,0.18)`,
         opacity: disabled ? 0.5 : 1,
         fontFamily: theme.font,
         letterSpacing: isNeon ? 0.5 : 0,
         textTransform: isNeon ? 'uppercase' : 'none',
-        transformStyle: 'preserve-3d',
         ...style,
       }}
     >
