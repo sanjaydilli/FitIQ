@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { localDateStr, formatLocalDate } from '../utils/date';
+import { formatLocalDate } from '../utils/date';
 import { useWorkoutLog } from './useWorkoutLog';
 import { useFoodLog } from './useFoodLog';
 import { useBodyComp } from './useBodyComp';

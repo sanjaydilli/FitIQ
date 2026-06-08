@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { localDateStr, formatLocalDate } from '../utils/date';
+import { formatLocalDate } from '../utils/date';
 import { useUser } from '../context/UserContext';
 
 export type ActivityCategory = 'morning' | 'nutrition' | 'workout' | 'hydration' | 'evening' | 'sleep';

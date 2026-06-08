@@ -71,6 +71,14 @@ export function AICoach() {
   const proteinLeft = targetProtein - todayTotals.protein;
   const waterLeft = TOTAL_WATER_L - eatenWaterL;
 
+  // Display helpers — flip sign and label when user has gone over the target
+  const calLabel    = caloriesLeft >= 0 ? 'Cal left'     : 'Cal over';
+  const calValue    = `${Math.abs(caloriesLeft)}`;
+  const proteinLabel = proteinLeft >= 0 ? 'Protein left' : 'Protein over';
+  const proteinValue = `${Math.abs(proteinLeft)}g`;
+  const waterLabel  = waterLeft >= 0 ? 'Water left' : 'Water over';
+  const waterValue  = `${Math.abs(waterLeft).toFixed(1)}L`;
+
   return (
     <Background>
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -123,9 +131,9 @@ export function AICoach() {
             }}
           >
             {[
-              { label: 'Cal left', value: `${caloriesLeft}`, unit: 'kcal', color: '#FB923C' },
-              { label: 'Protein left', value: `${proteinLeft}g`, unit: '', color: theme.accent },
-              { label: 'Water left', value: `${waterLeft.toFixed(1)}L`, unit: '', color: '#60A5FA' },
+              { label: calLabel,     value: calValue,     unit: 'kcal', color: '#FB923C' },
+              { label: proteinLabel, value: proteinValue, unit: '',     color: theme.accent },
+              { label: waterLabel,   value: waterValue,   unit: '',     color: '#60A5FA' },
             ].map(s => (
               <div
                 key={s.label}

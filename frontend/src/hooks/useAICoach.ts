@@ -1,4 +1,4 @@
-import { localDateStr, formatLocalDate } from '../utils/date';
+import { localDateStr } from '../utils/date';
 import { useState, useCallback, useMemo } from 'react';
 import { useUser } from '../context/UserContext';
 import { useFoodLog } from './useFoodLog';
@@ -64,17 +64,24 @@ export function useAICoach(liveStats?: Partial<UserStats>) {
 
     // Estimate minutes since last meal from most recent food log entry timestamp
     const lastMealMs = todayTotals.entries.reduce((max, e) => {
-      const ts = (e as { timestamp?: number }).timestamp;
-      return ts && ts > max ? ts : max;
+      const ts = e.timestamp;
+      return Number.isFinite(ts) && ts > max ? ts : max;
     }, 0);
     const lastMealMinutesAgo = lastMealMs > 0
-      ? Math.round((Date.now() - lastMealMs) / 60000)
+      ? Math.max(0, Math.round((Date.now() - lastMealMs) / 60000))
       : 120;
 
+    // Most recent today session — prefer endTime, fall back to startTime
     const todayISO = localDateStr();
-    const lastSession = sessions.filter(s => s.date === todayISO)[0];
-    const workoutMinutesAgo = lastSession
-      ? Math.round((Date.now() - new Date(lastSession.date + 'T12:00:00').getTime()) / 60000)
+    const todaySessions = sessions.filter(s => s.date === todayISO);
+    const lastSession = todaySessions.reduce<typeof todaySessions[number] | null>((best, s) => {
+      const t = s.endTime ?? s.startTime;
+      const bt = best ? (best.endTime ?? best.startTime) : -Infinity;
+      return t > bt ? s : best;
+    }, null);
+    const lastSessionMs = lastSession ? (lastSession.endTime ?? lastSession.startTime) : 0;
+    const workoutMinutesAgo = lastSessionMs > 0
+      ? Math.max(0, Math.round((Date.now() - lastSessionMs) / 60000))
       : 0;
 
     return {
@@ -144,7 +151,7 @@ export function useAICoach(liveStats?: Partial<UserStats>) {
       setError(null);
 
       try {
-        const reply = await askFitIQCoach(stats, EMPTY_FOOD_LOG, trimmed);
+        const reply = await askFitIQCoach(stats, EMPTY_FOOD_LOG, trimmed, user.name);
 
         const aiMsg: ChatMessage = {
           id: `a-${Date.now()}`,
@@ -177,7 +184,7 @@ export function useAICoach(liveStats?: Partial<UserStats>) {
         setLoading(false);
       }
     },
-    [stats, loading]
+    [stats, loading, user.name]
   );
 
   const clearHistory = useCallback(() => {

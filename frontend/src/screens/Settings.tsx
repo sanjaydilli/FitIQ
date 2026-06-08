@@ -262,7 +262,11 @@ export function Settings() {
         <div style={{ padding: '0 16px 16px' }}>
           <motion.button
             whileTap={{ scale: 0.97 }}
-            onClick={() => navigate('/')}
+            onClick={() => {
+              // Clear the name so PublicOnly/OnboardingFlow treats this as a fresh start
+              update({ name: '' });
+              navigate('/onboarding', { replace: true });
+            }}
             style={{
               width: '100%', padding: 14, borderRadius: 14,
               border: `1px solid ${theme.cardBorder}`,

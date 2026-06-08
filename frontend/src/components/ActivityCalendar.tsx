@@ -1,5 +1,5 @@
 import React, { memo, useMemo } from 'react';
-import { localDateStr, formatLocalDate } from '../utils/date';
+import { formatLocalDate } from '../utils/date';
 import { motion } from 'framer-motion';
 
 export interface DayActivity {

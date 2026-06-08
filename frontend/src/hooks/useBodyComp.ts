@@ -1,4 +1,4 @@
-import { localDateStr, formatLocalDate } from '../utils/date';
+import { localDateStr } from '../utils/date';
 import { useCallback, useMemo, useState } from 'react';
 import { useUser } from '../context/UserContext';
 import { navyBodyFat, calcBMR, calcTDEE, calcBodyComp } from '../utils/bodyComposition';

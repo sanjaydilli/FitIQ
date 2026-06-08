@@ -41,6 +41,11 @@ export function useNotifications() {
     };
   }
 
+  // Keep a ref to the latest buildCtx so async callbacks (init, app foreground)
+  // always see fresh state instead of the first-render closure
+  const buildCtxRef = useRef(buildCtx);
+  buildCtxRef.current = buildCtx;
+
   // Init once: request permission, create channels, attach tap handler
   useEffect(() => {
     let cancelled = false;
@@ -48,7 +53,7 @@ export function useNotifications() {
       if (cancelled || !ok) return;
       initialized.current = true;
       attachNotificationTapHandler(navigate);
-      rescheduleAll(buildCtx());
+      rescheduleAll(buildCtxRef.current());
     });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -56,7 +61,7 @@ export function useNotifications() {
 
   // Reschedule when relevant data changes
   useEffect(() => {
-    if (initialized.current) rescheduleAll(buildCtx());
+    if (initialized.current) rescheduleAll(buildCtxRef.current());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.waterDrops, user.steps, user.streak, entries.length, sessions.length]);
 
@@ -64,7 +69,7 @@ export function useNotifications() {
   useEffect(() => {
     let handle: { remove: () => void } | null = null;
     CapApp.addListener('appStateChange', s => {
-      if (s.isActive && initialized.current) rescheduleAll(buildCtx());
+      if (s.isActive && initialized.current) rescheduleAll(buildCtxRef.current());
     }).then(h => { handle = h; });
     return () => { handle?.remove(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -1,4 +1,4 @@
-import { localDateStr, formatLocalDate } from '../utils/date';
+import { localDateStr } from '../utils/date';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';

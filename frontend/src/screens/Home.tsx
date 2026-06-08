@@ -658,8 +658,10 @@ function StepsCard() {
   const { user } = useUser();
   const isNative = Capacitor.isNativePlatform();
 
-  const pct = Math.min(100, Math.round((user.steps / user.stepGoal) * 100));
-  const done = user.steps >= user.stepGoal;
+  const pct = user.stepGoal > 0
+    ? Math.min(100, Math.round((user.steps / user.stepGoal) * 100))
+    : 0;
+  const done = user.stepGoal > 0 && user.steps >= user.stepGoal;
   const remaining = Math.max(0, user.stepGoal - user.steps);
 
   return (

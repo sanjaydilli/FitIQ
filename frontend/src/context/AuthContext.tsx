@@ -83,12 +83,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!firebaseConfigured) return;
     if (isNative) {
       await FirebaseAuthentication.createUserWithEmailAndPassword({ email, password });
-      await FirebaseAuthentication.updateProfile({ displayName });
-      await FirebaseAuthentication.sendEmailVerification();
+      // updateProfile and sendEmailVerification are nice-to-have — never block account creation
+      try {
+        await FirebaseAuthentication.updateProfile({ displayName });
+      } catch (e) {
+        console.warn('[auth] updateProfile failed (non-fatal):', e);
+      }
+      try {
+        await FirebaseAuthentication.sendEmailVerification();
+      } catch (e) {
+        console.warn('[auth] sendEmailVerification failed (non-fatal):', e);
+      }
     } else {
       const cred = await createUserWithEmailAndPassword(auth, email, password);
-      await updateProfile(cred.user, { displayName });
-      await sendEmailVerification(cred.user);
+      try {
+        await updateProfile(cred.user, { displayName });
+      } catch (e) {
+        console.warn('[auth] updateProfile failed (non-fatal):', e);
+      }
+      try {
+        await sendEmailVerification(cred.user);
+      } catch (e) {
+        console.warn('[auth] sendEmailVerification failed (non-fatal):', e);
+      }
     }
   }
 

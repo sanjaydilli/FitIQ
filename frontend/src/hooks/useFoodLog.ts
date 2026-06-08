@@ -6,6 +6,7 @@ export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 export interface FoodEntry {
   id: string;
   date: string;      // YYYY-MM-DD
+  timestamp: number; // epoch ms when logged — used for "last meal" calculations
   meal: MealType;
   name: string;
   calories: number;
@@ -29,7 +30,16 @@ const MAX_ENTRIES = 500;
 function load(): FoodEntry[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as FoodEntry[]) : [];
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as FoodEntry[];
+    // Backfill timestamp on legacy entries — derive from id (fl_<ms>_xxx) or fall back to date noon
+    return parsed.map(e => {
+      if (typeof e.timestamp === 'number' && Number.isFinite(e.timestamp)) return e;
+      const m = /^fl_(\d+)_/.exec(e.id);
+      const fromId = m ? parseInt(m[1], 10) : NaN;
+      const ts = Number.isFinite(fromId) ? fromId : new Date(`${e.date}T12:00:00`).getTime();
+      return { ...e, timestamp: ts };
+    });
   } catch { return []; }
 }
 
@@ -46,11 +56,13 @@ function todayStr(): string {
 export function useFoodLog() {
   const [entries, setEntries] = useState<FoodEntry[]>(load);
 
-  const addEntry = useCallback((entry: Omit<FoodEntry, 'id' | 'date'> & { date?: string }) => {
+  const addEntry = useCallback((entry: Omit<FoodEntry, 'id' | 'date' | 'timestamp'> & { date?: string; timestamp?: number }) => {
+    const now = Date.now();
     const newEntry: FoodEntry = {
       ...entry,
-      id: `fl_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      id: `fl_${now}_${Math.random().toString(36).slice(2, 7)}`,
       date: entry.date ?? todayStr(),
+      timestamp: entry.timestamp ?? now,
     };
     setEntries(prev => {
       const next = [...prev, newEntry];

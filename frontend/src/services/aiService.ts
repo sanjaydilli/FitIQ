@@ -28,15 +28,17 @@ const GOAL_LABEL: Record<UserStats['goal'], string> = {
 export async function askFitIQCoach(
   userStats: UserStats,
   _foodLog: FoodLogItem[],
-  question: string
+  question: string,
+  userName?: string,
 ): Promise<string> {
+  const trimmedName = (userName ?? '').trim();
   const res = await fetch(`${getApiUrl()}/api/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       message: question,
       userStats: {
-        name:                   userStats.gender === 'male' ? 'User' : 'User',
+        name:                   trimmedName || 'User',
         gender:                 userStats.gender,
         weightKg:               userStats.weight,
         goal:                   GOAL_LABEL[userStats.goal],
