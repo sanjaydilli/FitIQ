@@ -46,30 +46,34 @@ export function BodyComp() {
 
   return (
     <Background>
-      {/* Header */}
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10,
         padding: '14px 20px',
-        background: 'rgba(10,10,10,0.85)',
-        backdropFilter: 'blur(12px)',
+        background: theme.id === 'aurora' ? 'rgba(8,6,15,0.7)' : theme.id === 'neon' ? 'rgba(0,0,0,0.85)' : 'rgba(0,0,0,0.65)',
+        backdropFilter: 'blur(20px) saturate(150%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(150%)',
         borderBottom: `1px solid ${theme.cardBorder}`,
         display: 'flex', alignItems: 'center', gap: 12,
       }}>
         <motion.button
           whileTap={{ scale: 0.92 }}
           onClick={() => navigate(-1)}
-          style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 10, padding: '6px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+          style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid ${theme.cardBorder}`, borderRadius: 10, padding: '6px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
         >
           <Icon name="chevron-left" size={16} color={theme.text} />
         </motion.button>
-        <div style={{ fontSize: 17, fontWeight: 700 }}>Body Composition</div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 10, color: theme.accent, fontFamily: theme.mono, letterSpacing: 2, fontWeight: 700 }}>METRICS</div>
+          <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: -0.3, color: theme.text, marginTop: 1 }}>Body Composition</div>
+        </div>
       </div>
 
-      {/* Tab bar */}
       <div style={{
-        position: 'absolute', top: 56, left: 0, right: 0, zIndex: 9,
+        position: 'absolute', top: 64, left: 0, right: 0, zIndex: 9,
         display: 'flex', gap: 0,
-        background: 'rgba(10,10,10,0.9)',
+        background: theme.id === 'aurora' ? 'rgba(8,6,15,0.6)' : theme.id === 'neon' ? 'rgba(0,0,0,0.8)' : 'rgba(0,0,0,0.55)',
+        backdropFilter: 'blur(20px) saturate(150%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(150%)',
         borderBottom: `1px solid ${theme.cardBorder}`,
       }}>
         {(['measure', 'progress'] as Tab[]).map(t => (
@@ -78,12 +82,13 @@ export function BodyComp() {
             whileTap={{ scale: 0.97 }}
             onClick={() => setTab(t)}
             style={{
-              flex: 1, padding: '10px 0', border: 'none', cursor: 'pointer',
+              flex: 1, padding: '12px 0', border: 'none', cursor: 'pointer',
               background: 'transparent',
               color: tab === t ? theme.accent : theme.textDim,
-              fontSize: 13, fontWeight: tab === t ? 700 : 400,
-              fontFamily: theme.mono, letterSpacing: 0.5, textTransform: 'uppercase',
+              fontSize: 11, fontWeight: 700,
+              fontFamily: theme.mono, letterSpacing: 2, textTransform: 'uppercase',
               borderBottom: tab === t ? `2px solid ${theme.accent}` : '2px solid transparent',
+              transition: 'color 0.2s, border-color 0.2s',
             }}
           >
             {t}
@@ -91,7 +96,7 @@ export function BodyComp() {
         ))}
       </div>
 
-      <div style={{ paddingTop: 104, paddingBottom: 32, height: '100%', overflowY: 'auto' }}>
+      <div style={{ paddingTop: 112, paddingBottom: 32, height: '100%', overflowY: 'auto' }}>
         <AnimatePresence mode="wait">
           {tab === 'measure' ? (
             <motion.div
@@ -102,32 +107,30 @@ export function BodyComp() {
               transition={{ duration: 0.22 }}
               style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}
             >
-              {/* Latest summary */}
               {latest && category && (
                 <Card style={{ borderRadius: 18, padding: '14px 16px', borderLeft: `3px solid ${category.color}` }}>
-                  <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, marginBottom: 6, letterSpacing: 1 }}>LAST MEASUREMENT · {latest.date}</div>
+                  <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, marginBottom: 8, letterSpacing: 2, fontWeight: 700 }}>LAST MEASUREMENT · {latest.date}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div>
-                      <div style={{ fontSize: 32, fontWeight: 800, letterSpacing: -1, color: category.color }}>{latest.bodyFatPct}%</div>
-                      <div style={{ fontSize: 11, color: category.color, fontFamily: theme.mono }}>{category.label}</div>
+                      <div style={{ fontSize: 36, fontWeight: 800, letterSpacing: -1.5, color: category.color, fontFamily: theme.mono, lineHeight: 1 }}>{latest.bodyFatPct}%</div>
+                      <div style={{ fontSize: 11, color: category.color, fontFamily: theme.mono, letterSpacing: 1.2, fontWeight: 700, marginTop: 4 }}>{category.label}</div>
                     </div>
                     <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                       <div>
-                        <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono }}>LEAN</div>
-                        <div style={{ fontSize: 16, fontWeight: 700 }}>{latest.leanMass}kg</div>
+                        <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.5, fontWeight: 700 }}>LEAN</div>
+                        <div style={{ fontSize: 17, fontWeight: 800, fontFamily: theme.mono, color: theme.text }}>{latest.leanMass}<span style={{ fontSize: 12, color: theme.textDim }}>kg</span></div>
                       </div>
                       <div>
-                        <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono }}>FAT</div>
-                        <div style={{ fontSize: 16, fontWeight: 700 }}>{latest.fatMass}kg</div>
+                        <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.5, fontWeight: 700 }}>FAT</div>
+                        <div style={{ fontSize: 17, fontWeight: 800, fontFamily: theme.mono, color: theme.text }}>{latest.fatMass}<span style={{ fontSize: 12, color: theme.textDim }}>kg</span></div>
                       </div>
                     </div>
                   </div>
                 </Card>
               )}
 
-              {/* Input fields */}
               <Card style={{ borderRadius: 18, padding: '14px 16px' }}>
-                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>New Measurement</div>
+                <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 2, fontWeight: 700, marginBottom: 12 }}>NEW MEASUREMENT</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {[
                     { label: 'Weight', unit: 'kg', val: weightKg, set: setWeightKg },
@@ -136,7 +139,7 @@ export function BodyComp() {
                     ...(user.sex === 'female' ? [{ label: 'Hip', unit: 'cm', val: hipCm, set: setHipCm }] : []),
                   ].map(({ label, unit, val, set }) => (
                     <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <div style={{ width: 60, fontSize: 12, color: theme.textDim }}>{label}</div>
+                      <div style={{ width: 60, fontSize: 11, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.2, fontWeight: 700 }}>{label.toUpperCase()}</div>
                       <input
                         type="number"
                         value={val}
@@ -146,21 +149,24 @@ export function BodyComp() {
                           flex: 1, background: 'rgba(255,255,255,0.06)',
                           border: `1px solid ${theme.cardBorder}`, borderRadius: 10,
                           padding: '8px 12px', color: theme.text,
-                          fontSize: 14, fontFamily: theme.mono, outline: 'none',
+                          fontSize: 15, fontFamily: theme.mono, outline: 'none', fontWeight: 700,
                         }}
                       />
-                      <div style={{ width: 26, fontSize: 11, color: theme.textMute, fontFamily: theme.mono }}>{unit}</div>
+                      <div style={{ width: 26, fontSize: 11, color: theme.textMute, fontFamily: theme.mono, fontWeight: 700 }}>{unit}</div>
                     </div>
                   ))}
                 </div>
 
                 <motion.button
                   whileTap={{ scale: 0.97 }}
+                  whileHover={{ y: -1 }}
                   onClick={handleCalculate}
                   style={{
-                    width: '100%', marginTop: 14, padding: '12px 0', borderRadius: 14, border: 'none',
+                    width: '100%', marginTop: 14, padding: '13px 0', borderRadius: 14, border: 'none',
                     background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
                     color: theme.onAccent, fontSize: 14, fontWeight: 700, cursor: 'pointer',
+                    boxShadow: `0 6px 18px ${theme.accent}30, inset 0 1px 0 rgba(255,255,255,0.18)`,
+                    fontFamily: theme.font, letterSpacing: 0.3,
                   }}
                 >
                   Calculate
@@ -178,8 +184,8 @@ export function BodyComp() {
                       exit={{ opacity: 0 }}
                     >
                       <Card style={{ borderRadius: 18, padding: '14px 16px', border: `1px solid ${cat.color}40` }}>
-                        <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: cat.color }}>Result</div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, marginBottom: 12, color: cat.color, fontFamily: theme.mono, letterSpacing: 2 }}>RESULT</div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 4 }}>
                           {[
                             { l: 'BODY FAT', v: `${result.bodyFatPct}%`, c: cat.color, sub: cat.label },
                             { l: 'LEAN MASS', v: `${result.leanMass}kg`, c: '#5EEAD4' },
@@ -189,9 +195,9 @@ export function BodyComp() {
                             { l: 'IDEAL RANGE', v: `${idealRange.low}–${idealRange.high}kg`, c: theme.textDim },
                           ].map(({ l, v, c, sub }) => (
                             <div key={l}>
-                              <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1 }}>{l}</div>
-                              <div style={{ fontSize: 16, fontWeight: 700, color: c }}>{v}</div>
-                              {sub && <div style={{ fontSize: 10, color: c, fontFamily: theme.mono }}>{sub}</div>}
+                              <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.5, fontWeight: 700 }}>{l}</div>
+                              <div style={{ fontSize: 17, fontWeight: 800, color: c, fontFamily: theme.mono, marginTop: 2 }}>{v}</div>
+                              {sub && <div style={{ fontSize: 10, color: c, fontFamily: theme.mono, letterSpacing: 1, fontWeight: 700, marginTop: 2 }}>{sub}</div>}
                             </div>
                           ))}
                         </div>
@@ -213,15 +219,14 @@ export function BodyComp() {
               {measurements.length < 2 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 240, gap: 12, textAlign: 'center' }}>
                   <div style={{ fontSize: 40 }}>📊</div>
-                  <div style={{ fontSize: 16, fontWeight: 700 }}>Not enough data</div>
-                  <div style={{ fontSize: 13, color: theme.textDim }}>Log at least 2 measurements to see trends</div>
+                  <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: -0.3, color: theme.text }}>Not enough data</div>
+                  <div style={{ fontSize: 13, color: theme.textDim, maxWidth: 240, lineHeight: 1.45 }}>Log at least 2 measurements to see trends</div>
                 </div>
               ) : (
                 <>
-                  {/* Trend summary */}
                   {trend && (
                     <Card style={{ borderRadius: 18, padding: '14px 16px' }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 10 }}>4-Week Trend</div>
+                      <div style={{ fontSize: 11, fontWeight: 700, marginBottom: 12, fontFamily: theme.mono, letterSpacing: 2, color: theme.textMute }}>4-WEEK TREND</div>
                       <div style={{ display: 'flex', gap: 12 }}>
                         {[
                           { l: 'Weight', v: trend.weightDelta, unit: 'kg', goodDir: -1 },
@@ -232,11 +237,11 @@ export function BodyComp() {
                           const col = v === 0 ? theme.textDim : isGood ? '#4ade80' : '#F87171';
                           return (
                             <div key={l} style={{ flex: 1, textAlign: 'center' }}>
-                              <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, marginBottom: 4 }}>{l.toUpperCase()}</div>
-                              <div style={{ fontSize: 17, fontWeight: 700, color: col }}>
+                              <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.5, fontWeight: 700, marginBottom: 4 }}>{l.toUpperCase()}</div>
+                              <div style={{ fontSize: 18, fontWeight: 800, color: col, fontFamily: theme.mono }}>
                                 {v > 0 ? '+' : ''}{v}{unit}
                               </div>
-                              <div style={{ fontSize: 14 }}>{v === 0 ? '→' : v * goodDir < 0 ? '↑' : '↓'}</div>
+                              <div style={{ fontSize: 14, color: col }}>{v === 0 ? '→' : v * goodDir < 0 ? '↑' : '↓'}</div>
                             </div>
                           );
                         })}
@@ -244,21 +249,18 @@ export function BodyComp() {
                     </Card>
                   )}
 
-                  {/* Body fat chart */}
                   <Card style={{ borderRadius: 18, padding: '14px 14px 10px' }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 8 }}>Body Fat %</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, marginBottom: 8, fontFamily: theme.mono, letterSpacing: 2, color: theme.textMute }}>BODY FAT %</div>
                     <LineChart data={bfData} color={category?.color ?? '#F87171'} height={110} unit="%" />
                   </Card>
 
-                  {/* Lean mass chart */}
                   <Card style={{ borderRadius: 18, padding: '14px 14px 10px' }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 8 }}>Lean Mass</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, marginBottom: 8, fontFamily: theme.mono, letterSpacing: 2, color: theme.textMute }}>LEAN MASS</div>
                     <LineChart data={leanData} color="#5EEAD4" height={110} unit="kg" />
                   </Card>
 
-                  {/* Weight chart */}
                   <Card style={{ borderRadius: 18, padding: '14px 14px 10px' }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 8 }}>Weight</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, marginBottom: 8, fontFamily: theme.mono, letterSpacing: 2, color: theme.textMute }}>WEIGHT</div>
                     <LineChart data={weightData} color={theme.accent} height={110} unit="kg" />
                   </Card>
                 </>

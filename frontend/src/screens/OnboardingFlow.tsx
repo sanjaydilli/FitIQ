@@ -53,31 +53,62 @@ function StepHeader({
   total,
   title,
   subtitle,
+  onBack,
 }: {
   step: number;
   total: number;
   title: React.ReactNode;
   subtitle?: string;
+  onBack?: () => void;
 }) {
   const { theme } = useTheme();
   return (
     <>
       <div
         style={{
-          fontSize: 11,
-          color: theme.accent,
-          fontFamily: theme.mono,
-          letterSpacing: 1.5,
-          marginBottom: 8,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 10,
         }}
       >
-        STEP {String(step).padStart(2, '0')} / {String(total).padStart(2, '0')}
+        <div
+          style={{
+            fontSize: 11,
+            color: theme.textMute,
+            fontFamily: theme.mono,
+            letterSpacing: 2,
+            fontWeight: 700,
+          }}
+        >
+          STEP {String(step).padStart(2, '0')} / {String(total).padStart(2, '0')}
+        </div>
+        {onBack && (
+          <motion.button
+            whileTap={{ scale: 0.94 }}
+            onClick={onBack}
+            style={{
+              background: 'rgba(255,255,255,0.05)',
+              border: `1px solid ${theme.cardBorder}`,
+              borderRadius: 999,
+              padding: '4px 12px',
+              color: theme.textDim,
+              fontSize: 11,
+              fontFamily: theme.mono,
+              letterSpacing: 1.2,
+              fontWeight: 700,
+              cursor: 'pointer',
+            }}
+          >
+            ← BACK
+          </motion.button>
+        )}
       </div>
       <div
         style={{
-          fontSize: 30,
-          fontWeight: 700,
-          letterSpacing: -0.8,
+          fontSize: 26,
+          fontWeight: 800,
+          letterSpacing: -0.5,
           lineHeight: 1.15,
           marginBottom: 8,
           color: theme.text,
@@ -86,7 +117,7 @@ function StepHeader({
         {title}
       </div>
       {subtitle && (
-        <div style={{ color: theme.textDim, fontSize: 14, marginBottom: 24 }}>{subtitle}</div>
+        <div style={{ color: theme.textDim, fontSize: 14, marginBottom: 24, lineHeight: 1.45 }}>{subtitle}</div>
       )}
     </>
   );
@@ -96,10 +127,16 @@ function GoalStep({ value, onChange }: { value: Goal; onChange: (g: Goal) => voi
   const { theme } = useTheme();
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
-      {GOALS.map((g) => {
+      {GOALS.map((g, i) => {
         const sel = g.id === value;
         return (
-          <motion.div key={g.id} whileTap={{ scale: 0.98 }}>
+          <motion.div
+            key={g.id}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.04, duration: 0.25 }}
+            whileTap={{ scale: 0.97 }}
+          >
             <Card selected={sel} onClick={() => onChange(g.id)} style={{ padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
               <div
                 style={{
@@ -113,12 +150,15 @@ function GoalStep({ value, onChange }: { value: Goal; onChange: (g: Goal) => voi
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: 22,
+                  flexShrink: 0,
+                  boxShadow: sel ? `0 4px 14px ${theme.accent}30` : 'none',
+                  transition: 'box-shadow 0.2s',
                 }}
               >
                 {g.icon}
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 2 }}>{g.t}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 2, color: theme.text }}>{g.t}</div>
                 <div style={{ color: theme.textDim, fontSize: 12 }}>{g.s}</div>
               </div>
               <Radio sel={sel} />
@@ -185,24 +225,25 @@ function Slider({
   return (
     <Card style={{ padding: 18, marginBottom: 12 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
-        <span style={{ fontSize: 13, color: theme.textDim, fontFamily: theme.mono, letterSpacing: 1 }}>
+        <span style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.8, fontWeight: 700 }}>
           {label}
         </span>
-        <span style={{ fontFamily: theme.mono, fontSize: 11, color: theme.textMute }}>{unit}</span>
+        <span style={{ fontFamily: theme.mono, fontSize: 11, color: theme.textMute, letterSpacing: 1 }}>{unit}</span>
       </div>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 14 }}>
         <span
           style={{
             fontSize: 36,
-            fontWeight: 700,
+            fontWeight: 800,
             letterSpacing: -1,
             fontFeatureSettings: '"tnum"',
+            fontFamily: theme.mono,
             color: theme.text,
           }}
         >
           {display ?? value}
         </span>
-        <span style={{ color: theme.textDim, fontSize: 14 }}>{unit}</span>
+        <span style={{ color: theme.textDim, fontSize: 14, fontFamily: theme.mono }}>{unit}</span>
       </div>
       <input
         type="range"
@@ -253,30 +294,45 @@ function StatsStep({
   setAge: (n: number) => void;
 }) {
   const { theme } = useTheme();
+  const [nameFocused, setNameFocused] = useState(false);
   return (
     <>
-      <Card style={{ padding: '12px 16px', marginBottom: 16 }}>
-        <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.5, marginBottom: 6 }}>YOUR NAME</div>
+      <div
+        style={{
+          padding: '12px 16px',
+          marginBottom: 16,
+          background: nameFocused ? 'rgba(255,255,255,0.07)' : theme.card,
+          border: `1px solid ${nameFocused ? theme.accent + '50' : theme.cardBorder}`,
+          borderRadius: theme.radius,
+          boxShadow: nameFocused
+            ? `0 0 0 3px ${theme.accent}18, inset 0 1px 0 rgba(255,255,255,0.04)`
+            : 'inset 0 1px 0 rgba(255,255,255,0.04)',
+          transition: 'box-shadow 0.2s, border-color 0.2s, background 0.2s',
+        }}
+      >
+        <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.8, fontWeight: 700, marginBottom: 6 }}>YOUR NAME</div>
         <input
           value={name}
           onChange={e => setName(e.target.value)}
+          onFocus={() => setNameFocused(true)}
+          onBlur={() => setNameFocused(false)}
           placeholder="e.g. Arjun"
           style={{
             width: '100%', background: 'transparent', border: 'none', outline: 'none',
             fontSize: 18, fontWeight: 700, color: theme.text, fontFamily: theme.font,
           }}
         />
-      </Card>
+      </div>
 
       <div style={{ display: 'flex', gap: 10, marginBottom: 18 }}>
         {(['male', 'female'] as Sex[]).map((s) => {
           const sel = s === sex;
           return (
-            <motion.div key={s} whileTap={{ scale: 0.98 }} style={{ flex: 1 }}>
+            <motion.div key={s} whileTap={{ scale: 0.97 }} style={{ flex: 1 }}>
               <Card
                 selected={sel}
                 onClick={() => setSex(s)}
-                style={{ padding: '14px', textAlign: 'center', fontSize: 14, fontWeight: 700, textTransform: 'capitalize' }}
+                style={{ padding: '14px', textAlign: 'center', fontSize: 14, fontWeight: 700, textTransform: 'capitalize', color: sel ? theme.text : theme.textDim }}
               >
                 {s}
               </Card>
@@ -302,25 +358,30 @@ function StatsStep({
           <div>
             <div
               style={{
-                fontSize: 13,
-                color: theme.textDim,
+                fontSize: 11,
+                color: theme.textMute,
                 fontFamily: theme.mono,
-                letterSpacing: 1,
+                letterSpacing: 1.8,
+                fontWeight: 700,
                 marginBottom: 4,
               }}
             >
               AGE
             </div>
-            <div style={{ fontSize: 22, fontWeight: 700, fontFeatureSettings: '"tnum"' }}>{age} yrs</div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+              <span style={{ fontSize: 28, fontWeight: 800, fontFeatureSettings: '"tnum"', fontFamily: theme.mono, color: theme.text, letterSpacing: -0.5 }}>{age}</span>
+              <span style={{ fontSize: 13, color: theme.textDim, fontFamily: theme.mono }}>yrs</span>
+            </div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             {['−', '+'].map((s, i) => (
-              <button
+              <motion.button
                 key={s}
+                whileTap={{ scale: 0.92 }}
                 onClick={() => setAge(Math.max(15, Math.min(80, age + (i === 0 ? -1 : 1))))}
                 style={{
-                  width: 38,
-                  height: 38,
+                  width: 40,
+                  height: 40,
                   borderRadius: 12,
                   background: 'rgba(255,255,255,0.06)',
                   display: 'flex',
@@ -330,10 +391,11 @@ function StatsStep({
                   color: theme.text,
                   border: `1px solid ${theme.cardBorder}`,
                   cursor: 'pointer',
+                  fontWeight: 700,
                 }}
               >
                 {s}
-              </button>
+              </motion.button>
             ))}
           </div>
         </div>
@@ -346,14 +408,36 @@ function DietStep({ value, onChange }: { value: Diet; onChange: (d: Diet) => voi
   const { theme } = useTheme();
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
-      {DIETS.map((d) => {
+      {DIETS.map((d, i) => {
         const sel = d.id === value;
         return (
-          <motion.div key={d.id} whileTap={{ scale: 0.98 }}>
+          <motion.div
+            key={d.id}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.04, duration: 0.25 }}
+            whileTap={{ scale: 0.97 }}
+          >
             <Card selected={sel} onClick={() => onChange(d.id)} style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ fontSize: 22, width: 32, textAlign: 'center' }}>{d.ic}</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 700, fontSize: 15 }}>{d.t}</div>
+              <div
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 10,
+                  background: sel
+                    ? `linear-gradient(135deg, ${theme.accent}22, ${theme.accent2}18)`
+                    : 'rgba(255,255,255,0.05)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 20,
+                  flexShrink: 0,
+                }}
+              >
+                {d.ic}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 700, fontSize: 15, color: theme.text }}>{d.t}</div>
                 <div style={{ color: theme.textDim, fontSize: 12 }}>{d.s}</div>
               </div>
               <Radio sel={sel} />
@@ -369,10 +453,16 @@ function ActivityStep({ value, onChange }: { value: Activity; onChange: (a: Acti
   const { theme } = useTheme();
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
-      {ACTIVITIES.map((a) => {
+      {ACTIVITIES.map((a, i) => {
         const sel = a.id === value;
         return (
-          <motion.div key={a.id} whileTap={{ scale: 0.98 }}>
+          <motion.div
+            key={a.id}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.04, duration: 0.25 }}
+            whileTap={{ scale: 0.97 }}
+          >
             <Card selected={sel} onClick={() => onChange(a.id)} style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
               <div
                 style={{
@@ -386,12 +476,15 @@ function ActivityStep({ value, onChange }: { value: Activity; onChange: (a: Acti
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: 22,
+                  flexShrink: 0,
+                  boxShadow: sel ? `0 4px 14px ${theme.accent}30` : 'none',
+                  transition: 'box-shadow 0.2s',
                 }}
               >
                 {a.icon}
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 700, fontSize: 15 }}>{a.t}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 700, fontSize: 15, color: theme.text }}>{a.t}</div>
                 <div style={{ color: theme.textDim, fontSize: 12 }}>{a.s}</div>
               </div>
               <Radio sel={sel} />
@@ -428,6 +521,10 @@ export function OnboardingFlow() {
     }
   };
 
+  const back = () => {
+    if (step > 0) setStep(step - 1);
+  };
+
   const titles: React.ReactNode[] = [
     <>What's your<br />primary goal?</>,
     <>Tell us about<br />your body</>,
@@ -446,7 +543,13 @@ export function OnboardingFlow() {
     <Background>
       <div style={{ padding: '70px 24px 30px', height: '100%', display: 'flex', flexDirection: 'column' }}>
         <ProgressBar step={step + 1} total={total} />
-        <StepHeader step={step + 1} total={total} title={titles[step]} subtitle={subtitles[step]} />
+        <StepHeader
+          step={step + 1}
+          total={total}
+          title={titles[step]}
+          subtitle={subtitles[step]}
+          onBack={step > 0 ? back : undefined}
+        />
 
         <AnimatePresence mode="wait">
           <motion.div

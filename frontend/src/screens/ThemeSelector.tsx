@@ -70,11 +70,10 @@ function MiniPreview({ t, selected }: { t: ThemeTokens; selected: boolean }) {
 }
 
 export function ThemeSelector() {
-  const { themeId, setTheme } = useTheme();
+  const { theme, themeId, setTheme } = useTheme();
   const { user } = useUser();
   const navigate = useNavigate();
 
-  // Returning users skip theme selection and go straight to home
   useEffect(() => {
     if (user.name) navigate('/home', { replace: true });
   }, [user.name, navigate]);
@@ -92,71 +91,81 @@ export function ThemeSelector() {
         <div
           style={{
             fontSize: 11,
-            color: themes[themeId].accent,
-            fontFamily: themes[themeId].mono,
-            letterSpacing: 1.5,
-            marginBottom: 8,
+            color: theme.textMute,
+            fontFamily: theme.mono,
+            letterSpacing: 2,
+            fontWeight: 700,
+            marginBottom: 10,
           }}
         >
           PICK YOUR VIBE
         </div>
         <div
           style={{
-            fontSize: 30,
-            fontWeight: 700,
-            letterSpacing: -0.8,
+            fontSize: 26,
+            fontWeight: 800,
+            letterSpacing: -0.5,
             lineHeight: 1.15,
-            marginBottom: 6,
-            color: themes[themeId].text,
+            marginBottom: 8,
+            color: theme.text,
           }}
         >
           Choose your<br />
           interface theme
         </div>
-        <div style={{ color: themes[themeId].textDim, fontSize: 13, marginBottom: 28 }}>
+        <div style={{ color: theme.textDim, fontSize: 14, marginBottom: 28, lineHeight: 1.45 }}>
           You can switch anytime from your profile.
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
-          {themeOrder.map((id: ThemeId) => {
+          {themeOrder.map((id: ThemeId, i: number) => {
             const t = themes[id];
             const sel = id === themeId;
             return (
               <motion.div
                 key={id}
-                whileTap={{ scale: 0.98 }}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.04, duration: 0.25 }}
+                whileTap={{ scale: 0.97 }}
+                whileHover={{ y: -2 }}
                 onClick={() => setTheme(id)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: 14,
                   padding: '14px 16px',
-                  borderRadius: 18,
-                  border: `${sel ? 1.5 : 1}px solid ${sel ? t.accent : 'rgba(255,255,255,0.08)'}`,
-                  background: sel ? `${t.accent}10` : 'rgba(255,255,255,0.04)',
-                  backdropFilter: 'blur(20px) saturate(150%)',
-                  WebkitBackdropFilter: 'blur(20px) saturate(150%)',
+                  borderRadius: theme.radius,
+                  border: `${sel ? 1.5 : 1}px solid ${sel ? t.accent : theme.cardBorder}`,
+                  background: sel ? `${t.accent}12` : theme.card,
+                  backdropFilter: theme.id === 'aurora' ? 'blur(20px) saturate(150%)' : undefined,
+                  WebkitBackdropFilter: theme.id === 'aurora' ? 'blur(20px) saturate(150%)' : undefined,
+                  boxShadow: sel
+                    ? `0 6px 22px ${t.accent}22, inset 0 1px 0 rgba(255,255,255,0.04)`
+                    : 'inset 0 1px 0 rgba(255,255,255,0.04)',
                   cursor: 'pointer',
+                  transition: 'box-shadow 0.2s, background 0.2s, border-color 0.2s',
                 }}
               >
                 <MiniPreview t={t} selected={sel} />
-                <div style={{ flex: 1 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
                   <div
                     style={{
                       fontSize: 16,
                       fontWeight: 700,
-                      color: themes[themeId].text,
+                      color: theme.text,
                       marginBottom: 2,
+                      letterSpacing: -0.2,
                     }}
                   >
                     {t.name}
                   </div>
-                  <div style={{ fontSize: 12, color: themes[themeId].textDim }}>{t.tagline}</div>
+                  <div style={{ fontSize: 12, color: theme.textDim }}>{t.tagline}</div>
                   <div style={{ display: 'flex', gap: 5, marginTop: 8 }}>
-                    {[t.accent, t.accent2, t.warn].map((c, i) => (
+                    {[t.accent, t.accent2, t.warn].map((c, idx) => (
                       <div
-                        key={i}
-                        style={{ width: 12, height: 12, borderRadius: 6, background: c }}
+                        key={idx}
+                        style={{ width: 12, height: 12, borderRadius: 6, background: c, boxShadow: `0 2px 6px ${c}40` }}
                       />
                     ))}
                   </div>
@@ -166,11 +175,13 @@ export function ThemeSelector() {
                     width: 22,
                     height: 22,
                     borderRadius: 11,
-                    border: sel ? `2px solid ${t.accent}` : '1.5px solid rgba(255,255,255,0.2)',
+                    border: sel ? `2px solid ${t.accent}` : `1.5px solid ${theme.cardBorder}`,
                     background: sel ? t.accent : 'transparent',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    flexShrink: 0,
+                    transition: 'background 0.2s, border-color 0.2s',
                   }}
                 >
                   {sel && (

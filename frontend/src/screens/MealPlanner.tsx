@@ -80,35 +80,38 @@ export function MealPlanner() {
 
   return (
     <Background>
-      {/* Header */}
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10,
         padding: '14px 20px',
-        background: 'rgba(10,10,10,0.85)',
-        backdropFilter: 'blur(12px)',
+        background: theme.id === 'aurora' ? 'rgba(8,6,15,0.7)' : theme.id === 'neon' ? 'rgba(0,0,0,0.85)' : 'rgba(0,0,0,0.65)',
+        backdropFilter: 'blur(20px) saturate(150%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(150%)',
         borderBottom: `1px solid ${theme.cardBorder}`,
         display: 'flex', alignItems: 'center', gap: 12,
       }}>
         <motion.button
           whileTap={{ scale: 0.92 }}
           onClick={() => navigate(-1)}
-          style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 10, padding: '6px 10px', color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+          style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid ${theme.cardBorder}`, borderRadius: 10, padding: '6px 10px', color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
         >
           <Icon name="chevron-left" size={16} color={theme.text} />
         </motion.button>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 17, fontWeight: 700 }}>AI Meal Planner</div>
-          <div style={{ fontSize: 11, color: theme.textDim }}>Indian nutrition · Personalised</div>
+          <div style={{ fontSize: 10, color: theme.accent, fontFamily: theme.mono, letterSpacing: 2, fontWeight: 700 }}>AI POWERED</div>
+          <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: -0.3, color: theme.text, marginTop: 1 }}>Meal Planner</div>
         </div>
         <motion.button
           whileTap={{ scale: 0.92 }}
+          whileHover={{ y: -1 }}
           onClick={generate}
           disabled={loading}
           style={{
-            padding: '7px 14px', borderRadius: 12, border: 'none',
+            padding: '8px 14px', borderRadius: 12, border: 'none',
             background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
             color: theme.onAccent, fontSize: 12, fontWeight: 700, cursor: 'pointer',
             opacity: loading ? 0.7 : 1,
+            boxShadow: loading ? 'none' : `0 4px 14px ${theme.accent}30`,
+            fontFamily: theme.font,
           }}
         >
           {loading ? '...' : plan ? 'Regenerate' : 'Generate'}

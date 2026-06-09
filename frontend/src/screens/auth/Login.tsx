@@ -14,6 +14,8 @@ export function Login() {
   const [password, setPassword] = useState('');
   const [error, setError]       = useState('');
   const [loading, setLoading]   = useState(false);
+  const [emailFocused, setEmailFocused] = useState(false);
+  const [pwFocused, setPwFocused] = useState(false);
 
   async function handleSignIn(e: React.FormEvent) {
     e.preventDefault();
@@ -47,20 +49,31 @@ export function Login() {
     <Background>
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 28px' }}>
 
-        {/* Logo */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           style={{ textAlign: 'center', marginBottom: 40 }}
         >
           <div style={{ fontSize: 48, marginBottom: 8 }}>💪</div>
-          <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: -0.5 }}>FitIQ</div>
-          <div style={{ fontSize: 12, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 2, marginTop: 4 }}>
+          <div
+            style={{
+              fontSize: 32,
+              fontWeight: 900,
+              letterSpacing: -1,
+              background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              display: 'inline-block',
+            }}
+          >
+            FitIQ
+          </div>
+          <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 2, fontWeight: 700, marginTop: 6 }}>
             INDIA'S SMARTEST FITNESS APP
           </div>
         </motion.div>
 
-        {/* Form */}
         <motion.form
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -73,53 +86,75 @@ export function Login() {
             placeholder="Email"
             value={email}
             onChange={e => setEmail(e.target.value)}
-            style={inputStyle(theme)}
+            onFocus={() => setEmailFocused(true)}
+            onBlur={() => setEmailFocused(false)}
+            style={inputStyle(theme, emailFocused)}
           />
           <input
             type="password"
             placeholder="Password"
             value={password}
             onChange={e => setPassword(e.target.value)}
-            style={inputStyle(theme)}
+            onFocus={() => setPwFocused(true)}
+            onBlur={() => setPwFocused(false)}
+            style={inputStyle(theme, pwFocused)}
           />
 
           {error && (
-            <div style={{ fontSize: 12, color: '#F87171', textAlign: 'center', padding: '4px 0' }}>
+            <motion.div
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              style={{
+                fontSize: 12,
+                color: '#F87171',
+                textAlign: 'center',
+                padding: '8px 12px',
+                background: 'rgba(248,113,113,0.08)',
+                border: '1px solid rgba(248,113,113,0.2)',
+                borderRadius: 10,
+                fontWeight: 600,
+              }}
+            >
               {error}
-            </div>
+            </motion.div>
           )}
 
           <motion.button
             whileTap={{ scale: 0.97 }}
+            whileHover={{ y: -2 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 26 }}
             type="submit"
             disabled={loading}
             style={{
-              padding: '14px', borderRadius: 14, border: 'none', cursor: 'pointer',
+              padding: '15px', borderRadius: 14, border: 'none', cursor: loading ? 'wait' : 'pointer',
               background: loading ? 'rgba(255,255,255,0.08)' : `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
-              color: '#fff', fontSize: 15, fontWeight: 700, marginTop: 4,
+              color: theme.onAccent, fontSize: 15, fontWeight: 700, marginTop: 4,
+              fontFamily: theme.font,
+              boxShadow: loading ? 'none' : `0 8px 24px ${theme.accent}38, 0 2px 6px ${theme.accent}1c, inset 0 1px 0 rgba(255,255,255,0.18)`,
+              letterSpacing: 0.2,
             }}
           >
             {loading ? 'Signing in…' : 'Sign In'}
           </motion.button>
 
-          {/* Divider */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '4px 0' }}>
-            <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
-            <span style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono }}>OR</span>
-            <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
+            <div style={{ flex: 1, height: 1, background: theme.cardBorder }} />
+            <span style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 2, fontWeight: 700 }}>OR</span>
+            <div style={{ flex: 1, height: 1, background: theme.cardBorder }} />
           </div>
 
-          {/* Google */}
           <motion.button
             whileTap={{ scale: 0.97 }}
+            whileHover={{ y: -1 }}
             type="button"
             onClick={handleGoogle}
             disabled={loading}
             style={{
-              padding: '13px', borderRadius: 14, border: '1px solid rgba(255,255,255,0.12)',
+              padding: '13px', borderRadius: 14, border: `1px solid ${theme.cardBorder}`,
               background: 'rgba(255,255,255,0.05)', cursor: 'pointer',
               color: theme.text, fontSize: 14, fontWeight: 600,
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+              fontFamily: theme.font,
             }}
           >
             <GoogleIcon />
@@ -127,7 +162,6 @@ export function Login() {
           </motion.button>
         </motion.form>
 
-        {/* Footer */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -147,18 +181,22 @@ export function Login() {
   );
 }
 
-function inputStyle(theme: ReturnType<typeof useTheme>['theme']): React.CSSProperties {
+function inputStyle(theme: ReturnType<typeof useTheme>['theme'], focused: boolean): React.CSSProperties {
   return {
     padding: '14px 16px',
     borderRadius: 14,
-    border: `1px solid ${theme.cardBorder}`,
-    background: 'rgba(255,255,255,0.05)',
+    border: `1px solid ${focused ? theme.accent + '50' : theme.cardBorder}`,
+    background: focused ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.05)',
     color: theme.text,
     fontSize: 14,
     fontFamily: theme.font,
     outline: 'none',
     width: '100%',
     boxSizing: 'border-box',
+    boxShadow: focused
+      ? `0 0 0 3px ${theme.accent}18, inset 0 1px 0 rgba(255,255,255,0.04)`
+      : 'inset 0 1px 0 rgba(255,255,255,0.03)',
+    transition: 'box-shadow 0.2s, border-color 0.2s, background 0.2s',
   };
 }
 
