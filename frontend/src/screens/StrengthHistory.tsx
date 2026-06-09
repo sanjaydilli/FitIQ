@@ -84,48 +84,54 @@ export function StrengthHistory() {
         >
           <Icon name="chevron-left" size={16} color={theme.text} />
         </motion.button>
-        <div style={{ fontSize: 17, fontWeight: 700 }}>Strength History</div>
+        <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: -0.3 }}>Strength History</div>
       </div>
 
       <div style={{ paddingTop: 64, paddingBottom: 32, height: '100%', overflowY: 'auto' }}>
         {/* Exercise selector */}
-        <div style={{ padding: '12px 0', overflowX: 'auto', display: 'flex', gap: 8, paddingLeft: 16, scrollbarWidth: 'none' }}>
-          {exercisesWithData.map(ex => (
-            <motion.button
-              key={ex.id}
-              whileTap={{ scale: 0.94 }}
-              onClick={() => setSelectedId(ex.id)}
-              style={{
-                flexShrink: 0,
-                padding: '7px 14px', borderRadius: 20,
-                border: selectedId === ex.id ? 'none' : `1px solid ${theme.cardBorder}`,
-                background: selectedId === ex.id ? `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})` : theme.card,
-                color: selectedId === ex.id ? theme.onAccent : theme.text,
-                fontSize: 12, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap',
-              }}
-            >
-              {ex.name}
-            </motion.button>
-          ))}
+        <div style={{ padding: '14px 0 10px', overflowX: 'auto', display: 'flex', gap: 8, paddingLeft: 20, scrollbarWidth: 'none' }}>
+          {exercisesWithData.map(ex => {
+            const sel = selectedId === ex.id;
+            return (
+              <motion.button
+                key={ex.id}
+                whileTap={{ scale: 0.96 }}
+                onClick={() => setSelectedId(ex.id)}
+                style={{
+                  flexShrink: 0,
+                  padding: '7px 14px', borderRadius: 20,
+                  border: sel ? 'none' : `1px solid ${theme.cardBorder}`,
+                  background: sel ? `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})` : 'rgba(255,255,255,0.04)',
+                  color: sel ? theme.onAccent : theme.textDim,
+                  fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap',
+                  letterSpacing: 0.2,
+                  boxShadow: sel ? `0 4px 12px ${theme.accent}33` : 'none',
+                }}
+              >
+                {ex.name}
+              </motion.button>
+            );
+          })}
         </div>
 
-        <div style={{ padding: '8px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ padding: '6px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           {/* Plateau warning */}
           {isPlateauing && (
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               style={{
-                padding: '10px 14px', borderRadius: 14,
-                background: 'rgba(251,191,36,0.12)',
+                padding: '12px 14px', borderRadius: 14,
+                background: 'rgba(251,191,36,0.10)',
                 border: '1px solid rgba(251,191,36,0.3)',
-                display: 'flex', alignItems: 'center', gap: 8,
+                borderLeft: '3px solid #FBBF24',
+                display: 'flex', alignItems: 'center', gap: 10,
               }}
             >
-              <span style={{ fontSize: 16 }}>⚠️</span>
+              <span style={{ fontSize: 18 }}>⚠️</span>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#FBBF24' }}>Plateau detected</div>
-                <div style={{ fontSize: 11, color: theme.textDim }}>No weight increase in last 4 sessions — consider deload or variation</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#FBBF24', letterSpacing: -0.2 }}>Plateau detected</div>
+                <div style={{ fontSize: 11, color: theme.textDim, marginTop: 1 }}>No weight increase in last 4 sessions — consider deload or variation</div>
               </div>
             </motion.div>
           )}
@@ -133,12 +139,17 @@ export function StrengthHistory() {
           {/* Max weight chart */}
           {weightData.length >= 2 ? (
             <Card style={{ borderRadius: 18, padding: '14px 14px 10px' }}>
-              <div style={{ marginBottom: 8 }}>
-                <div style={{ fontSize: 12, fontWeight: 700 }}>Max Weight</div>
+              <div style={{ marginBottom: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, textTransform: 'uppercase' }}>Max Weight</div>
+                  {pr && (
+                    <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, marginTop: 4, letterSpacing: 0.2 }}>
+                      Best: <span style={{ color: theme.accent, fontWeight: 700 }}>{pr.weight}kg × {pr.reps}</span> · {pr.date}
+                    </div>
+                  )}
+                </div>
                 {pr && (
-                  <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, marginTop: 2 }}>
-                    Best: {pr.weight}kg × {pr.reps} reps · {pr.date}
-                  </div>
+                  <div style={{ padding: '3px 8px', borderRadius: 6, background: `${theme.accent}1c`, border: `1px solid ${theme.accent}33`, fontSize: 9, fontWeight: 700, color: theme.accent, fontFamily: theme.mono, letterSpacing: 0.8 }}>PR</div>
                 )}
               </div>
               <LineChart data={weightData} color={theme.accent} height={130} unit="kg" prIndex={prIndex} />
@@ -152,30 +163,36 @@ export function StrengthHistory() {
           {/* Volume chart */}
           {volumeData.length >= 2 && (
             <Card style={{ borderRadius: 18, padding: '14px 14px 10px' }}>
-              <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 8 }}>Volume (kg)</div>
+              <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, textTransform: 'uppercase' }}>Volume (kg)</div>
               <LineChart data={volumeData} color="#60A5FA" height={100} showDots={false} />
             </Card>
           )}
 
           {/* Session history */}
           <div>
-            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8, padding: '0 2px' }}>Recent Sessions</div>
+            <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 8, padding: '0 2px', color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, textTransform: 'uppercase' }}>Recent Sessions</div>
             <Card style={{ borderRadius: 18, overflow: 'hidden' }}>
               {history.slice(-8).reverse().map((h, i, arr) => (
-                <div key={i} style={{
-                  padding: '11px 14px',
-                  borderBottom: i < arr.length - 1 ? `1px solid ${theme.cardBorder}` : 'none',
-                  display: 'flex', alignItems: 'center', gap: 12,
-                }}>
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: theme.accent, flexShrink: 0 }} />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 12, fontWeight: 600 }}>{h.date}</div>
-                    <div style={{ fontSize: 11, color: theme.textDim, fontFamily: theme.mono }}>
-                      {h.sets.length} sets · max {h.maxWeight}kg · {h.totalVolume.toFixed(0)}kg vol
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -6 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.03 }}
+                  style={{
+                    padding: '12px 14px',
+                    borderBottom: i < arr.length - 1 ? `1px solid ${theme.cardBorder}` : 'none',
+                    display: 'flex', alignItems: 'center', gap: 12,
+                  }}
+                >
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: theme.accent, flexShrink: 0, boxShadow: `0 0 6px ${theme.accent}88` }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, fontFamily: theme.mono, letterSpacing: 0.2 }}>{h.date}</div>
+                    <div style={{ fontSize: 11, color: theme.textDim, fontFamily: theme.mono, marginTop: 1 }}>
+                      {h.sets.length} sets · {h.totalVolume.toFixed(0)}kg vol
                     </div>
                   </div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: theme.accent }}>{h.maxWeight}kg</div>
-                </div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: theme.accent, fontFamily: theme.mono, letterSpacing: -0.3 }}>{h.maxWeight}<span style={{ fontSize: 10, color: theme.textMute }}>kg</span></div>
+                </motion.div>
               ))}
             </Card>
           </div>

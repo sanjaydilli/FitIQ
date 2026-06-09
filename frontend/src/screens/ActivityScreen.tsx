@@ -95,33 +95,41 @@ export function ActivityScreen() {
         >
           <Icon name="chevron-left" size={16} color={theme.text} />
         </motion.button>
-        <div style={{ fontSize: 17, fontWeight: 700 }}>Activity</div>
+        <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: -0.3 }}>Activity</div>
       </div>
 
       <div style={{ paddingTop: 64, paddingBottom: 32, height: '100%', overflowY: 'auto' }}>
         {/* Stats row */}
-        <div style={{ padding: '12px 16px 8px', display: 'flex', gap: 10 }}>
+        <div style={{ padding: '14px 20px 8px', display: 'flex', gap: 10 }}>
           {[
             { label: 'STREAK', iconName: 'streak' as const, value: `${currentStreak}d`, color: '#FB923C' },
             { label: 'WORKOUTS', iconName: 'dumbbell' as const, value: totalWorkouts, color: theme.accent },
             { label: 'ACTIVE DAYS', iconName: 'lightning' as const, value: activeDaysCount, color: theme.accent2 },
-          ].map(({ label, value, iconName, color }) => (
-            <div key={label} style={{ flex: 1 }}>
-              <Card style={{ padding: '10px 12px', borderRadius: 16, textAlign: 'center' }}>
-                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 4 }}>
-                  <Icon name={iconName} size={16} color={color} />
+          ].map(({ label, value, iconName, color }, i) => (
+            <motion.div
+              key={label}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.04, type: 'spring' as const, stiffness: 280, damping: 26 }}
+              style={{ flex: 1 }}
+            >
+              <Card style={{ padding: '12px 12px', borderRadius: 16, textAlign: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6 }}>
+                  <div style={{ width: 28, height: 28, borderRadius: 8, background: `${color}18`, border: `1px solid ${color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Icon name={iconName} size={14} color={color} />
+                  </div>
                 </div>
-                <div style={{ fontSize: 18, fontWeight: 800, color, letterSpacing: -0.5 }}>{value}</div>
-                <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 0.8 }}>{label}</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color, letterSpacing: -0.6, fontFamily: theme.mono, lineHeight: 1 }}>{value}</div>
+                <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.2, marginTop: 4 }}>{label}</div>
               </Card>
-            </div>
+            </motion.div>
           ))}
         </div>
 
         {/* Calendar */}
-        <div style={{ padding: '8px 16px 12px' }}>
+        <div style={{ padding: '10px 20px 12px' }}>
           <Card style={{ borderRadius: 18, padding: '14px 14px 10px', overflow: 'hidden' }}>
-            <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 10 }}>6-Month Activity</div>
+            <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 12, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, textTransform: 'uppercase' }}>6-Month Activity</div>
             <ActivityCalendar
               days={activityDays}
               color={theme.accent}
@@ -138,11 +146,11 @@ export function ActivityScreen() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              style={{ padding: '0 16px 12px', overflow: 'hidden' }}
+              style={{ padding: '0 20px 12px', overflow: 'hidden' }}
             >
-              <Card style={{ borderRadius: 18, padding: '14px 16px' }}>
+              <Card style={{ borderRadius: 18, padding: '14px 16px', borderLeft: `3px solid ${theme.accent}` }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700 }}>{selectedDate}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, fontFamily: theme.mono, letterSpacing: 0.3, color: theme.text }}>{selectedDate}</div>
                   <motion.button
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setSelectedDate(null)}
@@ -154,16 +162,19 @@ export function ActivityScreen() {
 
                 {/* Food summary */}
                 {selectedDayData.calories > 0 && (
-                  <div style={{ marginBottom: 10 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                      <Icon name="utensils" size={14} color="#FB923C" />
-                      <span style={{ fontSize: 12, fontWeight: 600 }}>Nutrition · {selectedDayData.calories} kcal</span>
+                  <div style={{ marginBottom: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                      <div style={{ width: 24, height: 24, borderRadius: 7, background: 'rgba(251,146,60,0.18)', border: '1px solid rgba(251,146,60,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Icon name="utensils" size={12} color="#FB923C" />
+                      </div>
+                      <span style={{ fontSize: 12, fontWeight: 700 }}>Nutrition</span>
+                      <span style={{ fontSize: 11, color: '#FB923C', fontFamily: theme.mono, marginLeft: 'auto', fontWeight: 700 }}>{selectedDayData.calories} kcal</span>
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                       {selectedDayData.foodEntries.map(e => (
-                        <div key={e.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: `1px solid ${theme.cardBorder}` }}>
+                        <div key={e.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderBottom: `1px solid ${theme.cardBorder}` }}>
                           <span style={{ fontSize: 12, color: theme.textDim }}>{e.name}</span>
-                          <span style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono }}>{e.calories} kcal</span>
+                          <span style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 0.2 }}>{e.calories} kcal</span>
                         </div>
                       ))}
                     </div>
@@ -172,12 +183,14 @@ export function ActivityScreen() {
 
                 {/* Workout summary */}
                 {selectedDayData.workout && (
-                  <div style={{ marginBottom: 10 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                      <Icon name="dumbbell" size={14} color={theme.accent} />
-                      <span style={{ fontSize: 12, fontWeight: 600 }}>Workout · {selectedDayData.workout.name}</span>
+                  <div style={{ marginBottom: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                      <div style={{ width: 24, height: 24, borderRadius: 7, background: `${theme.accent}18`, border: `1px solid ${theme.accent}30`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Icon name="dumbbell" size={12} color={theme.accent} />
+                      </div>
+                      <span style={{ fontSize: 12, fontWeight: 700 }}>Workout · {selectedDayData.workout.name}</span>
                     </div>
-                    <div style={{ fontSize: 11, color: theme.textDim, fontFamily: theme.mono }}>
+                    <div style={{ fontSize: 11, color: theme.textDim, fontFamily: theme.mono, paddingLeft: 32 }}>
                       {selectedDayData.workout.exercises.length} exercises · {selectedDayData.workout.totalVolume.toFixed(0)}kg volume
                     </div>
                   </div>
@@ -186,11 +199,13 @@ export function ActivityScreen() {
                 {/* Measurement summary */}
                 {selectedDayData.measurement && (
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                      <Icon name="body" size={14} color="#5EEAD4" />
-                      <span style={{ fontSize: 12, fontWeight: 600 }}>Body Comp · {selectedDayData.measurement.bodyFatPct}% BF</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                      <div style={{ width: 24, height: 24, borderRadius: 7, background: 'rgba(94,234,212,0.18)', border: '1px solid rgba(94,234,212,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Icon name="body" size={12} color="#5EEAD4" />
+                      </div>
+                      <span style={{ fontSize: 12, fontWeight: 700 }}>Body Comp · {selectedDayData.measurement.bodyFatPct}% BF</span>
                     </div>
-                    <div style={{ fontSize: 11, color: theme.textDim, fontFamily: theme.mono }}>
+                    <div style={{ fontSize: 11, color: theme.textDim, fontFamily: theme.mono, paddingLeft: 32 }}>
                       {selectedDayData.measurement.weightKg}kg · {selectedDayData.measurement.leanMass}kg lean
                     </div>
                   </div>
@@ -205,23 +220,31 @@ export function ActivityScreen() {
         </AnimatePresence>
 
         {/* Contribution breakdown */}
-        <div style={{ padding: '0 16px', marginBottom: 12 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8, padding: '0 2px' }}>Activity Breakdown</div>
+        <div style={{ padding: '0 20px', marginBottom: 12 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 8, padding: '0 2px', color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, textTransform: 'uppercase' }}>Activity Breakdown</div>
           <Card style={{ borderRadius: 18, overflow: 'hidden' }}>
             {[
               { label: 'Food logged', iconName: 'utensils' as const, count: Object.keys(caloriesByDate).length, color: '#FB923C' },
               { label: 'Workouts done', iconName: 'dumbbell' as const, count: totalWorkouts, color: theme.accent },
               { label: 'Body comp checks', iconName: 'body' as const, count: measurements.length, color: '#5EEAD4' },
             ].map(({ label, iconName, count, color }, i, arr) => (
-              <div key={label} style={{
-                padding: '12px 16px',
-                borderBottom: i < arr.length - 1 ? `1px solid ${theme.cardBorder}` : 'none',
-                display: 'flex', alignItems: 'center', gap: 12,
-              }}>
-                <Icon name={iconName} size={18} color={color} />
-                <div style={{ flex: 1, fontSize: 13 }}>{label}</div>
-                <div style={{ fontSize: 16, fontWeight: 700, color }}>{count}</div>
-              </div>
+              <motion.div
+                key={label}
+                initial={{ opacity: 0, x: -6 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 + i * 0.04 }}
+                style={{
+                  padding: '13px 16px',
+                  borderBottom: i < arr.length - 1 ? `1px solid ${theme.cardBorder}` : 'none',
+                  display: 'flex', alignItems: 'center', gap: 12,
+                }}
+              >
+                <div style={{ width: 32, height: 32, borderRadius: 9, background: `${color}18`, border: `1px solid ${color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon name={iconName} size={15} color={color} />
+                </div>
+                <div style={{ flex: 1, fontSize: 13, fontWeight: 600 }}>{label}</div>
+                <div style={{ fontSize: 18, fontWeight: 800, color, fontFamily: theme.mono, letterSpacing: -0.4 }}>{count}</div>
+              </motion.div>
             ))}
           </Card>
         </div>

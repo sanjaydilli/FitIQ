@@ -110,18 +110,25 @@ export function CustomRecipe() {
       <div style={{ height: '100%', overflowY: 'auto', padding: '52px 0 40px' }}>
 
         {/* Header */}
-        <div style={{ padding: '0 20px', marginBottom: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+        <div style={{ padding: '0 20px', marginBottom: 16, position: 'relative' }}>
+          <div style={{
+            position: 'absolute', inset: '-12px 0 0 0',
+            background: `radial-gradient(ellipse at 80% 0%, ${theme.accent2}1c, transparent 60%)`,
+            pointerEvents: 'none',
+          }} />
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
             <motion.div
               whileTap={{ scale: 0.92 }}
               onClick={() => navigate(-1)}
-              style={{ cursor: 'pointer', color: theme.textMute, fontSize: 22, lineHeight: 1 }}
+              style={{ cursor: 'pointer', background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 10, padding: '6px 10px', color: theme.text, display: 'flex', alignItems: 'center' }}
             >
-              ‹
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={theme.text} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
             </motion.div>
             <div>
-              <div style={{ fontSize: 9, color: theme.accent2, fontFamily: theme.mono, letterSpacing: 2.5 }}>RECIPE BUILDER</div>
-              <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: -0.4 }}>Custom Recipe</div>
+              <div style={{ fontSize: 10, color: theme.accent2, fontFamily: theme.mono, letterSpacing: 2.2, fontWeight: 700, textTransform: 'uppercase' }}>Recipe Builder</div>
+              <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: -0.6, marginTop: 2 }}>Custom Recipe</div>
             </div>
           </div>
 
@@ -131,11 +138,13 @@ export function CustomRecipe() {
             onChange={e => setRecipeName(e.target.value)}
             placeholder="Recipe name (e.g. Dal Tadka, Palak Paneer…)"
             style={{
+              position: 'relative',
               width: '100%', boxSizing: 'border-box',
-              background: theme.cardHi, border: `1px solid ${theme.cardBorder}`,
-              borderRadius: theme.radiusSm, padding: '10px 14px',
+              background: 'rgba(255,255,255,0.04)', border: `1px solid ${theme.cardBorder}`,
+              borderRadius: 14, padding: '12px 14px',
               fontSize: 14, color: theme.text, outline: 'none',
               fontFamily: theme.font, marginBottom: 10,
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
             }}
           />
         </div>
@@ -148,8 +157,8 @@ export function CustomRecipe() {
               <div style={{ position: 'relative' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
                   <div>
-                    <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.5, marginBottom: 2 }}>
-                      PER SERVING · {totalGrams}g TOTAL
+                    <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, marginBottom: 3, fontWeight: 700, textTransform: 'uppercase' }}>
+                      Per serving · {totalGrams}g total
                     </div>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
                       <motion.span
@@ -170,7 +179,7 @@ export function CustomRecipe() {
 
                   {/* Servings selector */}
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                    <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono }}>SERVINGS</div>
+                    <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, fontWeight: 700, textTransform: 'uppercase' }}>Servings</div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <motion.div whileTap={{ scale: 0.88 }} onClick={() => setServings(s => Math.max(1, s - 1))}
                         style={{ width: 26, height: 26, borderRadius: 8, background: theme.cardHi, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 16 }}>
@@ -186,12 +195,12 @@ export function CustomRecipe() {
                 </div>
 
                 {/* Macro bar */}
-                <div style={{ display: 'flex', gap: 2, height: 5, borderRadius: 4, overflow: 'hidden', marginBottom: 6 }}>
+                <div style={{ display: 'flex', gap: 2, height: 6, borderRadius: 4, overflow: 'hidden', marginBottom: 8, boxShadow: 'inset 0 1px 0 rgba(0,0,0,0.25)' }}>
                   <motion.div animate={{ width: `${pct.carbPct}%` }} style={{ background: '#FB923C', height: '100%' }} />
                   <motion.div animate={{ width: `${pct.protPct}%` }} style={{ background: theme.accent, height: '100%' }} />
                   <motion.div animate={{ width: `${pct.fatPct}%` }} style={{ background: theme.accent2, height: '100%' }} />
                 </div>
-                <div style={{ display: 'flex', gap: 14 }}>
+                <div style={{ display: 'flex', gap: 16 }}>
                   {[
                     { label: 'Carbs',   val: `${perServing.carbs}g`,   color: '#FB923C' },
                     { label: 'Protein', val: `${perServing.protein}g`, color: theme.accent },
@@ -199,8 +208,8 @@ export function CustomRecipe() {
                     { label: 'Fiber',   val: `${perServing.fiber}g`,   color: theme.textDim },
                   ].map(m => (
                     <div key={m.label}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: m.color }}>{m.val}</div>
-                      <div style={{ fontSize: 8, color: theme.textMute, fontFamily: theme.mono }}>{m.label}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: m.color, fontFamily: theme.mono, letterSpacing: -0.2 }}>{m.val}</div>
+                      <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 0.6, marginTop: 1, textTransform: 'uppercase' }}>{m.label}</div>
                     </div>
                   ))}
                 </div>
@@ -211,11 +220,12 @@ export function CustomRecipe() {
 
         {/* Ingredient search */}
         <div style={{ padding: '0 20px', marginBottom: 10 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, marginBottom: 8, color: theme.textDim }}>ADD INGREDIENT</div>
+          <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 8, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, textTransform: 'uppercase' }}>Add Ingredient</div>
           <div style={{
             display: 'flex', alignItems: 'center', gap: 10,
-            background: theme.cardHi, border: `1px solid ${theme.cardBorder}`,
-            borderRadius: theme.radiusSm, padding: '0 14px',
+            background: 'rgba(255,255,255,0.04)', border: `1px solid ${theme.cardBorder}`,
+            borderRadius: 14, padding: '0 14px',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
           }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={theme.textMute} strokeWidth="2" strokeLinecap="round">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
@@ -278,8 +288,8 @@ export function CustomRecipe() {
         {/* Ingredient list */}
         {ingredients.length > 0 && (
           <div style={{ padding: '0 20px', marginBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, marginBottom: 8, color: theme.textDim }}>
-              INGREDIENTS ({ingredients.length})
+            <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 8, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, textTransform: 'uppercase' }}>
+              Ingredients ({ingredients.length})
             </div>
             <Card style={{ borderRadius: 16, overflow: 'hidden' }}>
               <AnimatePresence>
@@ -366,11 +376,13 @@ export function CustomRecipe() {
           return (
             <div style={{ padding: '0 20px 20px' }}>
               <motion.button
-                whileTap={canSave && !saved ? { scale: 0.97 } : {}}
+                whileTap={canSave && !saved ? { scale: 0.96 } : {}}
+                whileHover={canSave && !saved ? { y: -1 } : {}}
+                transition={{ type: 'spring' as const, stiffness: 420, damping: 26 }}
                 onClick={handleSave}
                 disabled={inactive}
                 style={{
-                  width: '100%', padding: '14px 0', borderRadius: 16, border: 'none',
+                  width: '100%', padding: '16px 0', borderRadius: 16, border: 'none',
                   background: saved
                     ? `${theme.accent}40`
                     : canSave
@@ -378,7 +390,8 @@ export function CustomRecipe() {
                       : 'rgba(255,255,255,0.06)',
                   color: saved ? theme.accent : canSave ? theme.onAccent : theme.textMute,
                   fontSize: 15, fontWeight: 800, cursor: inactive ? 'default' : 'pointer',
-                  fontFamily: theme.font,
+                  fontFamily: theme.font, letterSpacing: -0.1,
+                  boxShadow: canSave && !saved ? `0 8px 24px ${theme.accent}38, 0 2px 6px ${theme.accent}1c, inset 0 1px 0 rgba(255,255,255,0.18)` : 'none',
                 }}
               >
                 {saved
