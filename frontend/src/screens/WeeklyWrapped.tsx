@@ -134,8 +134,8 @@ export function WeeklyWrapped() {
         >
           <Icon name="chevron-left" size={16} color={theme.text} />
         </motion.button>
-        <div style={{ fontSize: 17, fontWeight: 700 }}>Weekly Wrapped</div>
-        <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono }}>
+        <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: -0.3 }}>Weekly Wrapped</div>
+        <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 0.6 }}>
           {weekDates[0].slice(5)} – {weekDates[6].slice(5)}
         </div>
         <motion.button
@@ -160,45 +160,58 @@ export function WeeklyWrapped() {
 
       <div style={{ paddingTop: 64, paddingBottom: 32, height: '100%', overflowY: 'auto' }}>
         {/* Hero score card */}
-        <div style={{ padding: '16px 16px 10px' }}>
+        <div style={{ padding: '20px 20px 12px' }}>
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, type: 'spring' as const, stiffness: 200 }}
           >
-            <Card style={{ borderRadius: 24, padding: '24px 20px', position: 'relative', overflow: 'hidden', textAlign: 'center' }}>
+            <Card style={{ borderRadius: 24, padding: '28px 22px', position: 'relative', overflow: 'hidden', textAlign: 'center' }}>
               <div style={{
                 position: 'absolute', inset: 0,
-                background: `radial-gradient(ellipse at 50% 20%, ${theme.accent}20, transparent 65%)`,
+                background: `radial-gradient(ellipse at 50% 15%, ${scoreColor}26, transparent 65%)`,
               }} />
               <div style={{ position: 'relative' }}>
-                <div style={{ fontSize: 12, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.5, marginBottom: 8 }}>WEEK SCORE</div>
+                <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.8, marginBottom: 10, textTransform: 'uppercase' }}>Week Score</div>
                 <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.2, type: 'spring' as const, stiffness: 180 }}
+                  initial={{ scale: 0.4, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.18, type: 'spring' as const, stiffness: 160, damping: 14 }}
                   style={{
-                    fontSize: 80, fontWeight: 900, letterSpacing: -4,
+                    fontSize: 92, fontWeight: 900, letterSpacing: -5,
                     color: scoreColor,
                     lineHeight: 1,
-                    filter: `drop-shadow(0 0 20px ${scoreColor}60)`,
+                    fontFamily: theme.mono,
+                    filter: `drop-shadow(0 0 28px ${scoreColor}70)`,
                   }}
                 >
                   {score}
                 </motion.div>
-                <div style={{ fontSize: 18, fontWeight: 700, color: scoreColor, marginTop: 4 }}>{scoreLabel}</div>
-                <div style={{ fontSize: 12, color: theme.textDim, marginTop: 6 }}>
+                <motion.div
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.45 }}
+                  style={{ fontSize: 18, fontWeight: 700, color: scoreColor, marginTop: 6, letterSpacing: -0.2 }}
+                >
+                  {scoreLabel}
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.55 }}
+                  style={{ fontSize: 12, color: theme.textDim, marginTop: 8 }}
+                >
                   Hey {user.name}, here's your week at a glance
-                </div>
+                </motion.div>
               </div>
             </Card>
           </motion.div>
         </div>
 
         {/* Day heatmap strip */}
-        <div style={{ padding: '0 16px 10px' }}>
-          <Card style={{ borderRadius: 18, padding: '12px 16px' }}>
-            <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, marginBottom: 10, letterSpacing: 1 }}>THIS WEEK</div>
+        <div style={{ padding: '0 20px 12px' }}>
+          <Card style={{ borderRadius: 18, padding: '14px 16px' }}>
+            <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, marginBottom: 12, letterSpacing: 1.6, textTransform: 'uppercase' }}>This Week</div>
             <div style={{ display: 'flex', gap: 6 }}>
               {dayActivity.map(({ date, hasWorkout, hasFood }, i) => {
                 const dayName = new Date(date + 'T00:00:00').toLocaleDateString('en', { weekday: 'short' }).slice(0, 2);
@@ -219,7 +232,7 @@ export function WeeklyWrapped() {
                     >
                       {hasWorkout ? '💪' : hasFood ? '🍽' : ''}
                     </motion.div>
-                    <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono }}>{dayName}</div>
+                    <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 0.8, textTransform: 'uppercase' }}>{dayName}</div>
                   </div>
                 );
               })}
@@ -228,8 +241,8 @@ export function WeeklyWrapped() {
         </div>
 
         {/* Stats grid */}
-        <div style={{ padding: '0 16px 10px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <div style={{ padding: '0 20px 12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             {[
               { iconName: 'dumbbell' as const, label: 'Workouts', value: weekSessions.length, sub: `${weekSessions.length}/7 days`, color: theme.accent },
               { iconName: 'flame' as const, label: 'Volume', value: `${(totalVolume / 1000).toFixed(1)}t`, sub: 'total lifted', color: '#FB923C' },
@@ -240,15 +253,15 @@ export function WeeklyWrapped() {
                 key={label}
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 + i * 0.07 }}
+                transition={{ delay: 0.1 + i * 0.07, type: 'spring' as const, stiffness: 260, damping: 24 }}
               >
                 <Card style={{ padding: '14px 14px', borderRadius: 18 }}>
-                  <div style={{ marginBottom: 8 }}>
-                    <Icon name={iconName} size={22} color={color} />
+                  <div style={{ marginBottom: 10, width: 36, height: 36, borderRadius: 10, background: `${color}18`, border: `1px solid ${color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Icon name={iconName} size={18} color={color} />
                   </div>
-                  <div style={{ fontSize: 26, fontWeight: 800, color, letterSpacing: -1 }}>{value}</div>
-                  <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 2 }}>{label}</div>
-                  <div style={{ fontSize: 10, color: theme.textMute }}>{sub}</div>
+                  <div style={{ fontSize: 30, fontWeight: 800, color, letterSpacing: -1.2, fontFamily: theme.mono, lineHeight: 1 }}>{value}</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, marginTop: 6, letterSpacing: -0.1 }}>{label}</div>
+                  <div style={{ fontSize: 10, color: theme.textMute, marginTop: 1 }}>{sub}</div>
                 </Card>
               </motion.div>
             ))}
@@ -257,8 +270,8 @@ export function WeeklyWrapped() {
 
         {/* PR list */}
         {weekPRs.length > 0 && (
-          <div style={{ padding: '0 16px 10px' }}>
-            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8, padding: '0 2px' }}>🏆 Personal Records</div>
+          <div style={{ padding: '0 20px 12px' }}>
+            <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, fontWeight: 700, marginBottom: 8, padding: '0 2px', letterSpacing: 1.6, textTransform: 'uppercase' }}>Personal Records</div>
             <Card style={{ borderRadius: 18, overflow: 'hidden' }}>
               {weekPRs.map((pr, i, arr) => (
                 <motion.div
@@ -267,14 +280,14 @@ export function WeeklyWrapped() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 + i * 0.06 }}
                   style={{
-                    padding: '11px 14px',
+                    padding: '12px 14px',
                     borderBottom: i < arr.length - 1 ? `1px solid ${theme.cardBorder}` : 'none',
                     display: 'flex', alignItems: 'center', gap: 12,
                   }}
                 >
-                  <span style={{ fontSize: 16 }}>🥇</span>
-                  <div style={{ flex: 1, fontSize: 13 }}>{pr.exercise}</div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#FBBF24', fontFamily: theme.mono }}>
+                  <span style={{ fontSize: 18 }}>🥇</span>
+                  <div style={{ flex: 1, fontSize: 13, fontWeight: 600 }}>{pr.exercise}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#FBBF24', fontFamily: theme.mono, letterSpacing: 0.2 }}>
                     {pr.weight}kg × {pr.reps}
                   </div>
                 </motion.div>
@@ -285,22 +298,22 @@ export function WeeklyWrapped() {
 
         {/* Body comp this week */}
         {weekMeasurement && bfCat && (
-          <div style={{ padding: '0 16px 10px' }}>
-            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8, padding: '0 2px' }}>📊 Body Check-In</div>
-            <Card style={{ borderRadius: 18, padding: '14px 16px', borderLeft: `3px solid ${bfCat.color}` }}>
+          <div style={{ padding: '0 20px 12px' }}>
+            <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, fontWeight: 700, marginBottom: 8, padding: '0 2px', letterSpacing: 1.6, textTransform: 'uppercase' }}>Body Check-In</div>
+            <Card style={{ borderRadius: 18, padding: '16px 18px', borderLeft: `3px solid ${bfCat.color}` }}>
               <div style={{ display: 'flex', gap: 20 }}>
                 <div>
-                  <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono }}>BODY FAT</div>
-                  <div style={{ fontSize: 24, fontWeight: 800, color: bfCat.color }}>{weekMeasurement.bodyFatPct}%</div>
-                  <div style={{ fontSize: 10, color: bfCat.color }}>{bfCat.label}</div>
+                  <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 0.8 }}>BODY FAT</div>
+                  <div style={{ fontSize: 26, fontWeight: 800, color: bfCat.color, fontFamily: theme.mono, letterSpacing: -0.8, marginTop: 2 }}>{weekMeasurement.bodyFatPct}%</div>
+                  <div style={{ fontSize: 10, color: bfCat.color, fontWeight: 600 }}>{bfCat.label}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono }}>LEAN MASS</div>
-                  <div style={{ fontSize: 24, fontWeight: 800, color: '#5EEAD4' }}>{weekMeasurement.leanMass}kg</div>
+                  <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 0.8 }}>LEAN MASS</div>
+                  <div style={{ fontSize: 26, fontWeight: 800, color: '#5EEAD4', fontFamily: theme.mono, letterSpacing: -0.8, marginTop: 2 }}>{weekMeasurement.leanMass}<span style={{ fontSize: 14 }}>kg</span></div>
                 </div>
                 <div>
-                  <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono }}>WEIGHT</div>
-                  <div style={{ fontSize: 24, fontWeight: 800 }}>{weekMeasurement.weightKg}kg</div>
+                  <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 0.8 }}>WEIGHT</div>
+                  <div style={{ fontSize: 26, fontWeight: 800, fontFamily: theme.mono, letterSpacing: -0.8, marginTop: 2 }}>{weekMeasurement.weightKg}<span style={{ fontSize: 14 }}>kg</span></div>
                 </div>
               </div>
             </Card>
@@ -308,7 +321,7 @@ export function WeeklyWrapped() {
         )}
 
         {/* Motivational footer */}
-        <div style={{ padding: '0 16px' }}>
+        <div style={{ padding: '0 20px' }}>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
