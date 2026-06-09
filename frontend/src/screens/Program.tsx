@@ -37,9 +37,9 @@ function PhaseBar({ phases, currentPhase, daysElapsed }: {
 
   return (
     <Card style={{ borderRadius: 18, padding: '14px 16px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-        <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1 }}>PROGRAM PROGRESS</div>
-        <div style={{ fontSize: 11, fontFamily: theme.mono, color: theme.accent }}>{daysElapsed}/90 days</div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
+        <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, fontWeight: 700, textTransform: 'uppercase' }}>Program Progress</div>
+        <div style={{ fontSize: 11, fontFamily: theme.mono, color: theme.accent, fontWeight: 700, letterSpacing: 0.3 }}>{daysElapsed}/90 days</div>
       </div>
       {/* Phase labels */}
       <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
@@ -83,8 +83,8 @@ function TimelineCard({ projections, color }: {
 
   return (
     <Card style={{ borderRadius: 18, padding: '14px 16px' }}>
-      <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1, marginBottom: 12 }}>
-        TIMELINE TO GOAL
+      <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, marginBottom: 12, fontWeight: 700, textTransform: 'uppercase' }}>
+        Timeline to Goal
       </div>
       {projections.map((proj, i) => (
         <div key={i} style={{ marginBottom: i < projections.length - 1 ? 16 : 0 }}>
@@ -235,14 +235,14 @@ export function Program() {
             <Icon name="chevron-left" size={16} color={theme.text} />
           </motion.button>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 17, fontWeight: 700 }}>3-Month Program</div>
-            <div style={{ fontSize: 11, color: theme.textDim }}>AI-powered · Auto-updates monthly</div>
+            <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: -0.3 }}>3-Month Program</div>
+            <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 0.6 }}>AI-powered · Auto-updates monthly</div>
           </div>
         </div>
 
         <div style={{ paddingTop: 64, paddingBottom: 32, height: '100%', overflowY: 'auto' }}>
-          <div style={{ padding: '16px 16px 10px' }}>
-            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4 }}>Choose your program</div>
+          <div style={{ padding: '18px 20px 12px' }}>
+            <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4, letterSpacing: -0.2 }}>Choose your program</div>
             <div style={{ fontSize: 12, color: theme.textDim, marginBottom: 16, lineHeight: 1.5 }}>
               AI generates a new workout plan each month, automatically adjusting your TDEE, macros, and exercise selection based on your actual body composition changes.
             </div>
@@ -262,13 +262,15 @@ export function Program() {
                 return (
                   <motion.div
                     key={type}
-                    whileTap={{ scale: 0.98 }}
+                    whileTap={{ scale: 0.97 }}
+                    whileHover={{ y: -1 }}
+                    transition={{ type: 'spring' as const, stiffness: 360, damping: 26 }}
                     onClick={() => setSelectedType(type)}
                     style={{
                       padding: '14px 16px', borderRadius: 18, cursor: 'pointer',
                       background: isSelected ? `${color}12` : theme.card,
                       border: `1.5px solid ${isSelected ? color + '60' : theme.cardBorder}`,
-                      transition: 'all 0.2s',
+                      boxShadow: isSelected ? `0 6px 18px ${color}22, inset 0 1px 0 rgba(255,255,255,0.05)` : 'inset 0 1px 0 rgba(255,255,255,0.04)',
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -316,16 +318,20 @@ export function Program() {
             </div>
 
             <motion.button
-              whileTap={{ scale: 0.97 }}
+              whileTap={{ scale: 0.96 }}
+              whileHover={!generating ? { y: -1 } : {}}
+              transition={{ type: 'spring' as const, stiffness: 420, damping: 26 }}
               onClick={() => startProgram(selectedType)}
               disabled={generating}
               style={{
-                width: '100%', padding: '15px 0', borderRadius: 16, border: 'none', cursor: 'pointer',
-                marginTop: 20,
+                width: '100%', padding: '16px 0', borderRadius: 16, border: 'none', cursor: 'pointer',
+                marginTop: 22,
                 background: generating ? 'rgba(255,255,255,0.08)' : `linear-gradient(135deg, ${TYPE_COLOR[selectedType]}, ${theme.accent2})`,
                 color: generating ? theme.textMute : '#000',
                 fontSize: 15, fontWeight: 800,
+                letterSpacing: -0.1,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                boxShadow: generating ? 'none' : `0 8px 24px ${TYPE_COLOR[selectedType]}38, inset 0 1px 0 rgba(255,255,255,0.2)`,
               }}
             >
               {generating ? (
@@ -361,8 +367,8 @@ export function Program() {
           <Icon name="chevron-left" size={16} color={theme.text} />
         </motion.button>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 17, fontWeight: 700 }}>{meta.label}</div>
-          <div style={{ fontSize: 11, color: theme.textDim, fontFamily: theme.mono }}>
+          <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: -0.3 }}>{meta.label}</div>
+          <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 0.6 }}>
             Day {daysElapsed} · {daysRemaining} days left
           </div>
         </div>
@@ -377,7 +383,7 @@ export function Program() {
       </div>
 
       <div style={{ paddingTop: 64, paddingBottom: 32, height: '100%', overflowY: 'auto' }}>
-        <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
 
           {/* Phase progress */}
           <PhaseBar phases={phases} currentPhase={currentPhase} daysElapsed={daysElapsed} />
@@ -393,12 +399,12 @@ export function Program() {
                       <Icon name={TYPE_ICON[config.type]} size={20} color={progColor} />
                     </div>
                     <div>
-                      <div style={{ fontSize: 9, fontFamily: theme.mono, color: progColor, letterSpacing: 1.5 }}>PHASE {currentPhase.phase} OF 3</div>
-                      <div style={{ fontSize: 16, fontWeight: 800 }}>{currentPhase.label}</div>
+                      <div style={{ fontSize: 10, fontFamily: theme.mono, color: progColor, letterSpacing: 1.8, fontWeight: 700, textTransform: 'uppercase' }}>Phase {currentPhase.phase} of 3</div>
+                      <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: -0.3 }}>{currentPhase.label}</div>
                     </div>
                     <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-                      <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono }}>ENDS</div>
-                      <div style={{ fontSize: 11, fontFamily: theme.mono, fontWeight: 700 }}>{currentPhase.endDate.slice(5)}</div>
+                      <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 0.8, textTransform: 'uppercase' }}>Ends</div>
+                      <div style={{ fontSize: 12, fontFamily: theme.mono, fontWeight: 700, letterSpacing: 0.2 }}>{currentPhase.endDate.slice(5)}</div>
                     </div>
                   </div>
                   <div style={{ fontSize: 12, color: theme.textDim, lineHeight: 1.5, marginBottom: 10 }}>{currentPhase.focus}</div>
@@ -435,13 +441,14 @@ export function Program() {
                 {(['plan', 'nutrition', 'timeline'] as const).map(tab => (
                   <motion.button
                     key={tab}
-                    whileTap={{ scale: 0.94 }}
+                    whileTap={{ scale: 0.96 }}
                     onClick={() => setActiveTab(tab)}
                     style={{
-                      flex: 1, padding: '8px 0', borderRadius: 12, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700, fontFamily: theme.mono, letterSpacing: 0.5,
-                      background: activeTab === tab ? progColor : 'rgba(255,255,255,0.06)',
+                      flex: 1, padding: '9px 0', borderRadius: 12, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700, fontFamily: theme.mono, letterSpacing: 1.2,
+                      background: activeTab === tab ? progColor : 'rgba(255,255,255,0.04)',
                       color: activeTab === tab ? '#000' : theme.textMute,
                       textTransform: 'uppercase',
+                      boxShadow: activeTab === tab ? `0 4px 12px ${progColor}33` : 'none',
                     }}
                   >
                     {tab}
@@ -452,8 +459,8 @@ export function Program() {
               {/* Workout plan tab */}
               {activeTab === 'plan' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1, padding: '0 2px' }}>
-                    {currentPhase?.split.replace('_', '/')} · {currentPhase?.weeklyFrequency}x/WEEK · {currentPhase?.repRange[0]}-{currentPhase?.repRange[1]} REPS
+                  <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, padding: '0 2px', fontWeight: 700, textTransform: 'uppercase' }}>
+                    {currentPhase?.split.replace('_', '/')} · {currentPhase?.weeklyFrequency}x/Week · {currentPhase?.repRange[0]}-{currentPhase?.repRange[1]} Reps
                   </div>
                   {currentPlan.weeklyPlan.map((day, i) => (
                     <motion.div key={day.day} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
@@ -472,7 +479,7 @@ export function Program() {
               {activeTab === 'nutrition' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   <Card style={{ borderRadius: 18, padding: '14px 16px' }}>
-                    <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1, marginBottom: 12 }}>DAILY TARGETS — PHASE {currentPhase?.phase}</div>
+                    <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, marginBottom: 12, fontWeight: 700, textTransform: 'uppercase' }}>Daily Targets — Phase {currentPhase?.phase}</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                       {[
                         { l: 'Calories', v: currentPlan.calories, unit: 'kcal', color: '#FB923C' },
@@ -480,10 +487,10 @@ export function Program() {
                         { l: 'Carbs',    v: currentPlan.carbs,    unit: 'g',    color: theme.accent2 },
                         { l: 'Fat',      v: currentPlan.fat,      unit: 'g',    color: '#FBBF24' },
                       ].map(({ l, v, unit, color }) => (
-                        <div key={l} style={{ padding: '10px 12px', borderRadius: 14, background: `${color}10`, border: `1px solid ${color}25` }}>
-                          <div style={{ fontSize: 9, fontFamily: theme.mono, color, letterSpacing: 1 }}>{l.toUpperCase()}</div>
-                          <div style={{ fontSize: 22, fontWeight: 800, color, letterSpacing: -0.5 }}>{v}</div>
-                          <div style={{ fontSize: 9, color: theme.textMute }}>{unit}</div>
+                        <div key={l} style={{ padding: '12px 14px', borderRadius: 14, background: `${color}10`, border: `1px solid ${color}25` }}>
+                          <div style={{ fontSize: 9, fontFamily: theme.mono, color, letterSpacing: 1.4, fontWeight: 700 }}>{l.toUpperCase()}</div>
+                          <div style={{ fontSize: 24, fontWeight: 800, color, letterSpacing: -0.6, fontFamily: theme.mono, lineHeight: 1.1 }}>{v}</div>
+                          <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 0.6 }}>{unit}</div>
                         </div>
                       ))}
                     </div>
@@ -496,7 +503,7 @@ export function Program() {
                   {/* Phase comparison */}
                   {phases.length > 1 && (
                     <Card style={{ borderRadius: 18, padding: '14px 16px' }}>
-                      <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, marginBottom: 10 }}>CALORIE TARGETS BY PHASE</div>
+                      <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, marginBottom: 10, letterSpacing: 1.6, fontWeight: 700, textTransform: 'uppercase' }}>Calorie Targets by Phase</div>
                       {phases.map(p => {
                         const plan = plans[`phase_${p.phase}`];
                         const isCurrent = currentPhase?.phase === p.phase;
@@ -540,7 +547,7 @@ export function Program() {
                   )}
                   {/* Program start baseline */}
                   <Card style={{ borderRadius: 18, padding: '14px 16px' }}>
-                    <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, marginBottom: 10 }}>PROGRAM BASELINE</div>
+                    <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, marginBottom: 10, letterSpacing: 1.6, fontWeight: 700, textTransform: 'uppercase' }}>Program Baseline</div>
                     {[
                       { l: 'Start weight', v: `${config.startWeight}kg` },
                       { l: 'Start lean mass', v: `${config.startLeanMass}kg` },

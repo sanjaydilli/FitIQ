@@ -69,25 +69,27 @@ export function AIAnalysis() {
             fontSize: 11,
             color: theme.accent,
             fontFamily: theme.mono,
-            letterSpacing: 1.5,
+            letterSpacing: 2,
             marginBottom: 8,
+            fontWeight: 700,
+            textTransform: 'uppercase',
           }}
         >
-          NEURAL ENGINE
+          Neural Engine
         </div>
         <div
           style={{
-            fontSize: 26,
-            fontWeight: 700,
+            fontSize: 28,
+            fontWeight: 800,
             letterSpacing: -0.6,
-            lineHeight: 1.2,
-            marginBottom: 6,
+            lineHeight: 1.15,
+            marginBottom: 8,
           }}
         >
           Building your<br />
           personalized plan
         </div>
-        <div style={{ color: theme.textDim, fontSize: 13, marginBottom: 30 }}>
+        <div style={{ color: theme.textMute, fontSize: 13, marginBottom: 30, fontFamily: theme.mono, letterSpacing: 0.3 }}>
           This usually takes 8 seconds.
         </div>
 
@@ -102,10 +104,11 @@ export function AIAnalysis() {
             label={
               <div
                 style={{
-                  fontSize: 38,
-                  fontWeight: 700,
+                  fontSize: 42,
+                  fontWeight: 800,
                   fontFamily: theme.mono,
                   fontFeatureSettings: '"tnum"',
+                  letterSpacing: -1.5,
                 }}
               >
                 {progress}
@@ -118,10 +121,12 @@ export function AIAnalysis() {
                   fontSize: 10,
                   color: theme.textMute,
                   fontFamily: theme.mono,
-                  letterSpacing: 1.5,
+                  letterSpacing: 1.8,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
                 }}
               >
-                PROCESSING
+                Processing
               </div>
             }
           />

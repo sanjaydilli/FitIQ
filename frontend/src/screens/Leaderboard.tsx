@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { useUser } from '../context/UserContext';
 import { Background } from '../components/Background';
@@ -60,13 +61,15 @@ export function Leaderboard() {
                 fontSize: 11,
                 color: theme.accent,
                 fontFamily: theme.mono,
-                letterSpacing: 1.5,
+                letterSpacing: 1.8,
                 marginBottom: 4,
+                fontWeight: 700,
+                textTransform: 'uppercase',
               }}
             >
-              WEEK {weekNum} · {daysLeft === 0 ? 'LAST DAY' : `${daysLeft} DAYS LEFT`}
+              Week {weekNum} · {daysLeft === 0 ? 'Last Day' : `${daysLeft} Days Left`}
             </div>
-            <div style={{ fontSize: 26, fontWeight: 700, letterSpacing: -0.6 }}>Squad League</div>
+            <div style={{ fontSize: 28, fontWeight: 800, letterSpacing: -0.6 }}>Squad League</div>
           </div>
           <Pill>+240 XP</Pill>
         </div>
@@ -94,20 +97,25 @@ export function Leaderboard() {
                 const pos = [2, 1, 3][idx];
                 const h = pos === 1 ? 70 : pos === 2 ? 50 : 40;
                 return (
-                  <div
+                  <motion.div
                     key={f.n}
+                    initial={{ opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.08, type: 'spring' as const, stiffness: 260, damping: 22 }}
+                    whileTap={{ scale: 0.96 }}
                     style={{
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'center',
                       gap: 6,
+                      cursor: 'pointer',
                     }}
                   >
                     <div style={{ position: 'relative' }}>
                       <div
                         style={{
-                          width: pos === 1 ? 56 : 44,
-                          height: pos === 1 ? 56 : 44,
+                          width: pos === 1 ? 58 : 46,
+                          height: pos === 1 ? 58 : 46,
                           borderRadius: '50%',
                           background: f.avatar,
                           border: f.me
@@ -116,61 +124,73 @@ export function Leaderboard() {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          fontWeight: 700,
-                          fontSize: pos === 1 ? 18 : 14,
+                          fontWeight: 800,
+                          fontSize: pos === 1 ? 19 : 14,
                           color: '#0a0612',
+                          boxShadow: pos === 1
+                            ? '0 8px 22px rgba(251,191,36,0.35), inset 0 1px 0 rgba(255,255,255,0.25)'
+                            : 'inset 0 1px 0 rgba(255,255,255,0.15)',
                         }}
                       >
                         {f.n[0]}
                       </div>
                       {pos === 1 && (
-                        <div
+                        <motion.div
+                          initial={{ y: -4, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          transition={{ delay: 0.3, type: 'spring' as const, stiffness: 240 }}
                           style={{
                             position: 'absolute',
-                            top: -10,
+                            top: -12,
                             left: '50%',
                             transform: 'translateX(-50%)',
-                            fontSize: 16,
+                            fontSize: 18,
+                            filter: 'drop-shadow(0 2px 4px rgba(251,191,36,0.45))',
                           }}
                         >
                           👑
-                        </div>
+                        </motion.div>
                       )}
                     </div>
-                    <div style={{ fontSize: 11, fontWeight: 700 }}>{f.n.split(' ')[0]}</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: -0.1 }}>{f.n.split(' ')[0]}</div>
                     <div
                       style={{
                         fontSize: 11,
                         color: theme.accent,
                         fontFamily: theme.mono,
                         fontFeatureSettings: '"tnum"',
+                        fontWeight: 700,
+                        letterSpacing: 0.2,
                       }}
                     >
                       {f.xp.toLocaleString()}
                     </div>
-                    <div
+                    <motion.div
+                      initial={{ height: 0 }}
+                      animate={{ height: h }}
+                      transition={{ delay: 0.15 + idx * 0.08, duration: 0.5, ease: 'easeOut' }}
                       style={{
-                        width: 50,
-                        height: h,
-                        borderRadius: '6px 6px 0 0',
+                        width: 52,
+                        borderRadius: '8px 8px 0 0',
                         background:
                           pos === 1
                             ? `linear-gradient(180deg, #FBBF24, ${theme.accent2})`
-                            : `linear-gradient(180deg, ${theme.accent}40, ${theme.accent2}20)`,
+                            : `linear-gradient(180deg, ${theme.accent}55, ${theme.accent2}25)`,
                         border: `1px solid ${pos === 1 ? '#FBBF2440' : theme.cardBorder}`,
                         display: 'flex',
                         alignItems: 'flex-start',
                         justifyContent: 'center',
                         paddingTop: 4,
                         fontFamily: theme.mono,
-                        fontSize: 11,
-                        fontWeight: 700,
+                        fontSize: 12,
+                        fontWeight: 800,
                         color: pos === 1 ? '#0a0612' : theme.text,
+                        boxShadow: pos === 1 ? '0 6px 16px rgba(251,191,36,0.3)' : 'inset 0 1px 0 rgba(255,255,255,0.08)',
                       }}
                     >
                       {pos}
-                    </div>
-                  </div>
+                    </motion.div>
+                  </motion.div>
                 );
               })}
             </div>
@@ -180,35 +200,44 @@ export function Leaderboard() {
         <div style={{ padding: '0 20px' }}>
           <div
             style={{
-              fontSize: 11,
-              color: theme.textDim,
+              fontSize: 10,
+              color: theme.textMute,
               fontFamily: theme.mono,
-              letterSpacing: 1,
+              letterSpacing: 1.6,
               marginBottom: 8,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              padding: '0 2px',
             }}
           >
-            FULL RANKING
+            Full Ranking
           </div>
           <Card style={{ borderRadius: 18, overflow: 'hidden' }}>
             {friends.map((f, i, a) => (
-              <div
+              <motion.div
                 key={f.n}
+                initial={{ opacity: 0, x: -6 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 + i * 0.04 }}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: 12,
-                  padding: '12px 14px',
+                  padding: '13px 14px',
                   borderBottom: i < a.length - 1 ? `1px solid ${theme.cardBorder}` : 'none',
                   background: f.me ? `${theme.accent}10` : 'transparent',
+                  borderLeft: f.me ? `3px solid ${theme.accent}` : '3px solid transparent',
                 }}
               >
                 <div
                   style={{
                     width: 22,
-                    fontSize: 12,
+                    fontSize: 13,
                     fontFamily: theme.mono,
-                    color: f.r <= 3 ? theme.accent : theme.textDim,
-                    fontWeight: 700,
+                    color: f.r <= 3 ? theme.accent : theme.textMute,
+                    fontWeight: 800,
+                    letterSpacing: -0.2,
+                    textAlign: 'center',
                   }}
                 >
                   {f.r}
@@ -250,40 +279,46 @@ export function Leaderboard() {
                     {f.n[0]}
                   </div>
                 )}
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: -0.2 }}>
                     {f.n}{' '}
                     {f.me && (
                       <span
                         style={{
                           color: theme.accent,
-                          fontSize: 10,
+                          fontSize: 9,
                           fontFamily: theme.mono,
                           marginLeft: 4,
+                          padding: '1px 6px',
+                          background: `${theme.accent}25`,
+                          borderRadius: 5,
+                          letterSpacing: 0.8,
+                          fontWeight: 700,
                         }}
                       >
                         YOU
                       </span>
                     )}
                   </div>
-                  <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono }}>
+                  <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 0.6, marginTop: 1 }}>
                     LVL {f.stage}
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div
                     style={{
-                      fontSize: 13,
-                      fontWeight: 700,
+                      fontSize: 14,
+                      fontWeight: 800,
                       fontFamily: theme.mono,
                       fontFeatureSettings: '"tnum"',
+                      letterSpacing: -0.3,
                     }}
                   >
                     {f.xp.toLocaleString()}
                   </div>
-                  <div style={{ fontSize: 10, color: theme.accent, fontFamily: theme.mono }}>{f.delta}</div>
+                  <div style={{ fontSize: 10, color: theme.accent, fontFamily: theme.mono, fontWeight: 700, marginTop: 1 }}>{f.delta}</div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </Card>
         </div>
