@@ -20,6 +20,7 @@ const allowed = [
   'capacitor://localhost',
   'ionic://localhost',
   'http://localhost',
+  'https://localhost',   // Capacitor Android WebView (androidScheme: 'https')
 ].filter(Boolean) as string[];
 
 app.use(cors({

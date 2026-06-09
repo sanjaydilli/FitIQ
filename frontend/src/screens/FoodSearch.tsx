@@ -81,7 +81,7 @@ export function FoodSearch() {
               <div style={{ fontSize: 9, color: theme.accent, fontFamily: theme.mono, letterSpacing: 2.5 }}>
                 IFCT 2017 · 542 FOODS
               </div>
-              <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: -0.4 }}>Food Search</div>
+              <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5 }}>Food Search</div>
             </div>
             <div style={{ display: 'flex', gap: 6 }}>
               <motion.button
@@ -154,9 +154,10 @@ export function FoodSearch() {
                   fontWeight: 700,
                   fontFamily: theme.mono,
                   cursor: 'pointer',
-                  background: diet === f.id ? theme.accent : theme.card,
+                  background: diet === f.id ? `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})` : theme.card,
                   color: diet === f.id ? theme.onAccent : theme.textDim,
-                  border: `1px solid ${diet === f.id ? theme.accent : theme.cardBorder}`,
+                  border: diet === f.id ? 'none' : `1px solid ${theme.cardBorder}`,
+                  boxShadow: diet === f.id ? `0 4px 12px ${theme.accent}33` : 'none',
                   letterSpacing: 0.5,
                 }}
               >

@@ -154,12 +154,12 @@ export function FoodScan() {
             }}
           >
             <div style={{ fontSize: 36, marginBottom: 12 }}>📸</div>
-            <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 6 }}>AI Food Scanner</div>
+            <div style={{ fontSize: 21, fontWeight: 800, marginBottom: 6, letterSpacing: -0.4 }}>AI Food Scanner</div>
             <div style={{ fontSize: 13, color: theme.textDim, lineHeight: 1.6, marginBottom: 20 }}>
               Vision-based meal scanning is coming soon.{'\n'}
               For now, search our database of 542 Indian foods.
             </div>
-            <PrimaryButton onClick={() => navigate('/food')} style={{ width: '100%', padding: 14, fontSize: 14 }}>
+            <PrimaryButton onClick={() => navigate('/food')} style={{ width: '100%', fontSize: 15 }}>
               Search Food Database →
             </PrimaryButton>
           </Card>

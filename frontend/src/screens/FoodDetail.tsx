@@ -78,7 +78,7 @@ export function FoodDetail() {
               <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.5, marginBottom: 3 }}>
                 {food.grup.toUpperCase()}
               </div>
-              <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: -0.3, lineHeight: 1.2, marginBottom: 4 }}>
+              <div style={{ fontSize: 23, fontWeight: 800, letterSpacing: -0.5, lineHeight: 1.2, marginBottom: 4 }}>
                 {food.name}
               </div>
               {(food.nameHindi || food.nameTamil) && (
@@ -150,7 +150,7 @@ export function FoodDetail() {
 
         {/* Serving selector */}
         <div style={{ padding: '0 20px', marginBottom: 14 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, marginBottom: 8, color: theme.textDim }}>SERVING SIZE</div>
+          <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 8, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, textTransform: 'uppercase' }}>SERVING SIZE</div>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {food.servingSizes.map((s, i) => (
               <motion.div
@@ -163,6 +163,7 @@ export function FoodDetail() {
                   background: servingIdx === i ? theme.accent : theme.card,
                   color: servingIdx === i ? theme.onAccent : theme.textDim,
                   border: `1px solid ${servingIdx === i ? theme.accent : theme.cardBorder}`,
+                  boxShadow: servingIdx === i ? `0 4px 12px ${theme.accent}33` : 'none',
                 }}
               >
                 {s.name}
@@ -173,7 +174,7 @@ export function FoodDetail() {
 
         {/* Multiplier */}
         <div style={{ padding: '0 20px', marginBottom: 14 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, marginBottom: 8, color: theme.textDim }}>QUANTITY</div>
+          <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 8, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, textTransform: 'uppercase' }}>QUANTITY</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             {[0.5, 1, 1.5, 2, 2.5, 3].map(m => (
               <motion.div
@@ -187,6 +188,7 @@ export function FoodDetail() {
                   background: multiplier === m ? theme.accent2 : theme.card,
                   color: multiplier === m ? theme.onAccent : theme.textDim,
                   border: `1px solid ${multiplier === m ? theme.accent2 : theme.cardBorder}`,
+                  boxShadow: multiplier === m ? `0 4px 12px ${theme.accent2}33` : 'none',
                 }}
               >
                 {m}×
@@ -198,7 +200,7 @@ export function FoodDetail() {
         {/* Cooking method */}
         {food.cookingMethods.length > 1 && (
           <div style={{ padding: '0 20px', marginBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, marginBottom: 8, color: theme.textDim }}>COOKING METHOD</div>
+            <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 8, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, textTransform: 'uppercase' }}>COOKING METHOD</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {food.cookingMethods.map((c, i) => (
                 <motion.div
@@ -228,7 +230,7 @@ export function FoodDetail() {
 
         {/* Micronutrients */}
         <div style={{ padding: '0 20px', marginBottom: 14 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, marginBottom: 8, color: theme.textDim }}>MICRONUTRIENTS</div>
+          <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 8, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, textTransform: 'uppercase' }}>MICRONUTRIENTS</div>
           <Card style={{ borderRadius: 16, overflow: 'hidden' }}>
             {[
               { label: 'Iron',       value: `${nutrition.iron} mg`,      pct: Math.min(nutrition.iron / (18) * 100, 100),    color: '#F87171' },
@@ -265,7 +267,7 @@ export function FoodDetail() {
 
         {/* Meal type selector */}
         <div style={{ padding: '0 20px 14px' }}>
-          <div style={{ fontSize: 11, fontWeight: 700, marginBottom: 8, color: theme.textDim }}>LOG AS</div>
+          <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 8, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, textTransform: 'uppercase' }}>LOG AS</div>
           <div style={{ display: 'flex', gap: 6 }}>
             {(['breakfast', 'lunch', 'snack', 'dinner'] as MealType[]).map(m => (
               <motion.div
@@ -278,6 +280,7 @@ export function FoodDetail() {
                   background: selectedMeal === m ? theme.accent : theme.card,
                   color: selectedMeal === m ? theme.onAccent : theme.textDim,
                   border: `1px solid ${selectedMeal === m ? theme.accent : theme.cardBorder}`,
+                  boxShadow: selectedMeal === m ? `0 4px 12px ${theme.accent}33` : 'none',
                 }}
               >
                 {m === 'breakfast' ? '🌅' : m === 'lunch' ? '☀️' : m === 'snack' ? '🥜' : '🌙'}<br />{m}
@@ -324,10 +327,11 @@ export function FoodDetail() {
                   setTimeout(() => navigate(`/food${mealParam ? `?meal=${selectedMeal}` : ''}`), 1500);
                 }}
                 style={{
-                  width: '100%', padding: '14px 0', borderRadius: 16, border: 'none',
+                  width: '100%', padding: '16px 0', borderRadius: 16, border: 'none',
                   background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
                   color: theme.onAccent, fontSize: 15, fontWeight: 800,
                   cursor: 'pointer', fontFamily: theme.font,
+                  boxShadow: `0 8px 24px ${theme.accent}38, inset 0 1px 0 rgba(255,255,255,0.18)`,
                 }}
               >
                 + Log {serving.name} · {nutrition.calories} kcal

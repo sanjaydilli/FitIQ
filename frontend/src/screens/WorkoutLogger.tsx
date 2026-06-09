@@ -346,6 +346,7 @@ export function WorkoutLogger() {
             width: '100%', padding: '15px 0', borderRadius: 16, border: 'none', cursor: 'pointer',
             background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
             color: theme.onAccent, fontSize: 16, fontWeight: 800, letterSpacing: -0.3,
+            boxShadow: `0 8px 24px ${theme.accent}38, inset 0 1px 0 rgba(255,255,255,0.18)`,
           }}
         >
           Finish Workout · {fmt(elapsed)}
