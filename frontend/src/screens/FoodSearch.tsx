@@ -1,6 +1,6 @@
 import React, { memo, useMemo, useCallback, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { Background } from '../components/Background';
 import { TabBar } from '../components/TabBar';
