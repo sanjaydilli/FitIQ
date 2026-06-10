@@ -296,6 +296,33 @@ export function AICoach() {
             background: 'linear-gradient(to top, rgba(244,246,248,0.97) 60%, transparent)',
           }}
         >
+          {/* Live context + log-aware quick prompts */}
+          <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 8 }}>
+            <div style={{
+              flexShrink: 0, padding: '5px 11px', borderRadius: 999,
+              fontSize: 10, fontWeight: 800, fontFamily: theme.mono, letterSpacing: 0.4,
+              background: `${theme.accent}12`, border: `1px solid ${theme.accent}30`, color: theme.accent,
+            }}>
+              {Math.max(0, targetCalories - todayTotals.calories)} KCAL · {Math.max(0, targetProtein - Math.round(todayTotals.protein))}g P LEFT
+            </div>
+            {[
+              todayTotals.entries.length > 0 ? 'Review what I ate today' : 'What should I eat for breakfast?',
+              `What should I eat for dinner?`,
+              `High-protein snack under ${Math.min(400, Math.max(150, targetCalories - todayTotals.calories))} kcal?`,
+            ].map(q => (
+              <div
+                key={q}
+                onClick={() => !loading && sendMessage(q)}
+                style={{
+                  flexShrink: 0, padding: '5px 11px', borderRadius: 999, cursor: 'pointer',
+                  fontSize: 11, fontWeight: 600, color: loading ? theme.textMute : theme.textDim,
+                  border: `1px solid ${theme.cardBorder}`, background: theme.card,
+                }}
+              >
+                {q}
+              </div>
+            ))}
+          </div>
           <div
             style={{
               display: 'flex',

@@ -2,7 +2,8 @@ import { UserStats } from '../utils/warnings/warningTypes';
 
 export interface FoodLogItem {
   name: string;
-  grams: number;
+  grams?: number;
+  meal?: string;
   calories: number;
   protein: number;
   carbs: number;
@@ -27,16 +28,26 @@ const GOAL_LABEL: Record<UserStats['goal'], string> = {
 
 export async function askFitIQCoach(
   userStats: UserStats,
-  _foodLog: FoodLogItem[],
+  foodLog: FoodLogItem[],
   question: string,
   userName?: string,
 ): Promise<string> {
   const trimmedName = (userName ?? '').trim();
+
+  // Inline the day's actual meals so the model can reason about WHAT was
+  // eaten, not just the totals. Works with the existing server unchanged.
+  const logBlock = foodLog.length > 0
+    ? `TODAY'S FOOD LOG (already eaten):\n${foodLog
+        .map(f => `- ${f.meal ? `[${f.meal}] ` : ''}${f.name}: ${f.calories} kcal, ${f.protein}g protein, ${f.carbs}g carbs, ${f.fat}g fat`)
+        .join('\n')}\n\n`
+    : `TODAY'S FOOD LOG: nothing logged yet.\n\n`;
+
   const res = await fetch(`${getApiUrl()}/api/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      message: question,
+      message: `${logBlock}USER QUESTION: ${question}`,
+      foodLog,
       userStats: {
         name:                   trimmedName || 'User',
         gender:                 userStats.gender,

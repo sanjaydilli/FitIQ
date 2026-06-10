@@ -43,7 +43,7 @@ export function AIAnalysis() {
       setProgress((p) => {
         if (p >= 100) {
           clearInterval(interval);
-          setTimeout(() => navigate('/home'), 500);
+          setTimeout(() => navigate('/tour'), 500);
           return 100;
         }
         return p + 2;

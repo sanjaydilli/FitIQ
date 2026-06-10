@@ -144,10 +144,24 @@ export function useProgram() {
     localStorage.removeItem(PLANS_KEY);
   }, []);
 
+  /** Replace the current phase's weekly plan (manual or AI edits). */
+  const updateCurrentPlan = useCallback((weeklyPlan: GeneratedProgramPhase['weeklyPlan']) => {
+    if (!currentPhase) return;
+    setPlans(prev => {
+      const key = `phase_${currentPhase.phase}`;
+      const existing = prev[key];
+      if (!existing) return prev;
+      const next = { ...prev, [key]: { ...existing, weeklyPlan, generatedAt: new Date().toISOString() } };
+      savePlans(next);
+      return next;
+    });
+  }, [currentPhase]);
+
   return {
     config, phases, currentPhase, currentPlan, plans,
     generating, error, timeline,
     daysElapsed, daysRemaining, programEndDate,
     startProgram, regenerateCurrent, generatePhaseN, clearProgram,
+    updateCurrentPlan,
   };
 }

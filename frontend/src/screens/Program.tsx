@@ -459,8 +459,21 @@ export function Program() {
               {/* Workout plan tab */}
               {activeTab === 'plan' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, padding: '0 2px', fontWeight: 700, textTransform: 'uppercase' }}>
-                    {currentPhase?.split.replace('_', '/')} · {currentPhase?.weeklyFrequency}x/Week · {currentPhase?.repRange[0]}-{currentPhase?.repRange[1]} Reps
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 2px' }}>
+                    <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, fontWeight: 700, textTransform: 'uppercase' }}>
+                      {currentPhase?.split.replace('_', '/')} · {currentPhase?.weeklyFrequency}x/Week · {currentPhase?.repRange[0]}-{currentPhase?.repRange[1]} Reps
+                    </div>
+                    <motion.button
+                      whileTap={{ scale: 0.94 }}
+                      onClick={() => navigate('/plan-editor?src=program')}
+                      style={{
+                        padding: '5px 12px', borderRadius: 10, border: `1px solid ${progColor}40`,
+                        background: `${progColor}10`, color: progColor, cursor: 'pointer',
+                        fontSize: 10, fontWeight: 800, fontFamily: theme.mono, letterSpacing: 0.8,
+                      }}
+                    >
+                      EDIT PLAN ✎
+                    </motion.button>
                   </div>
                   {currentPlan.weeklyPlan.map((day, i) => (
                     <motion.div key={day.day} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>

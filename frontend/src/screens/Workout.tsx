@@ -8,6 +8,7 @@ import { Card } from '../components/Card';
 import { TabBar } from '../components/TabBar';
 import { Icon, IconName } from '../components/Icon';
 import { useWorkoutLog } from '../hooks/useWorkoutLog';
+import { useCustomPlan } from '../hooks/useCustomPlan';
 import { PUSH_DAY, PULL_DAY, LEG_DAY, FULL_BODY } from '../data/exercises';
 
 const PRESETS: { id: string; name: string; subtitle: string; icon: IconName; color: string; exerciseIds: string[] }[] = [
@@ -21,6 +22,7 @@ export function Workout() {
   const { theme } = useTheme();
   const navigate = useNavigate();
   const { active, sessions, startWorkout } = useWorkoutLog();
+  const { customPlan } = useCustomPlan();
 
   const todayISO = localDateStr();
   const todaySession = sessions.find(s => s.date === todayISO) ?? null;
@@ -131,6 +133,83 @@ export function Workout() {
               </motion.div>
             ))}
           </div>
+        </div>
+
+        {/* My Plan — user-built / AI-edited weekly plan */}
+        <div style={{ padding: '0 20px', marginBottom: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+            <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.5, fontWeight: 700 }}>
+              MY PLAN
+            </div>
+            {customPlan && (
+              <div
+                onClick={() => navigate('/plan-editor?src=custom')}
+                style={{ fontSize: 11, color: theme.accent, fontFamily: theme.mono, fontWeight: 700, cursor: 'pointer', letterSpacing: 0.5 }}
+              >
+                EDIT ✎
+              </div>
+            )}
+          </div>
+          {customPlan ? (
+            <Card style={{ borderRadius: 18, overflow: 'hidden' }}>
+              {customPlan.weeklyPlan.map((d, i, a) => (
+                <div
+                  key={`${d.day}_${i}`}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px',
+                    borderBottom: i < a.length - 1 ? `1px solid ${theme.cardBorder}` : 'none',
+                  }}
+                >
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: -0.2 }}>{d.day} · {d.focus}</div>
+                    <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, marginTop: 1 }}>
+                      {d.exercises.length} exercises · ~{d.estimatedMinutes} min
+                    </div>
+                  </div>
+                  <motion.button
+                    whileTap={{ scale: 0.93 }}
+                    onClick={() => {
+                      startWorkout(
+                        `${d.day} — ${d.focus}`,
+                        d.exercises.map(e => e.exerciseId),
+                        d.exercises.map(e => ({ sets: e.sets, repsDisplay: e.repsDisplay })),
+                      );
+                      navigate('/workout/log');
+                    }}
+                    style={{
+                      padding: '6px 14px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                      fontSize: 12, fontWeight: 800, flexShrink: 0,
+                      background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
+                      color: theme.onAccent, boxShadow: `0 2px 8px ${theme.accent}35`,
+                    }}
+                  >
+                    Start
+                  </motion.button>
+                </div>
+              ))}
+            </Card>
+          ) : (
+            <motion.div whileTap={{ scale: 0.97 }} whileHover={{ y: -2 }} onClick={() => navigate('/plan-editor?src=custom')}>
+              <Card style={{ padding: '16px', borderRadius: 18, display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+                  background: `${theme.accent}12`, border: `1.5px dashed ${theme.accent}50`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <Icon name="plus" size={20} color={theme.accent} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: -0.2 }}>Build your own plan</div>
+                  <div style={{ fontSize: 11, color: theme.textDim, marginTop: 1 }}>
+                    Pick exercises, sets & reps — or let AI draft it and edit from there
+                  </div>
+                </div>
+                <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke={theme.textMute} strokeWidth="2" strokeLinecap="round">
+                  <path d="M4.5 2.5L8 6l-3.5 3.5" />
+                </svg>
+              </Card>
+            </motion.div>
+          )}
         </div>
 
         {/* History link */}

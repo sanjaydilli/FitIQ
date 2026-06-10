@@ -8,7 +8,10 @@ import { Card } from '../components/Card';
 import { Icon, IconName } from '../components/Icon';
 import { useBodyComp } from '../hooks/useBodyComp';
 import { useFoodLog, MealType } from '../hooks/useFoodLog';
-import { generateMealPlan, MealPlan, PlannedMeal } from '../services/mealPlannerService';
+import {
+  generateMealPlan, swapMeal, MealPlan, PlannedMeal, MealSlot,
+  loadPrefs, savePrefs, loadLastPlan, saveLastPlan,
+} from '../services/mealPlannerService';
 import { goalCalorieAdjust } from '../utils/bodyComposition';
 
 const MEAL_ICONS: Record<string, IconName> = {
@@ -26,6 +29,9 @@ const MEAL_COLORS: Record<string, string> = {
 
 const MEAL_ORDER: MealType[] = ['breakfast', 'lunch', 'snack', 'dinner'];
 
+// imported lazily to avoid pulling RECIPES just for a count
+const RECIPES_COUNT = '3,400+';
+
 export function MealPlanner() {
   const { theme } = useTheme();
   const { user } = useUser();
@@ -33,7 +39,10 @@ export function MealPlanner() {
   const { tdee } = useBodyComp();
   const { addEntry } = useFoodLog();
 
-  const [plan, setPlan] = useState<MealPlan | null>(null);
+  const [plan, setPlan] = useState<MealPlan | null>(loadLastPlan);
+  const [prefs, setPrefs] = useState<string>(loadPrefs);
+  const [seed, setSeed] = useState(0);
+  const [swapBumps, setSwapBumps] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [logged, setLogged] = useState<Set<string>>(new Set());
@@ -41,26 +50,51 @@ export function MealPlanner() {
   const targetCalories = (tdee || Math.round(user.weightKg * 30)) + goalCalorieAdjust(user.goal);
   const targetProtein = Math.round(user.weightKg * 2.0);
 
+  const planParams = useCallback((s: number) => ({
+    targetCalories,
+    targetProtein,
+    goal: user.goal,
+    diet: user.diet,
+    preferences: prefs,
+    seed: s,
+  }), [targetCalories, targetProtein, user.goal, user.diet, prefs]);
+
   const generate = useCallback(async () => {
     setLoading(true);
     setError(null);
     setLogged(new Set());
+    setSwapBumps({});
+    savePrefs(prefs);
+    const nextSeed = seed + 1;
+    setSeed(nextSeed);
     try {
-      const result = await generateMealPlan({
-        tdee,
-        goal: user.goal,
-        diet: user.diet,
-        weightKg: user.weightKg,
-        targetCalories,
-        targetProtein,
-      });
+      const result = await generateMealPlan(planParams(nextSeed));
       setPlan(result);
+      saveLastPlan(result);
     } catch {
-      setError('Failed to generate meal plan. Check your internet connection.');
+      setError('Failed to generate meal plan.');
     } finally {
       setLoading(false);
     }
-  }, [tdee, user.goal, user.diet, user.weightKg, targetCalories, targetProtein]);
+  }, [prefs, seed, planParams]);
+
+  const handleSwap = useCallback((slot: MealSlot) => {
+    if (!plan) return;
+    const bump = (swapBumps[slot] ?? 0) + 1;
+    const replacement = swapMeal(plan, slot, planParams(seed), bump);
+    if (!replacement) return;
+    setSwapBumps(prev => ({ ...prev, [slot]: bump }));
+    const meals = plan.meals.map(m => (m.meal === slot ? replacement : m));
+    const next: MealPlan = {
+      ...plan,
+      meals,
+      totalCalories: meals.reduce((s, m) => s + m.calories, 0),
+      totalProtein: Math.round(meals.reduce((s, m) => s + m.protein, 0)),
+    };
+    setPlan(next);
+    saveLastPlan(next);
+    setLogged(prev => { const n = new Set(prev); n.delete(slot); return n; });
+  }, [plan, swapBumps, planParams, seed]);
 
   const logMeal = useCallback((meal: PlannedMeal) => {
     addEntry({
@@ -97,7 +131,9 @@ export function MealPlanner() {
           <Icon name="chevron-left" size={16} color={theme.text} />
         </motion.button>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 10, color: theme.accent, fontFamily: theme.mono, letterSpacing: 2, fontWeight: 700 }}>AI POWERED</div>
+          <div style={{ fontSize: 10, color: theme.accent, fontFamily: theme.mono, letterSpacing: 2, fontWeight: 700 }}>
+            {RECIPES_COUNT} REAL DISHES · IFCT MACROS
+          </div>
           <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: -0.3, color: theme.text, marginTop: 1 }}>Meal Planner</div>
         </div>
         <motion.button
@@ -141,6 +177,25 @@ export function MealPlanner() {
           </Card>
         </div>
 
+        {/* Taste preferences — drives the dish selection */}
+        <div style={{ padding: '0 16px 8px' }}>
+          <Card style={{ borderRadius: 16, padding: '10px 14px' }}>
+            <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1, marginBottom: 6 }}>
+              YOUR TASTES · USED TO PICK DISHES
+            </div>
+            <input
+              value={prefs}
+              onChange={e => setPrefs(e.target.value)}
+              onBlur={() => savePrefs(prefs)}
+              placeholder='e.g. "love south indian, more paneer, no okra, hate karela"'
+              style={{
+                width: '100%', background: 'transparent', border: 'none', outline: 'none',
+                fontSize: 13, color: theme.text, fontFamily: theme.font, boxSizing: 'border-box' as const,
+              }}
+            />
+          </Card>
+        </div>
+
         {/* Loading state */}
         {loading && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 32px', gap: 16 }}>
@@ -179,7 +234,7 @@ export function MealPlanner() {
               Tap Generate to get a personalised full-day Indian meal plan built around your calorie and protein targets.
             </div>
             <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, background: 'rgba(15,23,42,0.04)', border: `1px solid ${theme.cardBorder}`, borderRadius: 10, padding: '8px 12px' }}>
-              Powered by Groq AI · LLaMA 3.3 70B
+              Real dishes · IFCT macros · measured ingredients
             </div>
             <motion.button
               whileTap={{ scale: 0.96 }}
@@ -203,6 +258,16 @@ export function MealPlanner() {
               animate={{ opacity: 1 }}
               style={{ padding: '8px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}
             >
+              {/* Offline notice */}
+              {!plan.aiPowered && (
+                <div style={{
+                  padding: '8px 12px', borderRadius: 12, fontSize: 11, lineHeight: 1.5,
+                  background: 'rgba(217,119,6,0.08)', border: '1px solid rgba(217,119,6,0.25)', color: '#D97706',
+                }}>
+                  Built offline from your preferences using pure math. Connect to the AI server for prep steps and smarter taste matching.
+                </div>
+              )}
+
               {/* Totals */}
               <Card style={{ borderRadius: 16, padding: '10px 14px' }}>
                 <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, marginBottom: 8 }}>TODAY'S PLAN TOTALS</div>
@@ -247,10 +312,24 @@ export function MealPlanner() {
                       <div style={{ padding: '14px 16px', borderBottom: `1px solid ${theme.cardBorder}` }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                           <Icon name={MEAL_ICONS[meal.meal] ?? 'utensils'} size={22} color={MEAL_COLORS[meal.meal] ?? '#EA580C'} />
-                          <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1, textTransform: 'uppercase' }}>{meal.meal}</div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1, textTransform: 'uppercase' }}>
+                              {meal.meal} · {meal.servings} serving{meal.servings !== 1 ? 's' : ''} · ≈{meal.portionGrams}g
+                            </div>
                             <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: -0.3 }}>{meal.name}</div>
                           </div>
+                          <motion.button
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => handleSwap(meal.meal)}
+                            title="Swap dish"
+                            style={{
+                              padding: '6px 9px', borderRadius: 10, cursor: 'pointer',
+                              border: `1px solid ${theme.cardBorder}`, background: 'transparent',
+                              color: theme.textDim, fontSize: 12, fontWeight: 700, flexShrink: 0,
+                            }}
+                          >
+                            ⇄
+                          </motion.button>
                           <motion.button
                             whileTap={{ scale: 0.92 }}
                             onClick={() => !isLogged && logMeal(meal)}
@@ -258,13 +337,13 @@ export function MealPlanner() {
                               padding: '6px 12px', borderRadius: 10, border: 'none', cursor: isLogged ? 'default' : 'pointer',
                               background: isLogged ? 'rgba(22,163,74,0.15)' : `${theme.accent}20`,
                               color: isLogged ? '#16A34A' : theme.accent,
-                              fontSize: 11, fontWeight: 700,
+                              fontSize: 11, fontWeight: 700, flexShrink: 0,
                             }}
                           >
                             {isLogged ? '✓ Logged' : '+ Log'}
                           </motion.button>
                         </div>
-                        <div style={{ fontSize: 12, color: theme.textDim, marginTop: 6, lineHeight: 1.4 }}>{meal.description}</div>
+                        <div style={{ fontSize: 12, color: theme.textDim, marginTop: 6, lineHeight: 1.4 }}>{meal.why}</div>
                       </div>
 
                       {/* Macros */}
@@ -283,8 +362,11 @@ export function MealPlanner() {
                         ))}
                       </div>
 
-                      {/* Ingredients */}
-                      <div style={{ padding: '10px 16px' }}>
+                      {/* Ingredients with measurements (scaled to this portion) */}
+                      <div style={{ padding: '10px 16px', borderBottom: meal.prep.length > 0 ? `1px solid ${theme.cardBorder}` : 'none' }}>
+                        <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1, marginBottom: 6 }}>
+                          INGREDIENTS · YOUR PORTION
+                        </div>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                           {meal.ingredients.map((ing, j) => (
                             <div key={j} style={{
@@ -292,11 +374,33 @@ export function MealPlanner() {
                               background: 'rgba(15,23,42,0.06)',
                               fontSize: 10, color: theme.textDim,
                             }}>
-                              {ing}
+                              {ing.text}
                             </div>
                           ))}
                         </div>
                       </div>
+
+                      {/* Preparation steps (AI) */}
+                      {meal.prep.length > 0 && (
+                        <div style={{ padding: '10px 16px' }}>
+                          <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1, marginBottom: 6 }}>
+                            PREPARATION
+                          </div>
+                          {meal.prep.map((step, j) => (
+                            <div key={j} style={{ display: 'flex', gap: 8, marginBottom: 5 }}>
+                              <span style={{
+                                width: 16, height: 16, borderRadius: 8, flexShrink: 0,
+                                background: `${MEAL_COLORS[meal.meal]}18`, color: MEAL_COLORS[meal.meal],
+                                fontSize: 9, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                fontFamily: theme.mono, marginTop: 1,
+                              }}>
+                                {j + 1}
+                              </span>
+                              <span style={{ fontSize: 12, color: theme.textDim, lineHeight: 1.45 }}>{step}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </Card>
                   </motion.div>
                 );

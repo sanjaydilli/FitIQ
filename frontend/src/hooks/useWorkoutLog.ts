@@ -104,7 +104,13 @@ export function useWorkoutLog() {
 
   // ── Session management ──
 
-  const startWorkout = useCallback((name: string, exerciseIds: string[]) => {
+  const startWorkout = useCallback((
+    name: string,
+    exerciseIds: string[],
+    // Optional per-exercise overrides (aligned by position) — lets a custom
+    // plan's sets/reps flow into the session instead of template defaults.
+    planOverrides?: { sets: number; repsDisplay: string }[],
+  ) => {
     const session: WorkoutSession = {
       id: `ws_${Date.now()}`,
       name,
@@ -113,14 +119,19 @@ export function useWorkoutLog() {
       endTime: null,
       totalVolume: 0,
       notes: '',
-      exercises: exerciseIds.map(id => {
+      exercises: exerciseIds.map((id, i) => {
         const tmpl = getExercise(id);
+        const ov = planOverrides?.[i];
+        // "8-10" → 8, "12 each" → 12; non-numeric ("Max-1") → template default
+        const ovReps = ov ? parseInt(ov.repsDisplay, 10) : NaN;
+        const setCount = ov?.sets ?? tmpl?.defaultSets ?? 3;
+        const reps = Number.isFinite(ovReps) && ovReps > 0 ? ovReps : (tmpl?.defaultReps ?? 10);
         return {
           exerciseId: id,
           exerciseName: tmpl?.name ?? id,
-          sets: Array.from({ length: tmpl?.defaultSets ?? 3 }, () => ({
+          sets: Array.from({ length: setCount }, () => ({
             weight: getLastWeight(sessions, id),
-            reps: tmpl?.defaultReps ?? 10,
+            reps,
             completed: false,
             timestamp: 0,
           })),

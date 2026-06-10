@@ -42,8 +42,6 @@ function saveHistory(msgs: ChatMessage[]): void {
   } catch { /* ignore quota errors */ }
 }
 
-const EMPTY_FOOD_LOG: FoodLogItem[] = [];
-
 export function useAICoach(liveStats?: Partial<UserStats>) {
   const { user } = useUser();
   const { todayTotals } = useFoodLog();
@@ -130,6 +128,20 @@ export function useAICoach(liveStats?: Partial<UserStats>) {
     };
   }, [user, todayTotals, tdee, sessions, liveStats]);
 
+  // Today's actual meals — lets the coach reason about WHAT was eaten
+  const foodLog = useMemo<FoodLogItem[]>(
+    () => todayTotals.entries.map(e => ({
+      meal: e.meal,
+      name: e.name,
+      calories: e.calories,
+      protein: e.protein,
+      carbs: e.carbs,
+      fat: e.fat,
+      ...(e.grams ? { grams: e.grams } : {}),
+    })),
+    [todayTotals.entries],
+  );
+
   const sendMessage = useCallback(
     async (question: string) => {
       const trimmed = question.trim();
@@ -151,7 +163,7 @@ export function useAICoach(liveStats?: Partial<UserStats>) {
       setError(null);
 
       try {
-        const reply = await askFitIQCoach(stats, EMPTY_FOOD_LOG, trimmed, user.name);
+        const reply = await askFitIQCoach(stats, foodLog, trimmed, user.name);
 
         const aiMsg: ChatMessage = {
           id: `a-${Date.now()}`,
@@ -184,7 +196,7 @@ export function useAICoach(liveStats?: Partial<UserStats>) {
         setLoading(false);
       }
     },
-    [stats, loading, user.name]
+    [stats, foodLog, loading, user.name]
   );
 
   const clearHistory = useCallback(() => {

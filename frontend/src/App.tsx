@@ -13,6 +13,7 @@ import { useNotifications } from './hooks/useNotifications';
 import { ThemeSelector } from './screens/ThemeSelector';
 import { OnboardingFlow } from './screens/OnboardingFlow';
 import { AIAnalysis } from './screens/AIAnalysis';
+import { ScienceTour } from './screens/ScienceTour';
 import { Home } from './screens/Home';
 import { Workout } from './screens/Workout';
 import { FoodLog } from './screens/FoodLog';
@@ -24,6 +25,7 @@ import { Signup } from './screens/auth/Signup';
 // Lazy loaded — heavy routes
 const FoodSearch        = lazy(() => import('./screens/FoodSearch').then(m => ({ default: m.FoodSearch })));
 const DishDetail        = lazy(() => import('./screens/DishDetail').then(m => ({ default: m.DishDetail })));
+const PlanEditor        = lazy(() => import('./screens/PlanEditor').then(m => ({ default: m.PlanEditor })));
 const FoodDetail        = lazy(() => import('./screens/FoodDetail').then(m => ({ default: m.FoodDetail })));
 const CustomRecipe      = lazy(() => import('./screens/CustomRecipe').then(m => ({ default: m.CustomRecipe })));
 const AICoach           = lazy(() => import('./screens/AICoach').then(m => ({ default: m.AICoach })));
@@ -126,6 +128,7 @@ function AnimatedRoutes() {
             {/* Protected routes */}
             <Route path="/onboarding" element={<RequireAuth><OnboardingFlow /></RequireAuth>} />
             <Route path="/analysis"   element={<RequireAuth><AIAnalysis /></RequireAuth>} />
+            <Route path="/tour"       element={<RequireAuth><ScienceTour /></RequireAuth>} />
             <Route path="/home"       element={<RequireAuth><Home /></RequireAuth>} />
             <Route path="/workout"    element={<RequireAuth><Workout /></RequireAuth>} />
             <Route path="/food-log"   element={<RequireAuth><FoodLog /></RequireAuth>} />
@@ -134,6 +137,7 @@ function AnimatedRoutes() {
             <Route path="/food"       element={<RequireAuth><FoodSearch /></RequireAuth>} />
             <Route path="/food/:id"   element={<RequireAuth><FoodDetail /></RequireAuth>} />
             <Route path="/dish/:id"   element={<RequireAuth><DishDetail /></RequireAuth>} />
+            <Route path="/plan-editor" element={<RequireAuth><PlanEditor /></RequireAuth>} />
             <Route path="/recipe"     element={<RequireAuth><CustomRecipe /></RequireAuth>} />
             <Route path="/coach"      element={<RequireAuth><AICoach /></RequireAuth>} />
             <Route path="/routine"    element={<RequireAuth><DailyRoutine /></RequireAuth>} />
