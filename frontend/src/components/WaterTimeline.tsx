@@ -15,7 +15,7 @@ const BLUE_LIGHT = '#60A5FA';
 const BLUE_MID   = '#3B82F6';
 const BLUE_DEEP  = '#1D4ED8';
 const BLUE_NAVY  = '#1A3358';
-const ON_TRACK   = '#34D399';
+const ON_TRACK   = '#059669';
 
 // ─── Water Bottle ─────────────────────────────────────────────────────────────
 
@@ -207,80 +207,47 @@ function WaterBottle({
   );
 }
 
-// ─── Cup pill button ──────────────────────────────────────────────────────────
+// ─── Cup dot (compact, tappable) ──────────────────────────────────────────────
 
-function CupPill({
+function CupDot({
   filled,
   isNext,
   onClick,
-  index,
 }: {
   filled: boolean;
   isNext: boolean;
   onClick: () => void;
-  index: number;
 }) {
   return (
     <motion.button
-      initial={{ scale: 0.5, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ delay: index * 0.05, type: 'spring', stiffness: 360, damping: 20 }}
-      whileTap={{ scale: 0.82 }}
+      whileTap={{ scale: 0.75 }}
       onClick={onClick}
       style={{
         position: 'relative',
-        width: 22, height: 22,
-        borderRadius: 7,
+        width: 14, height: 14,
+        borderRadius: 5,
         border: 'none',
         cursor: 'pointer',
         padding: 0,
         background: filled
           ? `linear-gradient(135deg, ${BLUE_LIGHT}, ${BLUE_DEEP})`
-          : 'rgba(255,255,255,0.07)',
-        outline: isNext ? `1.5px solid ${BLUE_LIGHT}80` : 'none',
+          : 'rgba(15,23,42,0.08)',
         boxShadow: filled
-          ? `0 2px 8px ${BLUE_MID}70, inset 0 1px 0 rgba(255,255,255,0.25)`
-          : isNext
-          ? `0 0 8px ${BLUE_MID}50`
+          ? `0 1px 6px ${BLUE_MID}60, inset 0 1px 0 rgba(255,255,255,0.25)`
           : 'none',
-        overflow: 'hidden',
         flexShrink: 0,
       }}
       aria-label={filled ? 'Remove cup' : 'Add cup'}
     >
-      {/* Shine strip on filled */}
-      {filled && (
-        <div style={{
-          position: 'absolute', top: 2, left: 3, width: 6, height: 4,
-          borderRadius: 3, background: 'rgba(255,255,255,0.35)',
-        }} />
-      )}
-
-      {/* Pulse ring for next cup */}
       {isNext && !filled && (
         <motion.div
-          animate={{ scale: [1, 1.6], opacity: [0.45, 0] }}
+          animate={{ scale: [1, 1.7], opacity: [0.5, 0] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: 'easeOut' }}
           style={{
-            position: 'absolute', inset: -3, borderRadius: 10,
+            position: 'absolute', inset: -3, borderRadius: 8,
             border: `1.5px solid ${BLUE_LIGHT}`,
           }}
         />
-      )}
-
-      {/* Check icon on filled */}
-      {filled && (
-        <svg
-          width={11} height={11}
-          viewBox="0 0 12 12"
-          fill="none"
-          stroke="rgba(255,255,255,0.9)"
-          strokeWidth="2"
-          strokeLinecap="round"
-          style={{ position: 'absolute', inset: 0, margin: 'auto', display: 'block' }}
-        >
-          <path d="M2 6l3 3 5-5" />
-        </svg>
       )}
     </motion.button>
   );
@@ -300,7 +267,6 @@ export function WaterTimeline() {
   }, []);
 
   const currentHour = now.getHours();
-  const currentMin  = now.getMinutes();
 
   const currentSlot = useMemo(() => {
     let idx = 0;
@@ -315,18 +281,22 @@ export function WaterTimeline() {
   const filledMl    = filledCount * WATER_DROP_ML;
   const targetMl    = totalCount  * WATER_DROP_ML;
   const fillPct     = Math.round((filledMl / targetMl) * 100);
+  const goalDone    = filledCount >= totalCount;
 
   const expectedByNow = WATER_SLOT_CAPACITY.slice(0, currentSlot + 1).reduce((a: number, b) => a + b, 0);
   const filledByNow   = user.waterDrops.slice(0, currentSlot + 1).reduce((a, b) => a + b, 0);
   const onTrack       = filledByNow >= expectedByNow;
-  const statusColor   = onTrack ? ON_TRACK : '#F59E0B';
+  const statusColor   = goalDone ? ON_TRACK : onTrack ? ON_TRACK : '#F59E0B';
 
-  const nowProgress = useMemo(() => {
-    const start = WATER_SLOT_HOURS[0];
-    const end   = WATER_SLOT_HOURS[WATER_SLOT_HOURS.length - 1] + 3;
-    const cur   = currentHour + currentMin / 60;
-    return Math.max(0, Math.min(1, (cur - start) / (end - start)));
-  }, [currentHour, currentMin]);
+  // Slot that the big button logs into: current slot if it has room,
+  // otherwise the first slot (earliest first) with space left.
+  const logSlot = useMemo(() => {
+    if (user.waterDrops[currentSlot] < WATER_SLOT_CAPACITY[currentSlot]) return currentSlot;
+    for (let i = 0; i < WATER_SLOT_CAPACITY.length; i++) {
+      if (user.waterDrops[i] < WATER_SLOT_CAPACITY[i]) return i;
+    }
+    return -1; // all full
+  }, [user.waterDrops, currentSlot]);
 
   const tap = (slotIdx: number, dropIdx: number) => {
     const cur  = user.waterDrops[slotIdx];
@@ -336,53 +306,45 @@ export function WaterTimeline() {
     setTimeout(() => setRipple(false), 550);
   };
 
-  const bottleTap = () => {
-    const cur = user.waterDrops[currentSlot];
-    const cap = WATER_SLOT_CAPACITY[currentSlot];
-    if (cur < cap) tap(currentSlot, cur);
+  const logCup = () => {
+    if (logSlot < 0) return;
+    tap(logSlot, user.waterDrops[logSlot]);
   };
 
   return (
-    <Card style={{ padding: '15px 16px 16px', borderRadius: 22, position: 'relative', overflow: 'hidden' }}>
+    <Card style={{ padding: '15px 16px 14px', borderRadius: 22, position: 'relative', overflow: 'hidden' }}>
       {/* Ambient */}
       <motion.div
         animate={{ opacity: [0.4, 0.8, 0.4] }}
         transition={{ duration: 6, repeat: Infinity }}
         style={{
           position: 'absolute', inset: 0, pointerEvents: 'none',
-          background: `radial-gradient(ellipse at 25% 50%, ${BLUE_MID}16, transparent 60%)`,
+          background: `radial-gradient(ellipse at 25% 30%, ${BLUE_MID}16, transparent 60%)`,
         }}
       />
 
       <div style={{ position: 'relative' }}>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-          <div>
-            <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.5, fontWeight: 700, marginBottom: 3 }}>
-              HYDRATION
-            </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-              <motion.span
-                key={filledMl}
-                initial={{ scale: 0.88, opacity: 0.5 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: 'spring', stiffness: 340, damping: 20 }}
-                style={{
-                  fontSize: 26, fontWeight: 800, letterSpacing: -1,
-                  background: `linear-gradient(135deg, ${BLUE_SKY}, ${BLUE_DEEP})`,
-                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                  display: 'inline-block',
-                }}
-              >
-                {(filledMl / 1000).toFixed(1)}L
-              </motion.span>
-              <span style={{ fontSize: 11, color: theme.textMute }}>/ {(targetMl / 1000).toFixed(1)}L</span>
-            </div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+            <motion.span
+              key={filledMl}
+              initial={{ scale: 0.88, opacity: 0.5 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 340, damping: 20 }}
+              style={{
+                fontSize: 26, fontWeight: 800, letterSpacing: -1,
+                background: `linear-gradient(135deg, ${BLUE_SKY}, ${BLUE_DEEP})`,
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                display: 'inline-block', lineHeight: 1,
+              }}
+            >
+              {(filledMl / 1000).toFixed(1)}L
+            </motion.span>
+            <span style={{ fontSize: 11, color: theme.textMute }}>/ {(targetMl / 1000).toFixed(1)}L</span>
           </div>
 
-          <motion.div
-            animate={{ scale: [1, 1.04, 1] }}
-            transition={{ duration: 2.2, repeat: Infinity }}
+          <div
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 5,
               padding: '4px 10px', borderRadius: 999,
@@ -395,109 +357,114 @@ export function WaterTimeline() {
               transition={{ duration: 1.4, repeat: Infinity }}
               style={{ width: 6, height: 6, borderRadius: '50%', background: statusColor, boxShadow: `0 0 6px ${statusColor}`, display: 'inline-block' }}
             />
-            {onTrack ? 'ON TRACK' : 'BEHIND'}
-          </motion.div>
+            {goalDone ? 'GOAL HIT' : onTrack ? 'ON TRACK' : 'BEHIND'}
+          </div>
         </div>
 
-        {/* Content: bottle + vertical timeline */}
-        <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+        {/* Bottle + log action */}
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 14 }}>
+          <WaterBottle fillPct={fillPct} onTap={logCup} ripple={ripple} />
 
-          {/* Bottle */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, flexShrink: 0 }}>
-            <WaterBottle fillPct={fillPct} onTap={bottleTap} ripple={ripple} />
-            <div style={{ fontSize: 8.5, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 0.8, textAlign: 'center' }}>
-              TAP TO LOG
-            </div>
-          </div>
-
-          {/* Vertical timeline */}
-          <div style={{ flex: 1, position: 'relative', display: 'grid', gridTemplateColumns: '38px 1fr', rowGap: 8, paddingTop: 2 }}>
-
-            {/* Spine */}
+          <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{
-              position: 'absolute', left: 37, top: 10, bottom: 10,
-              width: 2, background: 'rgba(255,255,255,0.07)', borderRadius: 1, overflow: 'hidden',
+              fontSize: 10, color: theme.textMute, fontFamily: theme.mono,
+              letterSpacing: 1.2, fontWeight: 700, marginBottom: 8,
             }}>
-              <motion.div
-                initial={{ height: 0 }}
-                animate={{ height: `${(filledByNow / totalCount) * 100}%` }}
-                transition={{ duration: 0.9, ease: [0.22, 0.8, 0.22, 1] }}
-                style={{
-                  width: '100%',
-                  background: `linear-gradient(180deg, ${BLUE_LIGHT}, ${BLUE_MID}, ${BLUE_DEEP})`,
-                  boxShadow: `0 0 8px ${BLUE_MID}80`,
-                }}
-              />
+              {goalDone
+                ? 'ALL CUPS LOGGED 🎉'
+                : logSlot === currentSlot
+                ? `${WATER_SLOT_LABELS[currentSlot].toUpperCase()} SLOT · ${user.waterDrops[currentSlot]}/${WATER_SLOT_CAPACITY[currentSlot]} CUPS`
+                : `CATCH UP · ${WATER_SLOT_LABELS[Math.max(0, logSlot)].toUpperCase()} SLOT`}
             </div>
 
-            {/* Now indicator */}
-            <motion.div
-              animate={{ top: `calc(${nowProgress * 100}% - 6px)` }}
-              transition={{ duration: 0.6 }}
+            <motion.button
+              whileTap={{ scale: 0.96 }}
+              whileHover={{ y: -1 }}
+              onClick={logCup}
+              disabled={goalDone}
               style={{
-                position: 'absolute', left: 31, zIndex: 2,
-                width: 14, height: 14, borderRadius: 7,
-                background: BLUE_LIGHT,
-                border: '2px solid rgba(10,10,20,0.9)',
-                boxShadow: `0 0 10px ${BLUE_LIGHT}, 0 0 20px ${BLUE_LIGHT}70`,
+                width: '100%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                padding: '13px 0', borderRadius: 14, border: 'none', cursor: goalDone ? 'default' : 'pointer',
+                background: goalDone
+                  ? 'rgba(52,211,153,0.12)'
+                  : `linear-gradient(135deg, ${BLUE_MID}, ${BLUE_DEEP})`,
+                boxShadow: goalDone ? 'none' : `0 4px 16px ${BLUE_MID}50, inset 0 1px 0 rgba(255,255,255,0.2)`,
+                color: goalDone ? ON_TRACK : '#fff',
+                fontSize: 14, fontWeight: 800, letterSpacing: -0.2,
+                fontFamily: 'inherit',
               }}
             >
-              <motion.div
-                animate={{ scale: [1, 2.2, 1], opacity: [0.5, 0, 0.5] }}
-                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut' }}
-                style={{ position: 'absolute', inset: -2, borderRadius: 9, background: BLUE_LIGHT, opacity: 0.4 }}
-              />
-            </motion.div>
+              {goalDone ? (
+                <>✓ Done for today</>
+              ) : (
+                <>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                    <path d="M12 2.7C12 2.7 5.5 10 5.5 14.5a6.5 6.5 0 0013 0C18.5 10 12 2.7 12 2.7z" />
+                  </svg>
+                  +{WATER_DROP_ML} ml
+                </>
+              )}
+            </motion.button>
 
-            {/* Slots */}
-            {WATER_SLOT_HOURS.map((hour, slotIdx) => {
-              const cap      = WATER_SLOT_CAPACITY[slotIdx];
-              const filled   = user.waterDrops[slotIdx];
-              const isCur    = slotIdx === currentSlot;
-              const isPast   = slotIdx < currentSlot;
-              const complete = filled >= cap;
-
-              return (
-                <React.Fragment key={hour}>
-                  {/* Time label */}
-                  <motion.div
-                    initial={{ opacity: 0, x: -4 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: slotIdx * 0.04 }}
-                    style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', paddingRight: 12, paddingTop: 2 }}
-                  >
-                    <div style={{
-                      fontSize: 11, fontFamily: theme.mono, fontWeight: 800, letterSpacing: 0.3,
-                      color: isCur ? BLUE_LIGHT : isPast ? theme.textDim : theme.textMute,
-                    }}>
-                      {WATER_SLOT_LABELS[slotIdx]}
-                    </div>
-                    <div style={{ fontSize: 8.5, color: complete ? ON_TRACK : theme.textMute, fontFamily: theme.mono, fontWeight: 700 }}>
-                      {filled}/{cap}
-                    </div>
-                  </motion.div>
-
-                  {/* Cup pills */}
-                  <motion.div
-                    initial={{ opacity: 0, x: 6 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: slotIdx * 0.04 + 0.04 }}
-                    style={{ paddingLeft: 14, display: 'flex', alignItems: 'center', gap: 5, minHeight: 28 }}
-                  >
-                    {Array.from({ length: cap }).map((_, di) => (
-                      <CupPill
-                        key={di}
-                        index={di}
-                        filled={di < filled}
-                        isNext={isCur && di === filled && filled < cap}
-                        onClick={() => tap(slotIdx, di)}
-                      />
-                    ))}
-                  </motion.div>
-                </React.Fragment>
-              );
-            })}
+            <div style={{ fontSize: 10.5, color: theme.textMute, marginTop: 8, lineHeight: 1.4 }}>
+              {goalDone
+                ? `${(targetMl / 1000).toFixed(1)}L logged — great hydration!`
+                : `${((targetMl - filledMl) / 1000).toFixed(2).replace(/0$/, '')}L to go · ${totalCount - filledCount} cups left`}
+            </div>
           </div>
+        </div>
+
+        {/* Horizontal slot strip */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(${WATER_SLOT_HOURS.length}, 1fr)`,
+          gap: 6,
+        }}>
+          {WATER_SLOT_HOURS.map((hour, slotIdx) => {
+            const cap      = WATER_SLOT_CAPACITY[slotIdx];
+            const filled   = user.waterDrops[slotIdx];
+            const isCur    = slotIdx === currentSlot;
+            const isPast   = slotIdx < currentSlot;
+            const complete = filled >= cap;
+            const missed   = isPast && !complete;
+
+            return (
+              <motion.div
+                key={hour}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: slotIdx * 0.05 }}
+                style={{
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
+                  padding: '8px 2px 6px',
+                  borderRadius: 12,
+                  background: isCur ? `${BLUE_MID}14` : 'transparent',
+                  border: `1px solid ${isCur ? `${BLUE_LIGHT}35` : 'transparent'}`,
+                }}
+              >
+                {/* Cup dots, stacked bottom-up */}
+                <div style={{ display: 'flex', flexDirection: 'column-reverse', gap: 4, minHeight: 50, justifyContent: 'flex-start' }}>
+                  {Array.from({ length: cap }).map((_, di) => (
+                    <CupDot
+                      key={di}
+                      filled={di < filled}
+                      isNext={isCur && di === filled && filled < cap}
+                      onClick={() => tap(slotIdx, di)}
+                    />
+                  ))}
+                </div>
+
+                {/* Time label */}
+                <div style={{
+                  fontSize: 9.5, fontFamily: theme.mono, fontWeight: 800, letterSpacing: 0.3,
+                  color: isCur ? BLUE_LIGHT : complete ? ON_TRACK : missed ? '#F59E0B' : theme.textMute,
+                }}>
+                  {WATER_SLOT_LABELS[slotIdx]}
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </Card>

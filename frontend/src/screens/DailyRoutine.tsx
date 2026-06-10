@@ -9,11 +9,11 @@ import { useDailyRoutine, ActivityCategory, ActivityEntry } from '../hooks/useDa
 // ── Category config ───────────────────────────────────────────────────────────
 
 const CAT_META: Record<ActivityCategory, { label: string; color: string }> = {
-  morning:   { label: 'Morning',    color: '#FBBF24' },
-  nutrition: { label: 'Nutrition',  color: '#FB923C' },
-  workout:   { label: 'Workout',    color: '#5EEAD4' },
+  morning:   { label: 'Morning',    color: '#D97706' },
+  nutrition: { label: 'Nutrition',  color: '#EA580C' },
+  workout:   { label: 'Workout',    color: '#0E9384' },
   hydration: { label: 'Hydration',  color: '#60A5FA' },
-  evening:   { label: 'Evening',    color: '#A78BFA' },
+  evening:   { label: 'Evening',    color: '#7C3AED' },
   sleep:     { label: 'Sleep',      color: '#818CF8' },
 };
 
@@ -82,7 +82,7 @@ const AddSheet = memo(function AddSheet({ onClose, onAdd }: AddSheetProps) {
       }}
     >
       {/* Handle */}
-      <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.15)', margin: '0 auto 20px' }} />
+      <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.15)', margin: '0 auto 20px' }} />
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <div style={{ fontSize: 17, fontWeight: 700 }}>Add Activity</div>
@@ -171,7 +171,7 @@ const AddSheet = memo(function AddSheet({ onClose, onAdd }: AddSheetProps) {
         whileTap={{ scale: 0.97 }} disabled={!canSave} onClick={handleSave}
         style={{
           width: '100%', padding: '14px 0', borderRadius: theme.radius, border: 'none',
-          background: canSave ? `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})` : 'rgba(255,255,255,0.08)',
+          background: canSave ? `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})` : 'rgba(15,23,42,0.08)',
           color: canSave ? theme.onAccent : theme.textMute,
           fontSize: 15, fontWeight: 800, cursor: canSave ? 'pointer' : 'not-allowed', fontFamily: theme.font,
         }}
@@ -237,7 +237,7 @@ const ActivityCard = memo(function ActivityCard({ entry, onToggle, onDelete, isN
             border: `2px solid ${entry.completed || isNow ? meta.color : meta.color + '70'}`,
             boxShadow: (entry.completed || isNow)
               ? `0 0 10px ${meta.color}90, 0 0 0 3px ${meta.color}20`
-              : `0 0 0 2px rgba(0,0,0,0.4)`,
+              : `0 0 0 2px rgba(15,23,42,0.15)`,
             transition: 'all 0.3s',
             zIndex: 1,
           }}
@@ -254,7 +254,7 @@ const ActivityCard = memo(function ActivityCard({ entry, onToggle, onDelete, isN
             padding: '12px 14px', borderRadius: theme.radiusSm,
             background: entry.completed ? `${meta.color}10` : isNow ? `${meta.color}08` : theme.card,
             border: `1px solid ${entry.completed ? meta.color + '30' : isNow ? meta.color + '30' : theme.cardBorder}`,
-            boxShadow: `inset 0 1px 0 rgba(255,255,255,0.03)`,
+            boxShadow: `inset 0 1px 0 rgba(15,23,42,0.03)`,
             cursor: 'pointer', position: 'relative', overflow: 'hidden',
           }}
           onPointerDown={onPointerDown}
@@ -318,12 +318,12 @@ const ActivityCard = memo(function ActivityCard({ entry, onToggle, onDelete, isN
               whileTap={{ scale: 0.85 }}
               style={{
                 width: 28, height: 28, borderRadius: 9, flexShrink: 0,
-                background: entry.completed ? meta.color : 'rgba(255,255,255,0.03)',
-                border: `2px solid ${entry.completed ? meta.color : 'rgba(255,255,255,0.18)'}`,
+                background: entry.completed ? meta.color : 'rgba(15,23,42,0.03)',
+                border: `2px solid ${entry.completed ? meta.color : 'rgba(15,23,42,0.18)'}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 boxShadow: entry.completed
-                  ? `0 0 12px ${meta.color}60, inset 0 1px 0 rgba(255,255,255,0.2)`
-                  : `inset 0 1px 0 rgba(255,255,255,0.03)`,
+                  ? `0 0 12px ${meta.color}60, inset 0 1px 0 rgba(15,23,42,0.2)`
+                  : `inset 0 1px 0 rgba(15,23,42,0.03)`,
                 transition: 'all 0.25s',
               }}
             >
@@ -358,8 +358,8 @@ const ActivityCard = memo(function ActivityCard({ entry, onToggle, onDelete, isN
                   onClick={e => { e.stopPropagation(); onDelete?.(entry.id); }}
                   style={{
                     flex: 1, padding: '7px 0', borderRadius: 8, textAlign: 'center',
-                    background: 'rgba(248,113,113,0.12)', border: '1px solid rgba(248,113,113,0.3)',
-                    fontSize: 11, color: '#F87171', fontWeight: 700, cursor: 'pointer',
+                    background: 'rgba(220,38,38,0.12)', border: '1px solid rgba(220,38,38,0.3)',
+                    fontSize: 11, color: '#DC2626', fontWeight: 700, cursor: 'pointer',
                   }}
                 >Delete activity</motion.div>
                 <motion.div
@@ -387,7 +387,7 @@ function ProgressRing({ pct, size = 64, accent }: { pct: number; size?: number; 
   const dash = (pct / 100) * circ;
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="5" />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(15,23,42,0.06)" strokeWidth="5" />
       <motion.circle
         cx={size / 2} cy={size / 2} r={r} fill="none"
         stroke={accent} strokeWidth="5"
@@ -480,7 +480,7 @@ export function DailyRoutine() {
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             background: theme.card, border: `1px solid ${theme.cardBorder}`,
             borderRadius: theme.radiusSm, padding: '12px 14px', marginBottom: 16,
-            boxShadow: `inset 0 1px 0 rgba(255,255,255,0.03)`,
+            boxShadow: `inset 0 1px 0 rgba(15,23,42,0.03)`,
           }}>
             <motion.div whileTap={{ scale: 0.88 }} onClick={goToPrevDay}
               style={{ cursor: 'pointer', color: theme.textMute, fontSize: 20, lineHeight: 1, width: 28, textAlign: 'center' }}>‹</motion.div>
@@ -499,7 +499,7 @@ export function DailyRoutine() {
             <motion.div whileTap={{ scale: 0.88 }} onClick={goToNextDay}
               style={{
                 cursor: isToday ? 'default' : 'pointer',
-                color: isToday ? 'rgba(255,255,255,0.08)' : theme.textMute,
+                color: isToday ? 'rgba(15,23,42,0.08)' : theme.textMute,
                 fontSize: 20, lineHeight: 1, width: 28, textAlign: 'center',
               }}>›</motion.div>
           </div>
@@ -511,7 +511,7 @@ export function DailyRoutine() {
               <div style={{ display: 'flex', gap: 16, marginBottom: 10 }}>
                 {[
                   { label: 'Completed', value: `${stats.done}/${stats.total}`, color: theme.accent },
-                  { label: 'XP earned', value: `${stats.xpEarned}`, color: '#FBBF24' },
+                  { label: 'XP earned', value: `${stats.xpEarned}`, color: '#D97706' },
                   { label: 'XP total', value: `${stats.xpTotal}`, color: theme.textMute },
                 ].map(s => (
                   <div key={s.label}>
@@ -521,7 +521,7 @@ export function DailyRoutine() {
                 ))}
               </div>
               {/* Progress bar */}
-              <div style={{ height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+              <div style={{ height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.06)', overflow: 'hidden' }}>
                 <motion.div
                   animate={{ width: `${stats.pct}%` }}
                   transition={{ duration: 0.7, ease: 'easeOut' }}

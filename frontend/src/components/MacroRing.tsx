@@ -39,12 +39,12 @@ export const MacroRing = memo(function MacroRing({
     <div style={{ position: 'relative', width: size, height: size }}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)' }}>
         {/* Track */}
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={stroke} />
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(15,23,42,0.06)" strokeWidth={stroke} />
 
         {/* Carbs - orange */}
         {carbArc > 0 && (
           <motion.circle
-            cx={cx} cy={cy} r={r} fill="none" stroke="#FB923C" strokeWidth={stroke}
+            cx={cx} cy={cy} r={r} fill="none" stroke="#EA580C" strokeWidth={stroke}
             strokeDasharray={`${carbArc} ${circumference}`}
             strokeDashoffset={carbOffset}
             strokeLinecap="butt"
@@ -57,7 +57,7 @@ export const MacroRing = memo(function MacroRing({
         {/* Protein - purple */}
         {protArc > 0 && (
           <motion.circle
-            cx={cx} cy={cy} r={r} fill="none" stroke="#A78BFA" strokeWidth={stroke}
+            cx={cx} cy={cy} r={r} fill="none" stroke="#7C3AED" strokeWidth={stroke}
             strokeDasharray={`${protArc} ${circumference}`}
             strokeDashoffset={protOffset}
             strokeLinecap="butt"
@@ -70,7 +70,7 @@ export const MacroRing = memo(function MacroRing({
         {/* Fat - teal */}
         {fatArc > 0 && (
           <motion.circle
-            cx={cx} cy={cy} r={r} fill="none" stroke="#5EEAD4" strokeWidth={stroke}
+            cx={cx} cy={cy} r={r} fill="none" stroke="#0E9384" strokeWidth={stroke}
             strokeDasharray={`${fatArc} ${circumference}`}
             strokeDashoffset={fatOffset}
             strokeLinecap="butt"

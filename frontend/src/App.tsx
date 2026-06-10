@@ -23,6 +23,7 @@ import { Signup } from './screens/auth/Signup';
 
 // Lazy loaded — heavy routes
 const FoodSearch        = lazy(() => import('./screens/FoodSearch').then(m => ({ default: m.FoodSearch })));
+const DishDetail        = lazy(() => import('./screens/DishDetail').then(m => ({ default: m.DishDetail })));
 const FoodDetail        = lazy(() => import('./screens/FoodDetail').then(m => ({ default: m.FoodDetail })));
 const CustomRecipe      = lazy(() => import('./screens/CustomRecipe').then(m => ({ default: m.CustomRecipe })));
 const AICoach           = lazy(() => import('./screens/AICoach').then(m => ({ default: m.AICoach })));
@@ -45,7 +46,7 @@ function RouteSpinner() {
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ duration: 0.9, repeat: Infinity, ease: 'linear' }}
-        style={{ width: 24, height: 24, borderRadius: '50%', border: '2px solid rgba(255,255,255,0.1)', borderTopColor: 'rgba(255,255,255,0.6)' }}
+        style={{ width: 24, height: 24, borderRadius: '50%', border: '2px solid rgba(15,23,42,0.1)', borderTopColor: 'rgba(255,255,255,0.6)' }}
       />
     </div>
   );
@@ -132,6 +133,7 @@ function AnimatedRoutes() {
             <Route path="/profile"    element={<RequireAuth><Profile /></RequireAuth>} />
             <Route path="/food"       element={<RequireAuth><FoodSearch /></RequireAuth>} />
             <Route path="/food/:id"   element={<RequireAuth><FoodDetail /></RequireAuth>} />
+            <Route path="/dish/:id"   element={<RequireAuth><DishDetail /></RequireAuth>} />
             <Route path="/recipe"     element={<RequireAuth><CustomRecipe /></RequireAuth>} />
             <Route path="/coach"      element={<RequireAuth><AICoach /></RequireAuth>} />
             <Route path="/routine"    element={<RequireAuth><DailyRoutine /></RequireAuth>} />

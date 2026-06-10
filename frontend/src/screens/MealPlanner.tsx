@@ -18,10 +18,10 @@ const MEAL_ICONS: Record<string, IconName> = {
   snack: 'leaf',
 };
 const MEAL_COLORS: Record<string, string> = {
-  breakfast: '#FBBF24',
-  lunch: '#FB923C',
-  dinner: '#A78BFA',
-  snack: '#4ade80',
+  breakfast: '#D97706',
+  lunch: '#EA580C',
+  dinner: '#7C3AED',
+  snack: '#16A34A',
 };
 
 const MEAL_ORDER: MealType[] = ['breakfast', 'lunch', 'snack', 'dinner'];
@@ -83,7 +83,7 @@ export function MealPlanner() {
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10,
         padding: '14px 20px',
-        background: theme.id === 'aurora' ? 'rgba(8,6,15,0.7)' : theme.id === 'neon' ? 'rgba(0,0,0,0.85)' : 'rgba(0,0,0,0.65)',
+        background: 'rgba(15,23,42,0.45)',
         backdropFilter: 'blur(20px) saturate(150%)',
         WebkitBackdropFilter: 'blur(20px) saturate(150%)',
         borderBottom: `1px solid ${theme.cardBorder}`,
@@ -92,7 +92,7 @@ export function MealPlanner() {
         <motion.button
           whileTap={{ scale: 0.92 }}
           onClick={() => navigate(-1)}
-          style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid ${theme.cardBorder}`, borderRadius: 10, padding: '6px 10px', color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+          style={{ background: 'rgba(15,23,42,0.06)', border: `1px solid ${theme.cardBorder}`, borderRadius: 10, padding: '6px 10px', color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
         >
           <Icon name="chevron-left" size={16} color={theme.text} />
         </motion.button>
@@ -124,7 +124,7 @@ export function MealPlanner() {
           <Card style={{ borderRadius: 16, padding: '10px 14px', display: 'flex', gap: 20 }}>
             <div>
               <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1 }}>TARGET KCAL</div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: '#FB923C' }}>{targetCalories}</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: '#EA580C' }}>{targetCalories}</div>
             </div>
             <div>
               <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1 }}>PROTEIN</div>
@@ -158,7 +158,7 @@ export function MealPlanner() {
         {/* Error */}
         {error && !loading && (
           <div style={{ padding: '12px 16px' }}>
-            <div style={{ padding: '12px 16px', borderRadius: 14, background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)', fontSize: 13, color: '#F87171' }}>
+            <div style={{ padding: '12px 16px', borderRadius: 14, background: 'rgba(220,38,38,0.1)', border: '1px solid rgba(220,38,38,0.3)', fontSize: 13, color: '#DC2626' }}>
               {error}
             </div>
           </div>
@@ -178,7 +178,7 @@ export function MealPlanner() {
             <div style={{ fontSize: 13, color: theme.textDim, lineHeight: 1.6 }}>
               Tap Generate to get a personalised full-day Indian meal plan built around your calorie and protein targets.
             </div>
-            <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, background: 'rgba(255,255,255,0.04)', border: `1px solid ${theme.cardBorder}`, borderRadius: 10, padding: '8px 12px' }}>
+            <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, background: 'rgba(15,23,42,0.04)', border: `1px solid ${theme.cardBorder}`, borderRadius: 10, padding: '8px 12px' }}>
               Powered by Groq AI · LLaMA 3.3 70B
             </div>
             <motion.button
@@ -208,7 +208,7 @@ export function MealPlanner() {
                 <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, marginBottom: 8 }}>TODAY'S PLAN TOTALS</div>
                 <div style={{ display: 'flex', gap: 16 }}>
                   {[
-                    { l: 'Calories', v: plan.totalCalories, target: targetCalories, unit: 'kcal', color: '#FB923C' },
+                    { l: 'Calories', v: plan.totalCalories, target: targetCalories, unit: 'kcal', color: '#EA580C' },
                     { l: 'Protein', v: plan.totalProtein, target: targetProtein, unit: 'g', color: theme.accent },
                   ].map(({ l, v, target, unit, color }) => {
                     const pct = Math.round((v / target) * 100);
@@ -218,7 +218,7 @@ export function MealPlanner() {
                           <span style={{ fontSize: 11, color: theme.textDim }}>{l}</span>
                           <span style={{ fontSize: 11, fontFamily: theme.mono, color }}>{v}{unit}</span>
                         </div>
-                        <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 2 }}>
+                        <div style={{ height: 4, background: 'rgba(15,23,42,0.06)', borderRadius: 2 }}>
                           <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${Math.min(pct, 100)}%` }}
@@ -246,7 +246,7 @@ export function MealPlanner() {
                     <Card style={{ borderRadius: 18, overflow: 'hidden' }}>
                       <div style={{ padding: '14px 16px', borderBottom: `1px solid ${theme.cardBorder}` }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                          <Icon name={MEAL_ICONS[meal.meal] ?? 'utensils'} size={22} color={MEAL_COLORS[meal.meal] ?? '#FB923C'} />
+                          <Icon name={MEAL_ICONS[meal.meal] ?? 'utensils'} size={22} color={MEAL_COLORS[meal.meal] ?? '#EA580C'} />
                           <div style={{ flex: 1 }}>
                             <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1, textTransform: 'uppercase' }}>{meal.meal}</div>
                             <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: -0.3 }}>{meal.name}</div>
@@ -256,8 +256,8 @@ export function MealPlanner() {
                             onClick={() => !isLogged && logMeal(meal)}
                             style={{
                               padding: '6px 12px', borderRadius: 10, border: 'none', cursor: isLogged ? 'default' : 'pointer',
-                              background: isLogged ? 'rgba(74,222,128,0.15)' : `${theme.accent}20`,
-                              color: isLogged ? '#4ade80' : theme.accent,
+                              background: isLogged ? 'rgba(22,163,74,0.15)' : `${theme.accent}20`,
+                              color: isLogged ? '#16A34A' : theme.accent,
                               fontSize: 11, fontWeight: 700,
                             }}
                           >
@@ -270,10 +270,10 @@ export function MealPlanner() {
                       {/* Macros */}
                       <div style={{ padding: '10px 16px', display: 'flex', gap: 16, borderBottom: `1px solid ${theme.cardBorder}` }}>
                         {[
-                          { l: 'Cal', v: meal.calories, unit: 'kcal', color: '#FB923C' },
+                          { l: 'Cal', v: meal.calories, unit: 'kcal', color: '#EA580C' },
                           { l: 'Pro', v: meal.protein, unit: 'g', color: theme.accent },
                           { l: 'Carb', v: meal.carbs, unit: 'g', color: theme.accent2 },
-                          { l: 'Fat', v: meal.fat, unit: 'g', color: '#FBBF24' },
+                          { l: 'Fat', v: meal.fat, unit: 'g', color: '#D97706' },
                         ].map(({ l, v, unit, color }) => (
                           <div key={l} style={{ flex: 1, textAlign: 'center' }}>
                             <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono }}>{l}</div>
@@ -289,7 +289,7 @@ export function MealPlanner() {
                           {meal.ingredients.map((ing, j) => (
                             <div key={j} style={{
                               padding: '3px 8px', borderRadius: 8,
-                              background: 'rgba(255,255,255,0.06)',
+                              background: 'rgba(15,23,42,0.06)',
                               fontSize: 10, color: theme.textDim,
                             }}>
                               {ing}

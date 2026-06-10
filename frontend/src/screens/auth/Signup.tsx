@@ -129,11 +129,11 @@ export function Signup() {
               animate={{ opacity: 1, y: 0 }}
               style={{
                 fontSize: 12,
-                color: '#F87171',
+                color: '#DC2626',
                 textAlign: 'center',
                 padding: '8px 12px',
-                background: 'rgba(248,113,113,0.08)',
-                border: '1px solid rgba(248,113,113,0.2)',
+                background: 'rgba(220,38,38,0.08)',
+                border: '1px solid rgba(220,38,38,0.2)',
                 borderRadius: 10,
                 fontWeight: 600,
               }}
@@ -150,10 +150,10 @@ export function Signup() {
             disabled={loading}
             style={{
               padding: '15px', borderRadius: 14, border: 'none', cursor: loading ? 'wait' : 'pointer',
-              background: loading ? 'rgba(255,255,255,0.08)' : `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
+              background: loading ? 'rgba(15,23,42,0.08)' : `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
               color: theme.onAccent, fontSize: 15, fontWeight: 700, marginTop: 4,
               fontFamily: theme.font,
-              boxShadow: loading ? 'none' : `0 8px 24px ${theme.accent}38, 0 2px 6px ${theme.accent}1c, inset 0 1px 0 rgba(255,255,255,0.18)`,
+              boxShadow: loading ? 'none' : `0 8px 24px ${theme.accent}38, 0 2px 6px ${theme.accent}1c, inset 0 1px 0 rgba(15,23,42,0.18)`,
               letterSpacing: 0.2,
             }}
           >
@@ -174,7 +174,7 @@ export function Signup() {
             disabled={loading}
             style={{
               padding: '13px', borderRadius: 14, border: `1px solid ${theme.cardBorder}`,
-              background: 'rgba(255,255,255,0.05)', cursor: 'pointer',
+              background: 'rgba(15,23,42,0.05)', cursor: 'pointer',
               color: theme.text, fontSize: 14, fontWeight: 600,
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
               fontFamily: theme.font,
@@ -209,7 +209,7 @@ function inputStyle(theme: ReturnType<typeof useTheme>['theme'], focused: boolea
     padding: '14px 16px',
     borderRadius: 14,
     border: `1px solid ${focused ? theme.accent + '50' : theme.cardBorder}`,
-    background: focused ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.05)',
+    background: focused ? 'rgba(15,23,42,0.08)' : 'rgba(15,23,42,0.05)',
     color: theme.text,
     fontSize: 14,
     fontFamily: theme.font,
@@ -217,8 +217,8 @@ function inputStyle(theme: ReturnType<typeof useTheme>['theme'], focused: boolea
     width: '100%',
     boxSizing: 'border-box',
     boxShadow: focused
-      ? `0 0 0 3px ${theme.accent}18, inset 0 1px 0 rgba(255,255,255,0.04)`
-      : 'inset 0 1px 0 rgba(255,255,255,0.03)',
+      ? `0 0 0 3px ${theme.accent}18, inset 0 1px 0 rgba(15,23,42,0.04)`
+      : 'inset 0 1px 0 rgba(15,23,42,0.03)',
     transition: 'box-shadow 0.2s, border-color 0.2s, background 0.2s',
   };
 }

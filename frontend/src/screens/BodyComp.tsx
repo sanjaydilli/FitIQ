@@ -49,7 +49,7 @@ export function BodyComp() {
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10,
         padding: '14px 20px',
-        background: theme.id === 'aurora' ? 'rgba(8,6,15,0.7)' : theme.id === 'neon' ? 'rgba(0,0,0,0.85)' : 'rgba(0,0,0,0.65)',
+        background: 'rgba(15,23,42,0.45)',
         backdropFilter: 'blur(20px) saturate(150%)',
         WebkitBackdropFilter: 'blur(20px) saturate(150%)',
         borderBottom: `1px solid ${theme.cardBorder}`,
@@ -58,7 +58,7 @@ export function BodyComp() {
         <motion.button
           whileTap={{ scale: 0.92 }}
           onClick={() => navigate(-1)}
-          style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid ${theme.cardBorder}`, borderRadius: 10, padding: '6px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+          style={{ background: 'rgba(15,23,42,0.06)', border: `1px solid ${theme.cardBorder}`, borderRadius: 10, padding: '6px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
         >
           <Icon name="chevron-left" size={16} color={theme.text} />
         </motion.button>
@@ -71,7 +71,7 @@ export function BodyComp() {
       <div style={{
         position: 'absolute', top: 64, left: 0, right: 0, zIndex: 9,
         display: 'flex', gap: 0,
-        background: theme.id === 'aurora' ? 'rgba(8,6,15,0.6)' : theme.id === 'neon' ? 'rgba(0,0,0,0.8)' : 'rgba(0,0,0,0.55)',
+        background: 'rgba(15,23,42,0.4)',
         backdropFilter: 'blur(20px) saturate(150%)',
         WebkitBackdropFilter: 'blur(20px) saturate(150%)',
         borderBottom: `1px solid ${theme.cardBorder}`,
@@ -146,7 +146,7 @@ export function BodyComp() {
                         onChange={e => set(e.target.value)}
                         placeholder="—"
                         style={{
-                          flex: 1, background: 'rgba(255,255,255,0.06)',
+                          flex: 1, background: 'rgba(15,23,42,0.06)',
                           border: `1px solid ${theme.cardBorder}`, borderRadius: 10,
                           padding: '8px 12px', color: theme.text,
                           fontSize: 15, fontFamily: theme.mono, outline: 'none', fontWeight: 700,
@@ -165,7 +165,7 @@ export function BodyComp() {
                     width: '100%', marginTop: 14, padding: '13px 0', borderRadius: 14, border: 'none',
                     background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
                     color: theme.onAccent, fontSize: 14, fontWeight: 700, cursor: 'pointer',
-                    boxShadow: `0 6px 18px ${theme.accent}30, inset 0 1px 0 rgba(255,255,255,0.18)`,
+                    boxShadow: `0 6px 18px ${theme.accent}30, inset 0 1px 0 rgba(15,23,42,0.18)`,
                     fontFamily: theme.font, letterSpacing: 0.3,
                   }}
                 >
@@ -188,8 +188,8 @@ export function BodyComp() {
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 4 }}>
                           {[
                             { l: 'BODY FAT', v: `${result.bodyFatPct}%`, c: cat.color, sub: cat.label },
-                            { l: 'LEAN MASS', v: `${result.leanMass}kg`, c: '#5EEAD4' },
-                            { l: 'FAT MASS', v: `${result.fatMass}kg`, c: '#F87171' },
+                            { l: 'LEAN MASS', v: `${result.leanMass}kg`, c: '#0E9384' },
+                            { l: 'FAT MASS', v: `${result.fatMass}kg`, c: '#DC2626' },
                             { l: 'BMR', v: `${bmr} kcal`, c: theme.accent },
                             { l: 'TDEE', v: `${tdee} kcal`, c: theme.accent2 },
                             { l: 'IDEAL RANGE', v: `${idealRange.low}–${idealRange.high}kg`, c: theme.textDim },
@@ -234,7 +234,7 @@ export function BodyComp() {
                           { l: 'Lean Mass', v: trend.leanDelta, unit: 'kg', goodDir: 1 },
                         ].map(({ l, v, unit, goodDir }) => {
                           const isGood = v * goodDir <= 0;
-                          const col = v === 0 ? theme.textDim : isGood ? '#4ade80' : '#F87171';
+                          const col = v === 0 ? theme.textDim : isGood ? '#16A34A' : '#DC2626';
                           return (
                             <div key={l} style={{ flex: 1, textAlign: 'center' }}>
                               <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.5, fontWeight: 700, marginBottom: 4 }}>{l.toUpperCase()}</div>
@@ -251,12 +251,12 @@ export function BodyComp() {
 
                   <Card style={{ borderRadius: 18, padding: '14px 14px 10px' }}>
                     <div style={{ fontSize: 11, fontWeight: 700, marginBottom: 8, fontFamily: theme.mono, letterSpacing: 2, color: theme.textMute }}>BODY FAT %</div>
-                    <LineChart data={bfData} color={category?.color ?? '#F87171'} height={110} unit="%" />
+                    <LineChart data={bfData} color={category?.color ?? '#DC2626'} height={110} unit="%" />
                   </Card>
 
                   <Card style={{ borderRadius: 18, padding: '14px 14px 10px' }}>
                     <div style={{ fontSize: 11, fontWeight: 700, marginBottom: 8, fontFamily: theme.mono, letterSpacing: 2, color: theme.textMute }}>LEAN MASS</div>
-                    <LineChart data={leanData} color="#5EEAD4" height={110} unit="kg" />
+                    <LineChart data={leanData} color="#0E9384" height={110} unit="kg" />
                   </Card>
 
                   <Card style={{ borderRadius: 18, padding: '14px 14px 10px' }}>

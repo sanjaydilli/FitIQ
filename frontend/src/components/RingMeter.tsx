@@ -18,7 +18,7 @@ export function RingMeter({
   size = 180,
   stroke = 14,
   color = '#7CF9C5',
-  track = 'rgba(255,255,255,0.08)',
+  track = 'rgba(15,23,42,0.08)',
   gradient,
   label,
   sublabel,

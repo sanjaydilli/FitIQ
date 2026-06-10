@@ -96,23 +96,23 @@ export const LineChart = memo(function LineChart({
           <g key={i}>
             <motion.circle
               cx={p.x} cy={p.y} r={isPR ? 6 : 4}
-              fill={isPR ? '#FBBF24' : color}
-              stroke={isPR ? '#FBBF24' : 'rgba(0,0,0,0.6)'}
+              fill={isPR ? '#D97706' : color}
+              stroke={isPR ? '#D97706' : 'rgba(0,0,0,0.6)'}
               strokeWidth="1.5"
               initial={{ r: 0 }}
               animate={{ r: isPR ? 6 : 4 }}
               transition={{ delay: 0.7 + i * 0.03 }}
-              style={{ filter: isPR ? 'drop-shadow(0 0 6px #FBBF2480)' : undefined }}
+              style={{ filter: isPR ? 'drop-shadow(0 0 6px #D9770680)' : undefined }}
             />
             {isPR && (
               <text x={p.x} y={p.y - 12} textAnchor="middle"
-                fontSize="9" fill="#FBBF24" fontWeight="700" fontFamily="ui-monospace, monospace">
+                fontSize="9" fill="#D97706" fontWeight="700" fontFamily="ui-monospace, monospace">
                 PR
               </text>
             )}
             {(isEnd || isPR) && (
               <text x={p.x} y={p.y - (isPR ? 20 : 14)} textAnchor="middle"
-                fontSize="10" fill={isPR ? '#FBBF24' : color} fontWeight="700" fontFamily="ui-monospace, monospace">
+                fontSize="10" fill={isPR ? '#D97706' : color} fontWeight="700" fontFamily="ui-monospace, monospace">
                 {p.value}{unit}
               </text>
             )}

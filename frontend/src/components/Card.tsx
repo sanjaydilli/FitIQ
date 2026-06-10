@@ -11,30 +11,16 @@ interface CardProps {
 
 export function Card({ children, style, selected, onClick }: CardProps) {
   const { theme } = useTheme();
-  const isAurora = theme.id === 'aurora';
-  const isNeon = theme.id === 'neon';
 
-  const insetHighlight = isAurora
-    ? 'inset 0 1px 0 rgba(255,255,255,0.05), 0 1px 2px rgba(0,0,0,0.25)'
-    : isNeon
-    ? 'inset 0 1px 0 rgba(255,255,255,0.03), 0 1px 2px rgba(0,0,0,0.4)'
-    : 'inset 0 1px 0 rgba(255,255,255,0.04), 0 1px 2px rgba(0,0,0,0.3)';
-
-  const base: CSSProperties = isAurora
-    ? {
-        background: selected ? `${theme.accent}14` : theme.card,
-        backdropFilter: 'blur(24px) saturate(150%)',
-        WebkitBackdropFilter: 'blur(24px) saturate(150%)',
-        border: `${selected ? 1.5 : 1}px solid ${selected ? theme.accent : theme.cardBorder}`,
-        borderRadius: theme.radius,
-        boxShadow: insetHighlight,
-      }
-    : {
-        background: selected ? `${theme.accent}10` : theme.card,
-        border: `${selected ? 1.5 : 1}px solid ${selected ? theme.accent : theme.cardBorder}`,
-        borderRadius: theme.radius,
-        boxShadow: insetHighlight,
-      };
+  // Light UI: white surface, hairline border, soft layered shadow
+  const base: CSSProperties = {
+    background: selected ? `${theme.accent}0d` : theme.card,
+    border: `${selected ? 1.5 : 1}px solid ${selected ? theme.accent : theme.cardBorder}`,
+    borderRadius: theme.radius,
+    boxShadow: selected
+      ? `0 1px 2px rgba(16,24,40,0.05), 0 4px 14px ${theme.accent}1f`
+      : '0 1px 2px rgba(16,24,40,0.05), 0 4px 14px rgba(16,24,40,0.06)',
+  };
 
   const interactionProps = onClick
     ? {
@@ -55,8 +41,8 @@ export function Card({ children, style, selected, onClick }: CardProps) {
         position: 'relative',
       }}
     >
-      {/* Subtle gloss overlay on hover — absolutely positioned, never affects layout */}
-      {onClick && (isAurora || isNeon) && (
+      {/* Subtle tint overlay on hover — absolutely positioned, never affects layout */}
+      {onClick && (
         <motion.div
           initial={{ opacity: 0 }}
           whileHover={{ opacity: 1 }}
@@ -64,7 +50,7 @@ export function Card({ children, style, selected, onClick }: CardProps) {
             position: 'absolute',
             inset: 0,
             borderRadius: 'inherit',
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 55%)',
+            background: 'linear-gradient(135deg, rgba(15,23,42,0.025) 0%, transparent 55%)',
             pointerEvents: 'none',
             zIndex: 0,
           }}
@@ -141,7 +127,7 @@ export function PrimaryButton({
         fontWeight: 700,
         fontSize: 16,
         cursor: disabled ? 'not-allowed' : 'pointer',
-        boxShadow: `0 8px 24px ${theme.accent}38, 0 2px 6px ${theme.accent}1c, inset 0 1px 0 rgba(255,255,255,0.18)`,
+        boxShadow: `0 8px 24px ${theme.accent}38, 0 2px 6px ${theme.accent}1c, inset 0 1px 0 rgba(15,23,42,0.18)`,
         opacity: disabled ? 0.5 : 1,
         fontFamily: theme.font,
         letterSpacing: isNeon ? 0.5 : 0,

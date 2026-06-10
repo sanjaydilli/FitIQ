@@ -24,18 +24,11 @@ export function TabBar() {
   const location = useLocation();
   const { theme } = useTheme();
   const active = TABS.find((t) => location.pathname.startsWith(t.path))?.id ?? 'home';
-  const isAurora = theme.id === 'aurora';
-  const isNeon = theme.id === 'neon';
 
-  const barBg = isAurora
-    ? 'rgba(20,16,32,0.72)'
-    : isNeon
-    ? 'rgba(10,10,10,0.88)'
-    : 'rgba(17,19,22,0.86)';
-
-  const inactiveStroke = isNeon ? 'rgba(245,245,242,0.45)' : theme.textDim;
-  const pillRadius = isNeon ? 10 : 14;
-  const outerRadius = isNeon ? 18 : 22;
+  const barBg = 'rgba(255,255,255,0.96)';
+  const inactiveStroke = theme.textMute;
+  const pillRadius = 15;
+  const outerRadius = 24;
 
   return (
     <div
@@ -48,7 +41,7 @@ export function TabBar() {
         paddingTop: 10,
         paddingLeft: 16,
         paddingRight: 16,
-        background: 'linear-gradient(to top, rgba(0,0,0,0.92), rgba(0,0,0,0.55) 60%, transparent)',
+        background: `linear-gradient(to top, ${theme.bg} 35%, ${theme.bg}cc 70%, transparent)`,
         zIndex: 40,
       }}
     >
@@ -66,7 +59,7 @@ export function TabBar() {
           border: `1px solid ${theme.cardBorder}`,
           borderRadius: outerRadius,
           padding: '8px 6px',
-          boxShadow: `0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05), inset 0 -1px 0 rgba(0,0,0,0.25)`,
+          boxShadow: `0 8px 28px rgba(16,24,40,0.14), 0 1px 2px rgba(16,24,40,0.06)`,
         }}
       >
         {TABS.map((t) => {
@@ -98,9 +91,9 @@ export function TabBar() {
                     position: 'absolute',
                     inset: 0,
                     borderRadius: pillRadius,
-                    background: `linear-gradient(135deg, ${theme.accent}26, ${theme.accent2}1a)`,
-                    border: `1px solid ${theme.accent}44`,
-                    boxShadow: `0 0 16px ${theme.accent}30, inset 0 1px 0 rgba(255,255,255,0.06)`,
+                    background: `${theme.accent}14`,
+                    border: `1px solid ${theme.accent}30`,
+                    boxShadow: `0 2px 10px ${theme.accent}22`,
                   }}
                   transition={{ type: 'spring', stiffness: 380, damping: 28 }}
                 />
@@ -117,7 +110,7 @@ export function TabBar() {
                 style={{
                   position: 'relative',
                   zIndex: 1,
-                  filter: isActive ? `drop-shadow(0 0 6px ${theme.accent}70)` : 'none',
+                  filter: 'none',
                   transition: 'filter 0.3s, stroke 0.3s',
                 }}
               >

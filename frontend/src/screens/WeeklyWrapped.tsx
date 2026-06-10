@@ -82,7 +82,7 @@ export function WeeklyWrapped() {
   ));
 
   const scoreLabel = score >= 80 ? 'Excellent' : score >= 55 ? 'Good' : score >= 30 ? 'Getting there' : 'Keep going';
-  const scoreColor = score >= 80 ? '#4ade80' : score >= 55 ? theme.accent : score >= 30 ? '#FBBF24' : '#F87171';
+  const scoreColor = score >= 80 ? '#16A34A' : score >= 55 ? theme.accent : score >= 30 ? '#D97706' : '#DC2626';
 
   const [copied, setCopied] = useState(false);
 
@@ -130,7 +130,7 @@ export function WeeklyWrapped() {
         <motion.button
           whileTap={{ scale: 0.92 }}
           onClick={() => navigate(-1)}
-          style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 10, padding: '6px 10px', color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+          style={{ background: 'rgba(15,23,42,0.06)', border: 'none', borderRadius: 10, padding: '6px 10px', color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
         >
           <Icon name="chevron-left" size={16} color={theme.text} />
         </motion.button>
@@ -144,14 +144,14 @@ export function WeeklyWrapped() {
           style={{
             marginLeft: 'auto',
             padding: '6px 14px', borderRadius: 12, border: 'none', cursor: 'pointer',
-            background: copied ? 'rgba(74,222,128,0.15)' : `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
-            color: copied ? '#4ade80' : theme.onAccent,
+            background: copied ? 'rgba(22,163,74,0.15)' : `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
+            color: copied ? '#16A34A' : theme.onAccent,
             fontSize: 12, fontWeight: 700,
             display: 'flex', alignItems: 'center', gap: 6,
           }}
         >
           {copied ? (
-            <><Icon name="check" size={13} color="#4ade80" /> Copied!</>
+            <><Icon name="check" size={13} color="#16A34A" /> Copied!</>
           ) : (
             <><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg> Share</>
           )}
@@ -225,7 +225,7 @@ export function WeeklyWrapped() {
                       transition={{ delay: i * 0.05 }}
                       style={{
                         width: '100%', aspectRatio: '1', borderRadius: 8,
-                        background: both ? `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})` : any ? `${theme.accent}50` : 'rgba(255,255,255,0.06)',
+                        background: both ? `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})` : any ? `${theme.accent}50` : 'rgba(15,23,42,0.06)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         marginBottom: 4, fontSize: 12,
                       }}
@@ -245,9 +245,9 @@ export function WeeklyWrapped() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             {[
               { iconName: 'dumbbell' as const, label: 'Workouts', value: weekSessions.length, sub: `${weekSessions.length}/7 days`, color: theme.accent },
-              { iconName: 'flame' as const, label: 'Volume', value: `${(totalVolume / 1000).toFixed(1)}t`, sub: 'total lifted', color: '#FB923C' },
-              { iconName: 'target' as const, label: 'On Target', value: `${onTargetDays}d`, sub: 'calorie goal hit', color: '#4ade80' },
-              { iconName: 'trophy' as const, label: 'New PRs', value: weekPRs.length, sub: weekPRs.length > 0 ? weekPRs[0].exercise.split(' ')[0] : 'none this week', color: '#FBBF24' },
+              { iconName: 'flame' as const, label: 'Volume', value: `${(totalVolume / 1000).toFixed(1)}t`, sub: 'total lifted', color: '#EA580C' },
+              { iconName: 'target' as const, label: 'On Target', value: `${onTargetDays}d`, sub: 'calorie goal hit', color: '#16A34A' },
+              { iconName: 'trophy' as const, label: 'New PRs', value: weekPRs.length, sub: weekPRs.length > 0 ? weekPRs[0].exercise.split(' ')[0] : 'none this week', color: '#D97706' },
             ].map(({ iconName, label, value, sub, color }, i) => (
               <motion.div
                 key={label}
@@ -287,7 +287,7 @@ export function WeeklyWrapped() {
                 >
                   <span style={{ fontSize: 18 }}>🥇</span>
                   <div style={{ flex: 1, fontSize: 13, fontWeight: 600 }}>{pr.exercise}</div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#FBBF24', fontFamily: theme.mono, letterSpacing: 0.2 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#D97706', fontFamily: theme.mono, letterSpacing: 0.2 }}>
                     {pr.weight}kg × {pr.reps}
                   </div>
                 </motion.div>
@@ -309,7 +309,7 @@ export function WeeklyWrapped() {
                 </div>
                 <div>
                   <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 0.8 }}>LEAN MASS</div>
-                  <div style={{ fontSize: 26, fontWeight: 800, color: '#5EEAD4', fontFamily: theme.mono, letterSpacing: -0.8, marginTop: 2 }}>{weekMeasurement.leanMass}<span style={{ fontSize: 14 }}>kg</span></div>
+                  <div style={{ fontSize: 26, fontWeight: 800, color: '#0E9384', fontFamily: theme.mono, letterSpacing: -0.8, marginTop: 2 }}>{weekMeasurement.leanMass}<span style={{ fontSize: 14 }}>kg</span></div>
                 </div>
                 <div>
                   <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 0.8 }}>WEIGHT</div>

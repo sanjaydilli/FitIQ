@@ -80,7 +80,7 @@ export function StrengthHistory() {
         <motion.button
           whileTap={{ scale: 0.92 }}
           onClick={() => navigate(-1)}
-          style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 10, padding: '6px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+          style={{ background: 'rgba(15,23,42,0.06)', border: 'none', borderRadius: 10, padding: '6px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
         >
           <Icon name="chevron-left" size={16} color={theme.text} />
         </motion.button>
@@ -101,7 +101,7 @@ export function StrengthHistory() {
                   flexShrink: 0,
                   padding: '7px 14px', borderRadius: 20,
                   border: sel ? 'none' : `1px solid ${theme.cardBorder}`,
-                  background: sel ? `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})` : 'rgba(255,255,255,0.04)',
+                  background: sel ? `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})` : 'rgba(15,23,42,0.04)',
                   color: sel ? theme.onAccent : theme.textDim,
                   fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap',
                   letterSpacing: 0.2,
@@ -122,15 +122,15 @@ export function StrengthHistory() {
               animate={{ opacity: 1, y: 0 }}
               style={{
                 padding: '12px 14px', borderRadius: 14,
-                background: 'rgba(251,191,36,0.10)',
-                border: '1px solid rgba(251,191,36,0.3)',
-                borderLeft: '3px solid #FBBF24',
+                background: 'rgba(217,119,6,0.10)',
+                border: '1px solid rgba(217,119,6,0.3)',
+                borderLeft: '3px solid #D97706',
                 display: 'flex', alignItems: 'center', gap: 10,
               }}
             >
               <span style={{ fontSize: 18 }}>⚠️</span>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#FBBF24', letterSpacing: -0.2 }}>Plateau detected</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#D97706', letterSpacing: -0.2 }}>Plateau detected</div>
                 <div style={{ fontSize: 11, color: theme.textDim, marginTop: 1 }}>No weight increase in last 4 sessions — consider deload or variation</div>
               </div>
             </motion.div>

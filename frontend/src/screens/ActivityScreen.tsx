@@ -91,7 +91,7 @@ export function ActivityScreen() {
         <motion.button
           whileTap={{ scale: 0.92 }}
           onClick={() => navigate(-1)}
-          style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 10, padding: '6px 10px', color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+          style={{ background: 'rgba(15,23,42,0.06)', border: 'none', borderRadius: 10, padding: '6px 10px', color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
         >
           <Icon name="chevron-left" size={16} color={theme.text} />
         </motion.button>
@@ -102,7 +102,7 @@ export function ActivityScreen() {
         {/* Stats row */}
         <div style={{ padding: '14px 20px 8px', display: 'flex', gap: 10 }}>
           {[
-            { label: 'STREAK', iconName: 'streak' as const, value: `${currentStreak}d`, color: '#FB923C' },
+            { label: 'STREAK', iconName: 'streak' as const, value: `${currentStreak}d`, color: '#EA580C' },
             { label: 'WORKOUTS', iconName: 'dumbbell' as const, value: totalWorkouts, color: theme.accent },
             { label: 'ACTIVE DAYS', iconName: 'lightning' as const, value: activeDaysCount, color: theme.accent2 },
           ].map(({ label, value, iconName, color }, i) => (
@@ -165,10 +165,10 @@ export function ActivityScreen() {
                   <div style={{ marginBottom: 12 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                       <div style={{ width: 24, height: 24, borderRadius: 7, background: 'rgba(251,146,60,0.18)', border: '1px solid rgba(251,146,60,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <Icon name="utensils" size={12} color="#FB923C" />
+                        <Icon name="utensils" size={12} color="#EA580C" />
                       </div>
                       <span style={{ fontSize: 12, fontWeight: 700 }}>Nutrition</span>
-                      <span style={{ fontSize: 11, color: '#FB923C', fontFamily: theme.mono, marginLeft: 'auto', fontWeight: 700 }}>{selectedDayData.calories} kcal</span>
+                      <span style={{ fontSize: 11, color: '#EA580C', fontFamily: theme.mono, marginLeft: 'auto', fontWeight: 700 }}>{selectedDayData.calories} kcal</span>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                       {selectedDayData.foodEntries.map(e => (
@@ -201,7 +201,7 @@ export function ActivityScreen() {
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                       <div style={{ width: 24, height: 24, borderRadius: 7, background: 'rgba(94,234,212,0.18)', border: '1px solid rgba(94,234,212,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <Icon name="body" size={12} color="#5EEAD4" />
+                        <Icon name="body" size={12} color="#0E9384" />
                       </div>
                       <span style={{ fontSize: 12, fontWeight: 700 }}>Body Comp · {selectedDayData.measurement.bodyFatPct}% BF</span>
                     </div>
@@ -224,9 +224,9 @@ export function ActivityScreen() {
           <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 8, padding: '0 2px', color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, textTransform: 'uppercase' }}>Activity Breakdown</div>
           <Card style={{ borderRadius: 18, overflow: 'hidden' }}>
             {[
-              { label: 'Food logged', iconName: 'utensils' as const, count: Object.keys(caloriesByDate).length, color: '#FB923C' },
+              { label: 'Food logged', iconName: 'utensils' as const, count: Object.keys(caloriesByDate).length, color: '#EA580C' },
               { label: 'Workouts done', iconName: 'dumbbell' as const, count: totalWorkouts, color: theme.accent },
-              { label: 'Body comp checks', iconName: 'body' as const, count: measurements.length, color: '#5EEAD4' },
+              { label: 'Body comp checks', iconName: 'body' as const, count: measurements.length, color: '#0E9384' },
             ].map(({ label, iconName, count, color }, i, arr) => (
               <motion.div
                 key={label}

@@ -55,7 +55,7 @@ export function FoodDetail() {
     );
   }
 
-  const dot = food.isVegan ? '#5EEAD4' : food.isVegetarian ? '#4ade80' : '#F87171';
+  const dot = food.isVegan ? '#0E9384' : food.isVegetarian ? '#16A34A' : '#DC2626';
   const dotLabel = food.isVegan ? 'Vegan' : food.isVegetarian ? 'Vegetarian' : 'Non-veg';
 
   return (
@@ -124,13 +124,13 @@ export function FoodDetail() {
 
               {/* Macro bar */}
               <div style={{ display: 'flex', gap: 2, height: 6, borderRadius: 4, overflow: 'hidden', marginBottom: 8 }}>
-                <motion.div animate={{ width: `${pct.carbPct}%` }} style={{ background: '#FB923C', height: '100%', borderRadius: 2 }} />
+                <motion.div animate={{ width: `${pct.carbPct}%` }} style={{ background: '#EA580C', height: '100%', borderRadius: 2 }} />
                 <motion.div animate={{ width: `${pct.protPct}%` }} style={{ background: theme.accent, height: '100%', borderRadius: 2 }} />
                 <motion.div animate={{ width: `${pct.fatPct}%` }} style={{ background: theme.accent2, height: '100%', borderRadius: 2 }} />
               </div>
               <div style={{ display: 'flex', gap: 12 }}>
                 {[
-                  { label: 'Carbs', value: `${nutrition.carbs}g`, color: '#FB923C', pct: pct.carbPct },
+                  { label: 'Carbs', value: `${nutrition.carbs}g`, color: '#EA580C', pct: pct.carbPct },
                   { label: 'Protein', value: `${nutrition.protein}g`, color: theme.accent, pct: pct.protPct },
                   { label: 'Fat', value: `${nutrition.fat}g`, color: theme.accent2, pct: pct.fatPct },
                 ].map(m => (
@@ -233,13 +233,13 @@ export function FoodDetail() {
           <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 8, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, textTransform: 'uppercase' }}>MICRONUTRIENTS</div>
           <Card style={{ borderRadius: 16, overflow: 'hidden' }}>
             {[
-              { label: 'Iron',       value: `${nutrition.iron} mg`,      pct: Math.min(nutrition.iron / (18) * 100, 100),    color: '#F87171' },
-              { label: 'Calcium',    value: `${nutrition.calcium} mg`,   pct: Math.min(nutrition.calcium / 1000 * 100, 100), color: '#A78BFA' },
-              { label: 'Magnesium',  value: `${nutrition.magnesium} mg`, pct: Math.min(nutrition.magnesium / 400 * 100, 100),color: '#5EEAD4' },
-              { label: 'Zinc',       value: `${nutrition.zinc} mg`,      pct: Math.min(nutrition.zinc / 11 * 100, 100),      color: '#FBBF24' },
-              { label: 'Vitamin C',  value: `${nutrition.vitaminC} mg`,  pct: Math.min(nutrition.vitaminC / 90 * 100, 100),  color: '#FB923C' },
+              { label: 'Iron',       value: `${nutrition.iron} mg`,      pct: Math.min(nutrition.iron / (18) * 100, 100),    color: '#DC2626' },
+              { label: 'Calcium',    value: `${nutrition.calcium} mg`,   pct: Math.min(nutrition.calcium / 1000 * 100, 100), color: '#7C3AED' },
+              { label: 'Magnesium',  value: `${nutrition.magnesium} mg`, pct: Math.min(nutrition.magnesium / 400 * 100, 100),color: '#0E9384' },
+              { label: 'Zinc',       value: `${nutrition.zinc} mg`,      pct: Math.min(nutrition.zinc / 11 * 100, 100),      color: '#D97706' },
+              { label: 'Vitamin C',  value: `${nutrition.vitaminC} mg`,  pct: Math.min(nutrition.vitaminC / 90 * 100, 100),  color: '#EA580C' },
               { label: 'Omega-3',    value: `${nutrition.omega3} g`,     pct: Math.min(nutrition.omega3 / 1.6 * 100, 100),   color: '#60A5FA' },
-              { label: 'Potassium',  value: `${nutrition.potassium} mg`, pct: Math.min(nutrition.potassium / 3500 * 100, 100), color: '#4ade80' },
+              { label: 'Potassium',  value: `${nutrition.potassium} mg`, pct: Math.min(nutrition.potassium / 3500 * 100, 100), color: '#16A34A' },
               { label: 'Sodium',     value: `${nutrition.sodium} mg`,    pct: Math.min(nutrition.sodium / 2300 * 100, 100),  color: '#94a3b8' },
             ].map((m, i, arr) => (
               <div
@@ -251,7 +251,7 @@ export function FoodDetail() {
                 }}
               >
                 <div style={{ width: 74, fontSize: 11, color: theme.textDim }}>{m.label}</div>
-                <div style={{ flex: 1, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+                <div style={{ flex: 1, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.06)', overflow: 'hidden' }}>
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${m.pct}%` }}
@@ -300,8 +300,8 @@ export function FoodDetail() {
                 exit={{ opacity: 0 }}
                 style={{
                   width: '100%', padding: '14px 0', borderRadius: 16,
-                  background: 'rgba(74,222,128,0.15)', border: '1px solid rgba(74,222,128,0.3)',
-                  color: '#4ade80', fontSize: 15, fontWeight: 800,
+                  background: 'rgba(22,163,74,0.15)', border: '1px solid rgba(22,163,74,0.3)',
+                  color: '#16A34A', fontSize: 15, fontWeight: 800,
                   textAlign: 'center', fontFamily: theme.font,
                 }}
               >
@@ -331,7 +331,7 @@ export function FoodDetail() {
                   background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
                   color: theme.onAccent, fontSize: 15, fontWeight: 800,
                   cursor: 'pointer', fontFamily: theme.font,
-                  boxShadow: `0 8px 24px ${theme.accent}38, inset 0 1px 0 rgba(255,255,255,0.18)`,
+                  boxShadow: `0 8px 24px ${theme.accent}38, inset 0 1px 0 rgba(15,23,42,0.18)`,
                 }}
               >
                 + Log {serving.name} · {nutrition.calories} kcal

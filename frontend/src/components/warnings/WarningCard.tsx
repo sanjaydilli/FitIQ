@@ -11,11 +11,11 @@ interface WarningCardProps {
 }
 
 const TYPE_COLOR: Record<Warning['type'], string> = {
-  critical: '#F87171',
-  daily:    '#FBBF24',
+  critical: '#DC2626',
+  daily:    '#D97706',
   timing:   '#60A5FA',
-  weekly:   '#A78BFA',
-  micro:    '#5EEAD4',
+  weekly:   '#7C3AED',
+  micro:    '#0E9384',
 };
 
 const TYPE_LABEL: Record<Warning['type'], string> = {

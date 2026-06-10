@@ -32,7 +32,7 @@ function NumberInput({ value, onChange, min, max, step = 0.1 }: { value: number;
       onBlur={() => setFocused(false)}
       style={{
         width: '100%',
-        background: focused ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.06)',
+        background: focused ? 'rgba(15,23,42,0.09)' : 'rgba(15,23,42,0.06)',
         border: `1px solid ${focused ? theme.accent + '50' : theme.cardBorder}`,
         borderRadius: 10,
         padding: '8px 12px', color: theme.text,
@@ -54,7 +54,7 @@ function PillSelect<T extends string>({ options, value, onChange }: { options: {
           <motion.button key={o.id} whileTap={{ scale: 0.93 }} onClick={() => onChange(o.id)}
             style={{
               padding: '5px 12px', borderRadius: 20, border: 'none', cursor: 'pointer',
-              background: sel ? `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})` : 'rgba(255,255,255,0.07)',
+              background: sel ? `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})` : 'rgba(15,23,42,0.07)',
               color: sel ? theme.onAccent : 'rgba(255,255,255,0.6)',
               fontSize: 11, fontWeight: 600,
               display: 'flex', alignItems: 'center', gap: 5,
@@ -96,14 +96,14 @@ export function Settings() {
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10,
         padding: '14px 20px',
-        background: theme.id === 'aurora' ? 'rgba(8,6,15,0.7)' : theme.id === 'neon' ? 'rgba(0,0,0,0.85)' : 'rgba(0,0,0,0.65)',
+        background: 'rgba(15,23,42,0.45)',
         backdropFilter: 'blur(20px) saturate(150%)',
         WebkitBackdropFilter: 'blur(20px) saturate(150%)',
         borderBottom: `1px solid ${theme.cardBorder}`,
         display: 'flex', alignItems: 'center', gap: 12,
       }}>
         <motion.button whileTap={{ scale: 0.92 }} onClick={() => navigate(-1)}
-          style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid ${theme.cardBorder}`, borderRadius: 10, padding: '6px 10px', color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+          style={{ background: 'rgba(15,23,42,0.06)', border: `1px solid ${theme.cardBorder}`, borderRadius: 10, padding: '6px 10px', color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
           <Icon name="chevron-left" size={16} color={theme.text} />
         </motion.button>
         <div style={{ flex: 1 }}>
@@ -116,8 +116,8 @@ export function Settings() {
           onClick={handleSave}
           style={{
             padding: '8px 16px', borderRadius: 12, border: 'none', cursor: 'pointer',
-            background: saved ? 'rgba(74,222,128,0.2)' : `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
-            color: saved ? '#4ade80' : theme.onAccent,
+            background: saved ? 'rgba(22,163,74,0.2)' : `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
+            color: saved ? '#16A34A' : theme.onAccent,
             fontSize: 13, fontWeight: 700,
             boxShadow: saved ? 'none' : `0 4px 14px ${theme.accent}30`,
             fontFamily: theme.font,
@@ -134,10 +134,10 @@ export function Settings() {
             margin: '12px 16px 0',
             padding: '12px 14px',
             borderRadius: 14,
-            background: 'rgba(251,191,36,0.08)',
-            border: '1px solid rgba(251,191,36,0.2)',
+            background: 'rgba(217,119,6,0.08)',
+            border: '1px solid rgba(217,119,6,0.2)',
           }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#FBBF24', marginBottom: 4 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#D97706', marginBottom: 4 }}>
               Guest Mode — Data saved locally
             </div>
             <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>
@@ -156,7 +156,7 @@ export function Settings() {
                 value={name}
                 onChange={e => setName(e.target.value)}
                 style={{
-                  width: '100%', background: 'rgba(255,255,255,0.06)',
+                  width: '100%', background: 'rgba(15,23,42,0.06)',
                   border: `1px solid ${theme.cardBorder}`, borderRadius: 10,
                   padding: '8px 12px', color: theme.text, fontSize: 14, outline: 'none',
                   fontWeight: 700, fontFamily: theme.font,
@@ -285,7 +285,7 @@ export function Settings() {
             style={{
               width: '100%', padding: 14, borderRadius: 14,
               border: `1px solid ${theme.cardBorder}`,
-              background: 'rgba(255,255,255,0.03)', color: theme.textDim,
+              background: 'rgba(15,23,42,0.03)', color: theme.textDim,
               fontSize: 13, fontWeight: 600, cursor: 'pointer',
               fontFamily: theme.font,
             }}

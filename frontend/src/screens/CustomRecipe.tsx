@@ -120,7 +120,7 @@ export function CustomRecipe() {
             <motion.div
               whileTap={{ scale: 0.92 }}
               onClick={() => navigate(-1)}
-              style={{ cursor: 'pointer', background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 10, padding: '6px 10px', color: theme.text, display: 'flex', alignItems: 'center' }}
+              style={{ cursor: 'pointer', background: 'rgba(15,23,42,0.06)', border: 'none', borderRadius: 10, padding: '6px 10px', color: theme.text, display: 'flex', alignItems: 'center' }}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={theme.text} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M19 12H5M12 19l-7-7 7-7" />
@@ -140,11 +140,11 @@ export function CustomRecipe() {
             style={{
               position: 'relative',
               width: '100%', boxSizing: 'border-box',
-              background: 'rgba(255,255,255,0.04)', border: `1px solid ${theme.cardBorder}`,
+              background: 'rgba(15,23,42,0.04)', border: `1px solid ${theme.cardBorder}`,
               borderRadius: 14, padding: '12px 14px',
               fontSize: 14, color: theme.text, outline: 'none',
               fontFamily: theme.font, marginBottom: 10,
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
+              boxShadow: 'inset 0 1px 0 rgba(15,23,42,0.04)',
             }}
           />
         </div>
@@ -196,13 +196,13 @@ export function CustomRecipe() {
 
                 {/* Macro bar */}
                 <div style={{ display: 'flex', gap: 2, height: 6, borderRadius: 4, overflow: 'hidden', marginBottom: 8, boxShadow: 'inset 0 1px 0 rgba(0,0,0,0.25)' }}>
-                  <motion.div animate={{ width: `${pct.carbPct}%` }} style={{ background: '#FB923C', height: '100%' }} />
+                  <motion.div animate={{ width: `${pct.carbPct}%` }} style={{ background: '#EA580C', height: '100%' }} />
                   <motion.div animate={{ width: `${pct.protPct}%` }} style={{ background: theme.accent, height: '100%' }} />
                   <motion.div animate={{ width: `${pct.fatPct}%` }} style={{ background: theme.accent2, height: '100%' }} />
                 </div>
                 <div style={{ display: 'flex', gap: 16 }}>
                   {[
-                    { label: 'Carbs',   val: `${perServing.carbs}g`,   color: '#FB923C' },
+                    { label: 'Carbs',   val: `${perServing.carbs}g`,   color: '#EA580C' },
                     { label: 'Protein', val: `${perServing.protein}g`, color: theme.accent },
                     { label: 'Fat',     val: `${perServing.fat}g`,     color: theme.accent2 },
                     { label: 'Fiber',   val: `${perServing.fiber}g`,   color: theme.textDim },
@@ -223,9 +223,9 @@ export function CustomRecipe() {
           <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 8, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, textTransform: 'uppercase' }}>Add Ingredient</div>
           <div style={{
             display: 'flex', alignItems: 'center', gap: 10,
-            background: 'rgba(255,255,255,0.04)', border: `1px solid ${theme.cardBorder}`,
+            background: 'rgba(15,23,42,0.04)', border: `1px solid ${theme.cardBorder}`,
             borderRadius: 14, padding: '0 14px',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
+            boxShadow: 'inset 0 1px 0 rgba(15,23,42,0.04)',
           }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={theme.textMute} strokeWidth="2" strokeLinecap="round">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
@@ -270,7 +270,7 @@ export function CustomRecipe() {
                   >
                     <div style={{
                       width: 7, height: 7, borderRadius: '50%', flexShrink: 0,
-                      background: food.isVegan ? '#5EEAD4' : food.isVegetarian ? '#4ade80' : '#F87171',
+                      background: food.isVegan ? '#0E9384' : food.isVegetarian ? '#16A34A' : '#DC2626',
                     }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{food.name}</div>
@@ -387,11 +387,11 @@ export function CustomRecipe() {
                     ? `${theme.accent}40`
                     : canSave
                       ? `linear-gradient(135deg, ${theme.accent2}, ${theme.accent})`
-                      : 'rgba(255,255,255,0.06)',
+                      : 'rgba(15,23,42,0.06)',
                   color: saved ? theme.accent : canSave ? theme.onAccent : theme.textMute,
                   fontSize: 15, fontWeight: 800, cursor: inactive ? 'default' : 'pointer',
                   fontFamily: theme.font, letterSpacing: -0.1,
-                  boxShadow: canSave && !saved ? `0 8px 24px ${theme.accent}38, 0 2px 6px ${theme.accent}1c, inset 0 1px 0 rgba(255,255,255,0.18)` : 'none',
+                  boxShadow: canSave && !saved ? `0 8px 24px ${theme.accent}38, 0 2px 6px ${theme.accent}1c, inset 0 1px 0 rgba(15,23,42,0.18)` : 'none',
                 }}
               >
                 {saved

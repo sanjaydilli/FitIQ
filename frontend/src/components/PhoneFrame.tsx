@@ -20,7 +20,7 @@ export function PhoneFrame({ children }: { children: React.ReactNode }) {
   // On a real Android device — render full-screen, no frame
   if (native) {
     return (
-      <div style={{ width: '100%', height: '100vh', overflow: 'hidden', background: '#000' }}>
+      <div style={{ width: '100%', height: '100vh', overflow: 'hidden', background: '#E8ECEF' }}>
         {children}
       </div>
     );
@@ -32,7 +32,7 @@ export function PhoneFrame({ children }: { children: React.ReactNode }) {
       style={{
         minHeight: '100vh',
         width: '100%',
-        background: 'radial-gradient(ellipse at 50% 30%, #1a0a2e 0%, #000 70%)',
+        background: 'radial-gradient(ellipse at 50% 30%, #DDE6EA 0%, #E8ECEF 70%)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -59,7 +59,7 @@ export function PhoneFrame({ children }: { children: React.ReactNode }) {
           maxHeight: 844,
           position: 'relative',
           overflow: 'hidden',
-          background: '#000',
+          background: '#F4F6F8',
           borderRadius: 0,
           boxShadow:
             '0 40px 120px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06), 0 20px 60px rgba(120,80,255,0.12)',
@@ -79,7 +79,7 @@ export function PhoneFrame({ children }: { children: React.ReactNode }) {
             alignItems: 'center',
             justifyContent: 'space-between',
             padding: '0 24px',
-            color: '#fff',
+            color: '#0F172A',
             fontSize: 13,
             fontWeight: 600,
             fontFamily: '"Inter", -apple-system, system-ui, sans-serif',

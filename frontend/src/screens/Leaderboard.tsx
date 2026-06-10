@@ -36,9 +36,9 @@ export function Leaderboard() {
     { r: 1, n: 'Riya Mehta',  xp: Math.round(base * 1.22), avatar: '#F472B6', delta: '+340', me: false, stage: Math.floor(base * 1.22 / 1000) + 1 },
     { r: 2, n: 'You',         xp: user.xp,                  avatar: theme.accent, delta: `+${Math.min(user.xp % 1000, 999)}`, me: true, stage: user.level },
     { r: 3, n: 'Karan Joshi', xp: Math.round(base * 1.01), avatar: '#60A5FA', delta: '+180', me: false, stage: Math.floor(base * 1.01 / 1000) + 1 },
-    { r: 4, n: 'Aditi Rao',   xp: Math.round(base * 0.90), avatar: '#A78BFA', delta: '+120', me: false, stage: Math.floor(base * 0.90 / 1000) + 1 },
-    { r: 5, n: 'Vikram S.',   xp: Math.round(base * 0.74), avatar: '#FBBF24', delta: '+80',  me: false, stage: Math.floor(base * 0.74 / 1000) + 1 },
-    { r: 6, n: 'Neha P.',     xp: Math.round(base * 0.62), avatar: '#FB923C', delta: '+60',  me: false, stage: Math.floor(base * 0.62 / 1000) + 1 },
+    { r: 4, n: 'Aditi Rao',   xp: Math.round(base * 0.90), avatar: '#7C3AED', delta: '+120', me: false, stage: Math.floor(base * 0.90 / 1000) + 1 },
+    { r: 5, n: 'Vikram S.',   xp: Math.round(base * 0.74), avatar: '#D97706', delta: '+80',  me: false, stage: Math.floor(base * 0.74 / 1000) + 1 },
+    { r: 6, n: 'Neha P.',     xp: Math.round(base * 0.62), avatar: '#EA580C', delta: '+60',  me: false, stage: Math.floor(base * 0.62 / 1000) + 1 },
   ].sort((a, b) => b.xp - a.xp).map((f, i) => ({ ...f, r: i + 1 }));
 
   const podium = [friends[1], friends[0], friends[2]];
@@ -120,7 +120,7 @@ export function Leaderboard() {
                           background: f.avatar,
                           border: f.me
                             ? `2px solid ${theme.accent}`
-                            : `2px solid ${pos === 1 ? '#FBBF24' : 'rgba(255,255,255,0.2)'}`,
+                            : `2px solid ${pos === 1 ? '#D97706' : 'rgba(15,23,42,0.2)'}`,
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -128,8 +128,8 @@ export function Leaderboard() {
                           fontSize: pos === 1 ? 19 : 14,
                           color: '#0a0612',
                           boxShadow: pos === 1
-                            ? '0 8px 22px rgba(251,191,36,0.35), inset 0 1px 0 rgba(255,255,255,0.25)'
-                            : 'inset 0 1px 0 rgba(255,255,255,0.15)',
+                            ? '0 8px 22px rgba(217,119,6,0.35), inset 0 1px 0 rgba(15,23,42,0.25)'
+                            : 'inset 0 1px 0 rgba(15,23,42,0.15)',
                         }}
                       >
                         {f.n[0]}
@@ -145,7 +145,7 @@ export function Leaderboard() {
                             left: '50%',
                             transform: 'translateX(-50%)',
                             fontSize: 18,
-                            filter: 'drop-shadow(0 2px 4px rgba(251,191,36,0.45))',
+                            filter: 'drop-shadow(0 2px 4px rgba(217,119,6,0.45))',
                           }}
                         >
                           👑
@@ -174,9 +174,9 @@ export function Leaderboard() {
                         borderRadius: '8px 8px 0 0',
                         background:
                           pos === 1
-                            ? `linear-gradient(180deg, #FBBF24, ${theme.accent2})`
+                            ? `linear-gradient(180deg, #D97706, ${theme.accent2})`
                             : `linear-gradient(180deg, ${theme.accent}55, ${theme.accent2}25)`,
-                        border: `1px solid ${pos === 1 ? '#FBBF2440' : theme.cardBorder}`,
+                        border: `1px solid ${pos === 1 ? '#D9770640' : theme.cardBorder}`,
                         display: 'flex',
                         alignItems: 'flex-start',
                         justifyContent: 'center',
@@ -185,7 +185,7 @@ export function Leaderboard() {
                         fontSize: 12,
                         fontWeight: 800,
                         color: pos === 1 ? '#0a0612' : theme.text,
-                        boxShadow: pos === 1 ? '0 6px 16px rgba(251,191,36,0.3)' : 'inset 0 1px 0 rgba(255,255,255,0.08)',
+                        boxShadow: pos === 1 ? '0 6px 16px rgba(217,119,6,0.3)' : 'inset 0 1px 0 rgba(15,23,42,0.08)',
                       }}
                     >
                       {pos}

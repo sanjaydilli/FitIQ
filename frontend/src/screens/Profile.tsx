@@ -44,19 +44,19 @@ export function Profile() {
 
   const menuItems: { icon: IconName; iconColor: string; iconBg: string; t: string; d: string; path: string; badge?: string }[] = [
     {
-      icon: 'lightning', iconColor: '#A78BFA', iconBg: 'rgba(167,139,250,0.12)',
+      icon: 'lightning', iconColor: '#7C3AED', iconBg: 'rgba(167,139,250,0.12)',
       t: '3-Month Program',
       d: 'AI-powered periodization · Auto-updates monthly',
       path: '/program',
     },
     {
-      icon: 'trophy', iconColor: '#FBBF24', iconBg: 'rgba(251,191,36,0.12)',
+      icon: 'trophy', iconColor: '#D97706', iconBg: 'rgba(217,119,6,0.12)',
       t: 'Achievements',
       d: `${unlockedCount} of ${achievements.length} unlocked`,
       path: '/achievements',
     },
     {
-      icon: 'body', iconColor: '#5EEAD4', iconBg: 'rgba(94,234,212,0.12)',
+      icon: 'body', iconColor: '#0E9384', iconBg: 'rgba(94,234,212,0.12)',
       t: 'Body Composition',
       d: latest ? `Last: ${latest.bodyFatPct}% BF · ${latest.date}` : 'No measurements yet',
       path: '/body-comp',
@@ -96,7 +96,7 @@ export function Profile() {
                 background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 28, fontWeight: 800, color: theme.onAccent,
-                boxShadow: `0 4px 20px ${theme.accent}50, inset 0 1px 0 rgba(255,255,255,0.25)`,
+                boxShadow: `0 4px 20px ${theme.accent}50, inset 0 1px 0 rgba(15,23,42,0.25)`,
               }}>
                 {(user.name?.[0] ?? '?').toUpperCase()}
               </div>
@@ -118,7 +118,7 @@ export function Profile() {
                 <span style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, fontWeight: 700, letterSpacing: 0.6 }}>LVL {user.level}</span>
                 <span style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 0.4 }}>{xpInLevel} / {xpToNextLevel} XP → LVL {user.level + 1}</span>
               </div>
-              <div style={{ height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+              <div style={{ height: 6, borderRadius: 3, background: 'rgba(15,23,42,0.08)', overflow: 'hidden' }}>
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${xpPct}%` }}
@@ -135,8 +135,8 @@ export function Profile() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             {[
               { label: 'WORKOUTS', value: sessions.length, color: theme.accent, sub: 'logged' },
-              { label: 'VOLUME', value: totalVolume >= 1000 ? `${(totalVolume / 1000).toFixed(1)}t` : `${Math.round(totalVolume)}kg`, color: '#FB923C', sub: 'lifted' },
-              { label: 'STREAK', value: `${user.streak}d`, color: '#FBBF24', sub: 'current' },
+              { label: 'VOLUME', value: totalVolume >= 1000 ? `${(totalVolume / 1000).toFixed(1)}t` : `${Math.round(totalVolume)}kg`, color: '#EA580C', sub: 'lifted' },
+              { label: 'STREAK', value: `${user.streak}d`, color: '#D97706', sub: 'current' },
               { label: 'BADGES', value: `${unlockedCount}/${achievements.length}`, color: theme.accent2, sub: 'unlocked' },
             ].map(({ label, value, color, sub }, i) => (
               <motion.div
@@ -181,7 +181,7 @@ export function Profile() {
                   const first = measurements[0];
                   const delta = Math.round((latest.bodyFatPct - first.bodyFatPct) * 10) / 10;
                   return (
-                    <div style={{ position: 'relative', fontSize: 11, color: delta <= 0 ? '#4ade80' : '#F87171', fontFamily: theme.mono, marginTop: 10, fontWeight: 700 }}>
+                    <div style={{ position: 'relative', fontSize: 11, color: delta <= 0 ? '#16A34A' : '#DC2626', fontFamily: theme.mono, marginTop: 10, fontWeight: 700 }}>
                       {delta <= 0 ? '↓' : '↑'} {Math.abs(delta)}% since first measurement
                     </div>
                   );
@@ -206,7 +206,7 @@ export function Profile() {
                     border: sel ? `1px solid ${theme.accent}` : '1px solid transparent',
                     borderRadius: 12, color: theme.text, fontSize: 12, fontWeight: 700,
                     cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7,
-                    boxShadow: sel ? `inset 0 1px 0 rgba(255,255,255,0.05)` : 'none',
+                    boxShadow: sel ? `inset 0 1px 0 rgba(15,23,42,0.05)` : 'none',
                   }}>
                   <div style={{ width: 28, height: 18, borderRadius: 5, background: `linear-gradient(135deg, ${t.accent}, ${t.accent2})`, boxShadow: sel ? `0 2px 6px ${t.accent}40` : 'none' }} />
                   {t.name.split(' ')[0]}
@@ -261,11 +261,11 @@ export function Profile() {
                   onClick={handleLogOut}
                   style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px', cursor: 'pointer' }}
                 >
-                  <div style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(248,113,113,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Icon name="logout" size={16} color="#F87171" />
+                  <div style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(220,38,38,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Icon name="logout" size={16} color="#DC2626" />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#F87171' }}>Sign Out</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#DC2626' }}>Sign Out</div>
                     <div style={{ fontSize: 11, color: theme.textMute }}>Log out of your account</div>
                   </div>
                 </motion.div>

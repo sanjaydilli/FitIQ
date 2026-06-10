@@ -37,12 +37,24 @@ function ProgressBar({ step, total }: { step: number; total: number }) {
           key={i}
           style={{
             flex: 1,
-            height: 3,
+            height: 4,
             borderRadius: 2,
-            background: i < step ? theme.accent : 'rgba(255,255,255,0.1)',
-            transition: 'background .3s',
+            background: 'rgba(15,23,42,0.08)',
+            overflow: 'hidden',
           }}
-        />
+        >
+          <motion.div
+            initial={false}
+            animate={{ width: i < step ? '100%' : '0%' }}
+            transition={{ duration: 0.45, ease: [0.22, 0.8, 0.22, 1] }}
+            style={{
+              height: '100%',
+              borderRadius: 2,
+              background: `linear-gradient(90deg, ${theme.accent}, ${theme.accent2})`,
+              boxShadow: i < step ? `0 0 8px ${theme.accent}60` : 'none',
+            }}
+          />
+        </div>
       ))}
     </div>
   );
@@ -88,7 +100,7 @@ function StepHeader({
             whileTap={{ scale: 0.94 }}
             onClick={onBack}
             style={{
-              background: 'rgba(255,255,255,0.05)',
+              background: 'rgba(15,23,42,0.05)',
               border: `1px solid ${theme.cardBorder}`,
               borderRadius: 999,
               padding: '4px 12px',
@@ -145,7 +157,7 @@ function GoalStep({ value, onChange }: { value: Goal; onChange: (g: Goal) => voi
                   borderRadius: 12,
                   background: sel
                     ? `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`
-                    : 'rgba(255,255,255,0.06)',
+                    : 'rgba(15,23,42,0.06)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -178,7 +190,7 @@ function Radio({ sel }: { sel: boolean }) {
         width: 22,
         height: 22,
         borderRadius: 11,
-        border: sel ? `2px solid ${theme.accent}` : '1.5px solid rgba(255,255,255,0.2)',
+        border: sel ? `2px solid ${theme.accent}` : '1.5px solid rgba(15,23,42,0.2)',
         background: sel ? theme.accent : 'transparent',
         display: 'flex',
         alignItems: 'center',
@@ -254,7 +266,7 @@ function Slider({
         onChange={(e) => onChange(parseFloat(e.target.value))}
         style={{ width: '100%', accentColor: theme.accent }}
       />
-      <div style={{ position: 'relative', height: 4, marginTop: -16, background: 'rgba(255,255,255,0.08)', borderRadius: 2, pointerEvents: 'none' }}>
+      <div style={{ position: 'relative', height: 4, marginTop: -16, background: 'rgba(15,23,42,0.08)', borderRadius: 2, pointerEvents: 'none' }}>
         <div
           style={{
             position: 'absolute',
@@ -301,12 +313,12 @@ function StatsStep({
         style={{
           padding: '12px 16px',
           marginBottom: 16,
-          background: nameFocused ? 'rgba(255,255,255,0.07)' : theme.card,
+          background: nameFocused ? 'rgba(15,23,42,0.07)' : theme.card,
           border: `1px solid ${nameFocused ? theme.accent + '50' : theme.cardBorder}`,
           borderRadius: theme.radius,
           boxShadow: nameFocused
-            ? `0 0 0 3px ${theme.accent}18, inset 0 1px 0 rgba(255,255,255,0.04)`
-            : 'inset 0 1px 0 rgba(255,255,255,0.04)',
+            ? `0 0 0 3px ${theme.accent}18, inset 0 1px 0 rgba(15,23,42,0.04)`
+            : 'inset 0 1px 0 rgba(15,23,42,0.04)',
           transition: 'box-shadow 0.2s, border-color 0.2s, background 0.2s',
         }}
       >
@@ -383,7 +395,7 @@ function StatsStep({
                   width: 40,
                   height: 40,
                   borderRadius: 12,
-                  background: 'rgba(255,255,255,0.06)',
+                  background: 'rgba(15,23,42,0.06)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -426,7 +438,7 @@ function DietStep({ value, onChange }: { value: Diet; onChange: (d: Diet) => voi
                   borderRadius: 10,
                   background: sel
                     ? `linear-gradient(135deg, ${theme.accent}22, ${theme.accent2}18)`
-                    : 'rgba(255,255,255,0.05)',
+                    : 'rgba(15,23,42,0.05)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -471,7 +483,7 @@ function ActivityStep({ value, onChange }: { value: Activity; onChange: (a: Acti
                   borderRadius: 12,
                   background: sel
                     ? `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`
-                    : 'rgba(255,255,255,0.06)',
+                    : 'rgba(15,23,42,0.06)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',

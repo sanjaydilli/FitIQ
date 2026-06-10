@@ -26,7 +26,7 @@ export function Reveal({ children, index = 0, delay = 0, y = 14, duration = 0.5 
 }
 
 export function Shimmer({
-  color = 'rgba(255,255,255,0.18)',
+  color = 'rgba(15,23,42,0.05)',
   duration = 2.4,
   delay = 0,
 }: {

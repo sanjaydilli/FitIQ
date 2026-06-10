@@ -89,14 +89,14 @@ export function AICoach() {
           style={{
             padding: '52px 20px 0',
             flexShrink: 0,
-            background: 'linear-gradient(to bottom, rgba(0,0,0,0.4), transparent)',
+            background: 'linear-gradient(to bottom, rgba(244,246,248,0.95), transparent)',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
             <motion.button
               whileTap={{ scale: 0.92 }}
               onClick={() => navigate(-1)}
-              style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 10, padding: '6px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+              style={{ background: 'rgba(15,23,42,0.06)', border: 'none', borderRadius: 10, padding: '6px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
             >
               <Icon name="chevron-left" size={16} color={theme.text} />
             </motion.button>
@@ -132,7 +132,7 @@ export function AICoach() {
             }}
           >
             {[
-              { label: calLabel,     value: calValue,     unit: 'kcal', color: '#FB923C' },
+              { label: calLabel,     value: calValue,     unit: 'kcal', color: '#EA580C' },
               { label: proteinLabel, value: proteinValue, unit: '',     color: theme.accent },
               { label: waterLabel,   value: waterValue,   unit: '',     color: '#60A5FA' },
             ].map(s => (
@@ -179,7 +179,7 @@ export function AICoach() {
                     color: theme.accent,
                     border: `1px solid ${theme.accent}30`,
                     whiteSpace: 'nowrap',
-                    boxShadow: `inset 0 1px 0 rgba(255,255,255,0.04)`,
+                    boxShadow: `inset 0 1px 0 rgba(15,23,42,0.04)`,
                   }}
                 >
                   {q}
@@ -225,7 +225,7 @@ export function AICoach() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: 32,
-                  boxShadow: `0 6px 20px ${theme.accent}25, inset 0 1px 0 rgba(255,255,255,0.06)`,
+                  boxShadow: `0 6px 20px ${theme.accent}25, inset 0 1px 0 rgba(15,23,42,0.06)`,
                 }}
               >
                 🧠
@@ -236,7 +236,7 @@ export function AICoach() {
               <div style={{ fontSize: 12, lineHeight: 1.6, maxWidth: 240, margin: '0 auto' }}>
                 Ask me anything about your diet, workout, or nutrition. I know your data.
               </div>
-              <div style={{ display: 'inline-block', fontSize: 10, color: theme.textMute, fontFamily: theme.mono, background: 'rgba(255,255,255,0.04)', border: `1px solid ${theme.cardBorder}`, borderRadius: 10, padding: '6px 12px', marginTop: 12, letterSpacing: 0.4 }}>
+              <div style={{ display: 'inline-block', fontSize: 10, color: theme.textMute, fontFamily: theme.mono, background: 'rgba(15,23,42,0.04)', border: `1px solid ${theme.cardBorder}`, borderRadius: 10, padding: '6px 12px', marginTop: 12, letterSpacing: 0.4 }}>
                 LLaMA 3.1 · IFCT 2017 · ACSM
               </div>
             </motion.div>
@@ -259,8 +259,8 @@ export function AICoach() {
               <AIAvatar />
               <div
                 style={{
-                  background: 'rgba(255,255,255,0.06)',
-                  border: `1px solid rgba(255,255,255,0.08)`,
+                  background: 'rgba(15,23,42,0.06)',
+                  border: `1px solid rgba(15,23,42,0.08)`,
                   borderRadius: '18px 18px 18px 4px',
                   padding: '12px 16px',
                   display: 'flex',
@@ -293,7 +293,7 @@ export function AICoach() {
           style={{
             flexShrink: 0,
             padding: '8px 16px 90px',
-            background: 'linear-gradient(to top, rgba(0,0,0,0.7) 60%, transparent)',
+            background: 'linear-gradient(to top, rgba(244,246,248,0.97) 60%, transparent)',
           }}
         >
           <div
@@ -301,13 +301,13 @@ export function AICoach() {
               display: 'flex',
               gap: 10,
               alignItems: 'center',
-              background: inputFocused ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.06)',
+              background: inputFocused ? 'rgba(15,23,42,0.09)' : 'rgba(15,23,42,0.06)',
               border: `1px solid ${inputFocused ? theme.accent + '50' : theme.cardBorder}`,
               borderRadius: 24,
               padding: '6px 6px 6px 16px',
               boxShadow: inputFocused
-                ? `0 0 0 3px ${theme.accent}18, inset 0 1px 0 rgba(255,255,255,0.04)`
-                : `inset 0 1px 0 rgba(255,255,255,0.03)`,
+                ? `0 0 0 3px ${theme.accent}18, inset 0 1px 0 rgba(15,23,42,0.04)`
+                : `inset 0 1px 0 rgba(15,23,42,0.03)`,
               transition: 'box-shadow 0.2s, border-color 0.2s, background 0.2s',
             }}
           >
@@ -343,9 +343,9 @@ export function AICoach() {
                 border: 'none',
                 background: input.trim() && !loading
                   ? `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`
-                  : 'rgba(255,255,255,0.08)',
+                  : 'rgba(15,23,42,0.08)',
                 boxShadow: input.trim() && !loading
-                  ? `0 4px 12px ${theme.accent}40, inset 0 1px 0 rgba(255,255,255,0.18)`
+                  ? `0 4px 12px ${theme.accent}40, inset 0 1px 0 rgba(15,23,42,0.18)`
                   : 'none',
                 cursor: input.trim() && !loading ? 'pointer' : 'default',
                 display: 'flex',
@@ -427,18 +427,18 @@ const MessageBubble = memo(function MessageBubble({ message }: { message: ChatMe
           background: isUser
             ? `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`
             : message.error
-            ? 'rgba(248,113,113,0.12)'
-            : 'rgba(255,255,255,0.07)',
+            ? 'rgba(220,38,38,0.12)'
+            : 'rgba(15,23,42,0.07)',
           border: isUser
             ? 'none'
-            : `1px solid ${message.error ? 'rgba(248,113,113,0.3)' : 'rgba(255,255,255,0.09)'}`,
+            : `1px solid ${message.error ? 'rgba(220,38,38,0.3)' : 'rgba(15,23,42,0.09)'}`,
           color: isUser ? '#fff' : theme.text,
           fontSize: 13,
           lineHeight: 1.6,
           fontWeight: isUser ? 600 : 400,
           boxShadow: isUser
-            ? `0 4px 16px ${theme.accent}30, inset 0 1px 0 rgba(255,255,255,0.15)`
-            : `inset 0 1px 0 rgba(255,255,255,0.03)`,
+            ? `0 4px 16px ${theme.accent}30, inset 0 1px 0 rgba(15,23,42,0.15)`
+            : `inset 0 1px 0 rgba(15,23,42,0.03)`,
         }}
       >
         {message.content}

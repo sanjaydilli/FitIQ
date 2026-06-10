@@ -147,7 +147,7 @@ export const ActivityCalendar = memo(function ActivityCalendar({
                 rx={2}
                 fill={color}
                 fillOpacity={opacity}
-                stroke={day.level > 0 ? color : 'rgba(255,255,255,0.05)'}
+                stroke={day.level > 0 ? color : 'rgba(15,23,42,0.05)'}
                 strokeOpacity={day.level > 0 ? 0.4 : 1}
                 strokeWidth={0.5}
                 initial={{ scale: 0, opacity: 0 }}
@@ -171,7 +171,7 @@ export const ActivityCalendar = memo(function ActivityCalendar({
               width: 9, height: 9, borderRadius: 2,
               background: color,
               opacity: LEVEL_OPACITY[l],
-              border: l === 0 ? '0.5px solid rgba(255,255,255,0.1)' : 'none',
+              border: l === 0 ? '0.5px solid rgba(15,23,42,0.1)' : 'none',
             }}
           />
         ))}

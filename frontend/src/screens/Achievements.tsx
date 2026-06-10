@@ -43,7 +43,7 @@ export function Achievements() {
         display: 'flex', alignItems: 'center', gap: 12,
       }}>
         <motion.button whileTap={{ scale: 0.92 }} onClick={() => navigate(-1)}
-          style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 10, padding: '6px 10px', color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+          style={{ background: 'rgba(15,23,42,0.06)', border: 'none', borderRadius: 10, padding: '6px 10px', color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
           <Icon name="chevron-left" size={16} color={theme.text} />
         </motion.button>
         <div style={{ flex: 1 }}>
@@ -63,7 +63,7 @@ export function Achievements() {
               {Math.round((unlockedCount / achievements.length) * 100)}%
             </div>
           </div>
-          <div style={{ height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.06)', overflow: 'hidden', boxShadow: 'inset 0 1px 0 rgba(0,0,0,0.3)' }}>
+          <div style={{ height: 6, borderRadius: 3, background: 'rgba(15,23,42,0.06)', overflow: 'hidden', boxShadow: 'inset 0 1px 0 rgba(0,0,0,0.3)' }}>
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${(unlockedCount / achievements.length) * 100}%` }}
@@ -81,7 +81,7 @@ export function Achievements() {
             <motion.button key={f.id} whileTap={{ scale: 0.96 }} onClick={() => setFilter(f.id)}
               style={{
                 flexShrink: 0, padding: '7px 13px', borderRadius: 20, border: sel ? 'none' : `1px solid ${theme.cardBorder}`, cursor: 'pointer',
-                background: sel ? `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})` : 'rgba(255,255,255,0.04)',
+                background: sel ? `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})` : 'rgba(15,23,42,0.04)',
                 color: sel ? theme.onAccent : theme.textDim,
                 fontSize: 11, fontWeight: 700,
                 letterSpacing: sel ? 0.3 : 0.2,
@@ -108,8 +108,8 @@ export function Achievements() {
                 borderRadius: 16, padding: '14px 14px',
                 background: a.unlocked
                   ? `linear-gradient(135deg, ${theme.accent}0a, transparent 60%)`
-                  : 'rgba(255,255,255,0.02)',
-                borderLeft: a.unlocked ? `3px solid ${theme.accent}` : `3px solid rgba(255,255,255,0.06)`,
+                  : 'rgba(15,23,42,0.02)',
+                borderLeft: a.unlocked ? `3px solid ${theme.accent}` : `3px solid rgba(15,23,42,0.06)`,
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <div style={{ position: 'relative', flexShrink: 0 }}>
@@ -117,12 +117,12 @@ export function Achievements() {
                       width: 46, height: 46, borderRadius: 14,
                       background: a.unlocked
                         ? `linear-gradient(135deg, ${theme.accent}38, ${theme.accent2}22)`
-                        : 'rgba(255,255,255,0.03)',
+                        : 'rgba(15,23,42,0.03)',
                       border: a.unlocked ? `1px solid ${theme.accent}40` : `1px solid ${theme.cardBorder}`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontSize: 22,
                       filter: a.unlocked ? 'none' : 'grayscale(1) opacity(0.45)',
-                      boxShadow: a.unlocked ? `0 4px 14px ${theme.accent}22, inset 0 1px 0 rgba(255,255,255,0.08)` : 'inset 0 1px 0 rgba(255,255,255,0.02)',
+                      boxShadow: a.unlocked ? `0 4px 14px ${theme.accent}22, inset 0 1px 0 rgba(15,23,42,0.08)` : 'inset 0 1px 0 rgba(15,23,42,0.02)',
                     }}>
                       {a.icon}
                     </div>
@@ -155,7 +155,7 @@ export function Achievements() {
                     </div>
                     {!a.unlocked && a.progress !== undefined && (
                       <div>
-                        <div style={{ height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.05)', overflow: 'hidden', marginBottom: 4 }}>
+                        <div style={{ height: 3, borderRadius: 2, background: 'rgba(15,23,42,0.05)', overflow: 'hidden', marginBottom: 4 }}>
                           <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${a.progress}%` }}
@@ -170,7 +170,7 @@ export function Achievements() {
                   {a.xpReward > 0 && (
                     <div style={{
                       fontSize: 10, fontFamily: theme.mono, fontWeight: 700,
-                      color: a.unlocked ? '#FBBF24' : theme.textMute,
+                      color: a.unlocked ? '#D97706' : theme.textMute,
                       letterSpacing: 0.5,
                       flexShrink: 0,
                     }}>

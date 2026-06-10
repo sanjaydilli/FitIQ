@@ -26,7 +26,7 @@ function MiniPreview({ t, selected }: { t: ThemeTokens; selected: boolean }) {
           position: 'absolute',
           inset: 6,
           borderRadius: 8,
-          background: t.id === 'aurora' ? 'rgba(255,255,255,0.06)' : t.card,
+          background: t.id === 'aurora' ? 'rgba(15,23,42,0.06)' : t.card,
           border: `1px solid ${t.cardBorder}`,
           backdropFilter: t.id === 'aurora' ? 'blur(10px)' : undefined,
         }}
@@ -141,8 +141,8 @@ export function ThemeSelector() {
                   backdropFilter: theme.id === 'aurora' ? 'blur(20px) saturate(150%)' : undefined,
                   WebkitBackdropFilter: theme.id === 'aurora' ? 'blur(20px) saturate(150%)' : undefined,
                   boxShadow: sel
-                    ? `0 6px 22px ${t.accent}22, inset 0 1px 0 rgba(255,255,255,0.04)`
-                    : 'inset 0 1px 0 rgba(255,255,255,0.04)',
+                    ? `0 6px 22px ${t.accent}22, inset 0 1px 0 rgba(15,23,42,0.04)`
+                    : 'inset 0 1px 0 rgba(15,23,42,0.04)',
                   cursor: 'pointer',
                   transition: 'box-shadow 0.2s, background 0.2s, border-color 0.2s',
                 }}

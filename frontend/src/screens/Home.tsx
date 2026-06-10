@@ -10,6 +10,7 @@ import { Card, Pill } from '../components/Card';
 import { TabBar } from '../components/TabBar';
 import { WaterTimeline } from '../components/WaterTimeline';
 import { Reveal, Shimmer } from '../components/Reveal';
+import { RingMeter } from '../components/RingMeter';
 import { WarningCard } from '../components/warnings/WarningCard';
 import { Icon } from '../components/Icon';
 import { useWarnings } from '../hooks/useWarnings';
@@ -20,6 +21,41 @@ import { bodyFatCategory, goalCalorieAdjust } from '../utils/bodyComposition';
 import { WATER_SLOT_CAPACITY, WATER_DROP_ML } from '../context/UserContext';
 
 const DATE_FMT = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+
+const PAD = '0 20px';
+const GAP = 14;
+
+function greeting(): string {
+  const h = new Date().getHours();
+  if (h < 5) return 'Late night';
+  if (h < 12) return 'Good morning';
+  if (h < 17) return 'Good afternoon';
+  return 'Good evening';
+}
+
+/** Consistent section label — mono caps, used above every section */
+function SectionTitle({ children, right }: { children: React.ReactNode; right?: React.ReactNode }) {
+  const { theme } = useTheme();
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+      <div style={{
+        fontSize: 11, fontWeight: 700, letterSpacing: 1.5,
+        color: theme.textMute, fontFamily: theme.mono,
+      }}>
+        {children}
+      </div>
+      {right}
+    </div>
+  );
+}
+
+function Chevron({ color }: { color: string }) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round">
+      <path d="M4.5 2.5L8 6l-3.5 3.5" />
+    </svg>
+  );
+}
 
 export function Home() {
   const { theme } = useTheme();
@@ -63,7 +99,7 @@ export function Home() {
 
   const metrics = useMemo(() => [
     {
-      l: 'Calories', iconName: 'flame' as const, col: '#FB923C',
+      l: 'Calories', iconName: 'flame' as const, col: '#EA580C',
       v: todayTotals.calories > 0 ? todayTotals.calories.toLocaleString() : '—',
       max: `/${calTarget.toLocaleString()}`,
       pct: calTarget > 0 ? Math.min(100, Math.round((todayTotals.calories / calTarget) * 100)) : 0,
@@ -124,11 +160,13 @@ export function Home() {
     return () => clearTimeout(t);
   }, [verifyBanner]);
 
+  const remainingCal = calTarget - todayTotals.calories;
+
   return (
     <Background>
       <div
         className="scroll-y"
-        style={{ padding: '60px 0 110px', height: '100%', overflowY: 'auto' }}
+        style={{ padding: '56px 0 110px', height: '100%', overflowY: 'auto' }}
       >
         {/* Email verification banner — shown once after signup */}
         <AnimatePresence>
@@ -140,9 +178,9 @@ export function Home() {
               style={{
                 margin: '0 16px 12px',
                 padding: '10px 14px', borderRadius: 12,
-                background: 'rgba(74,222,128,0.12)',
-                border: '1px solid rgba(74,222,128,0.3)',
-                fontSize: 12, color: '#4ade80', lineHeight: 1.5,
+                background: 'rgba(22,163,74,0.12)',
+                border: '1px solid rgba(22,163,74,0.3)',
+                fontSize: 12, color: '#16A34A', lineHeight: 1.5,
               }}
             >
               ✉️ Verification email sent to <strong>{verifyBanner}</strong> — check your inbox.
@@ -150,125 +188,113 @@ export function Home() {
           )}
         </AnimatePresence>
 
-        {/* Header */}
-        <div
-          style={{
-            padding: '0 20px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 16,
-          }}
-        >
-          <div>
-            <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.5, fontWeight: 600 }}>
-              {today}
+        {/* ───── Header ───── */}
+        <div style={{ padding: PAD, display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <motion.div
+              whileTap={{ scale: 0.92 }}
+              onClick={() => navigate('/profile')}
+              style={{
+                width: 44, height: 44, borderRadius: 22, cursor: 'pointer', flexShrink: 0,
+                background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 18, fontWeight: 800, color: theme.onAccent,
+                boxShadow: `0 3px 14px ${theme.accent}40, inset 0 1px 0 rgba(15,23,42,0.25)`,
+              }}
+            >
+              {(user.name?.[0] ?? '?').toUpperCase()}
+            </motion.div>
+            <div>
+              <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.5, fontWeight: 600 }}>
+                {today}
+              </div>
+              <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: -0.4, marginTop: 1 }}>
+                {greeting()}, {user.name}
+              </div>
             </div>
-            <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: -0.5, marginTop: 2 }}>Hey, {user.name}</div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <Card style={{ width: 'auto', height: 38, borderRadius: 12, padding: '0 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
-              <Icon name="flame" size={14} color="#FB923C" />
+              <Icon name="flame" size={14} color="#EA580C" />
               <span style={{ fontSize: 12, fontWeight: 700, fontFamily: theme.mono }}>{user.streak}</span>
-            </Card>
-            <Card style={{ width: 38, height: 38, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={theme.text} strokeWidth="2">
-                <path d="M15 17h5l-1.4-1.4A2 2 0 0118 14V11a6 6 0 10-12 0v3a2 2 0 01-.6 1.6L4 17h5" />
-                <path d="M9 17a3 3 0 006 0" />
-              </svg>
             </Card>
           </div>
         </div>
 
-        {/* Hero */}
+        {/* ───── Hero: health score ring ───── */}
         <Reveal index={0}>
-        <div style={{ padding: '0 20px', marginBottom: 16 }}>
-          <Card style={{ padding: 20, borderRadius: 24, position: 'relative', overflow: 'hidden' }}>
-            <Shimmer color={`${theme.accent2}24`} duration={3.6} delay={1} />
+        <div style={{ padding: PAD, marginBottom: GAP }}>
+          <Card style={{ padding: '18px 20px', borderRadius: 24, position: 'relative', overflow: 'hidden' }}>
+            <Shimmer color={`${theme.accent2}20`} duration={3.6} delay={1} />
             <div
               style={{
-                position: 'absolute',
-                inset: 0,
-                background: `radial-gradient(circle at 30% 50%, ${theme.accent2}28, transparent 60%)`,
+                position: 'absolute', inset: 0,
+                background: `radial-gradient(circle at 18% 40%, ${theme.accent2}26, transparent 55%), radial-gradient(circle at 95% 90%, ${theme.accent}14, transparent 50%)`,
                 pointerEvents: 'none',
               }}
             />
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 14 }}>
-              <motion.div
-                whileTap={{ scale: 0.96 }}
-                onClick={() => navigate('/profile')}
-                style={{
-                  flexShrink: 0, cursor: 'pointer',
-                  width: 72, height: 72, borderRadius: 36,
-                  background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 28, fontWeight: 800, color: theme.onAccent,
-                  boxShadow: `0 4px 20px ${theme.accent}50, inset 0 1px 0 rgba(255,255,255,0.25)`,
-                }}
-              >
-                {(user.name?.[0] ?? '?').toUpperCase()}
-              </motion.div>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 18 }}>
+              <RingMeter
+                value={healthScore}
+                max={100}
+                size={116}
+                stroke={11}
+                gradient={[theme.accent, theme.accent2]}
+                label={
+                  <span style={{
+                    fontSize: 34, fontWeight: 800, letterSpacing: -1.5, lineHeight: 1,
+                    fontFamily: theme.mono, fontFeatureSettings: '"tnum"',
+                  }}>
+                    {healthScore}
+                  </span>
+                }
+                sublabel={
+                  <span style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 0.8 }}>
+                    /100
+                  </span>
+                }
+              />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div
-                  style={{
-                    fontSize: 10,
-                    color: theme.textMute,
-                    fontFamily: theme.mono,
-                    letterSpacing: 1.5,
-                    fontWeight: 700,
-                    marginBottom: 4,
-                  }}
-                >
+                <div style={{
+                  fontSize: 10, color: theme.textMute, fontFamily: theme.mono,
+                  letterSpacing: 1.5, fontWeight: 700, marginBottom: 6,
+                }}>
                   HEALTH SCORE
                 </div>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 4 }}>
-                  <div
-                    style={{
-                      fontSize: 52,
-                      fontWeight: 800,
-                      letterSpacing: -2,
-                      lineHeight: 1,
-                      fontFeatureSettings: '"tnum"',
-                      fontFamily: theme.mono,
-                      background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                    }}
-                  >
-                    {healthScore}
-                  </div>
-                  <div style={{ color: theme.textDim, fontSize: 14, fontFamily: theme.mono }}>/100</div>
-                </div>
-                <div style={{ fontSize: 12, color: theme.textDim, marginBottom: 10, lineHeight: 1.4 }}>
+                <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: -0.2, lineHeight: 1.35, marginBottom: 10 }}>
                   {healthScore >= 80 ? 'Looking great today 🔥' : healthScore >= 50 ? 'Keep going, almost there' : 'Log food & water to boost'}
                 </div>
-                <Pill>LVL {user.level}{bfCat ? ` · ${bfCat.label.toUpperCase()}` : ''}</Pill>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  <Pill>LVL {user.level}</Pill>
+                  {bfCat && <Pill>{bfCat.label.toUpperCase()}</Pill>}
+                </div>
               </div>
             </div>
           </Card>
         </div>
         </Reveal>
 
-        {/* Water timeline */}
+        {/* ───── Today's metrics ───── */}
         <Reveal index={1}>
-        <div style={{ padding: '0 20px', marginBottom: 16 }}>
-          <WaterTimeline />
-        </div>
-        </Reveal>
-
-        {/* Steps card */}
-        <Reveal index={2}>
-        <StepsCard />
-        </Reveal>
-
-        {/* Metric grid — calories hero + 2 stacked */}
-        <div style={{ padding: '0 20px', marginBottom: 16 }}>
+        <div style={{ padding: PAD, marginBottom: GAP }}>
+          <SectionTitle
+            right={todayTotals.calories > 0 ? (
+              <div
+                onClick={() => navigate('/food-log')}
+                style={{
+                  fontSize: 10, fontFamily: theme.mono, fontWeight: 700, letterSpacing: 0.6,
+                  color: remainingCal >= 0 ? '#16A34A' : '#DC2626', cursor: 'pointer',
+                }}
+              >
+                {Math.abs(remainingCal)} KCAL {remainingCal >= 0 ? 'LEFT' : 'OVER'}
+              </div>
+            ) : undefined}
+          >
+            TODAY
+          </SectionTitle>
           <div style={{ display: 'grid', gridTemplateColumns: '1.35fr 1fr', gap: 10 }}>
             {/* Calories hero */}
             <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.18, type: 'spring', stiffness: 280, damping: 22 }}
               whileTap={{ scale: 0.97 }}
               whileHover={{ y: -2 }}
               onClick={() => navigate('/food-log')}
@@ -307,7 +333,7 @@ export function Home() {
                   </div>
                   <div style={{
                     height: 4, borderRadius: 2,
-                    background: 'rgba(255,255,255,0.06)', overflow: 'hidden',
+                    background: 'rgba(15,23,42,0.06)', overflow: 'hidden',
                   }}>
                     <motion.div
                       initial={{ width: 0 }}
@@ -331,9 +357,6 @@ export function Home() {
               {metrics.slice(1).map((m, i) => (
                 <motion.div
                   key={m.l}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.22 + i * 0.06, type: 'spring', stiffness: 280, damping: 22 }}
                   whileTap={{ scale: 0.96 }}
                   whileHover={{ y: -2 }}
                   onClick={() => navigate(m.l === 'Protein' ? '/food-log' : '/activity')}
@@ -360,7 +383,7 @@ export function Home() {
                     </div>
                     <div style={{
                       marginTop: 6, height: 3, borderRadius: 2,
-                      background: 'rgba(255,255,255,0.06)', overflow: 'hidden',
+                      background: 'rgba(15,23,42,0.06)', overflow: 'hidden',
                     }}>
                       <motion.div
                         initial={{ width: 0 }}
@@ -375,6 +398,7 @@ export function Home() {
             </div>
           </div>
         </div>
+        </Reveal>
 
         {/* Smart warning system */}
         <AnimatePresence mode="wait">
@@ -385,7 +409,7 @@ export function Home() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.3, ease: [0.22, 0.8, 0.22, 1] }}
-              style={{ padding: '0 20px', marginBottom: 16 }}
+              style={{ padding: PAD, marginBottom: GAP }}
             >
               <WarningCard
                 warning={activeWarning}
@@ -397,134 +421,78 @@ export function Home() {
           )}
         </AnimatePresence>
 
-        {/* Ask AI Coach */}
-        <div style={{ padding: '0 20px', marginBottom: 16 }}>
-          <motion.div
-            whileTap={{ scale: 0.97 }}
-            whileHover={{ y: -2 }}
-            onClick={() => navigate('/coach')}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              padding: '14px 16px',
-              borderRadius: 18,
-              background: `linear-gradient(135deg, ${theme.accent}18, ${theme.accent2}12)`,
-              border: `1px solid ${theme.accent}30`,
-              boxShadow: `inset 0 1px 0 rgba(255,255,255,0.04)`,
-              cursor: 'pointer',
-            }}
-          >
-            <div
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 12,
-                background: `linear-gradient(135deg, ${theme.accent}30, ${theme.accent2}20)`,
-                border: `1px solid ${theme.accent}30`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-              }}
-            >
-              <Icon name="brain" size={20} color={theme.accent} />
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2 }}>Ask AI Coach</div>
-              <div style={{ fontSize: 11, color: theme.textDim }}>
-                Powered by Llama 3.1 · Indian nutrition expert
-              </div>
-            </div>
-            <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke={theme.accent} strokeWidth="2" strokeLinecap="round">
-              <path d="M4.5 2.5L8 6l-3.5 3.5" />
-            </svg>
-          </motion.div>
-        </div>
-
-        {/* Today's Routine */}
-        <div style={{ padding: '0 20px', marginBottom: 16 }}>
-          <motion.div
-            whileTap={{ scale: 0.97 }}
-            whileHover={{ y: -2 }}
-            onClick={() => navigate('/routine')}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 12,
-              padding: '14px 16px', borderRadius: 18,
-              background: theme.card, border: `1px solid ${theme.cardBorder}`,
-              cursor: 'pointer', position: 'relative', overflow: 'hidden',
-            }}
-          >
-            {/* Gradient accent bar */}
-            <div style={{
-              position: 'absolute', left: 0, top: 0, bottom: 0, width: 3,
-              background: `linear-gradient(to bottom, #FBBF24, ${theme.accent})`,
-              borderRadius: '2px 0 0 2px',
-            }} />
-            <div style={{
-              width: 40, height: 40, borderRadius: 12, flexShrink: 0,
-              background: 'rgba(251,191,36,0.12)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <Icon name="calendar" size={20} color="#FBBF24" />
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2 }}>Today's Routine</div>
-              <div style={{ fontSize: 11, color: theme.textDim }}>Schedule · track · earn XP</div>
-            </div>
-            <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke={theme.textMute} strokeWidth="2" strokeLinecap="round">
-              <path d="M4.5 2.5L8 6l-3.5 3.5" />
-            </svg>
-          </motion.div>
-        </div>
-
-        {/* Meal Planner + Activity + Wrapped quick links */}
-        <div style={{ padding: '0 20px', marginBottom: 16, display: 'flex', gap: 10 }}>
-          {[
-            { iconName: 'utensils' as const, label: 'Meal Plan', sub: 'AI-powered', path: '/meal-plan', color: '#FB923C' },
-            { iconName: 'leaf' as const,    label: 'Recipes',   sub: '3235 dishes', path: '/recipes',  color: '#4ade80' },
-            { iconName: 'calendar' as const, label: 'Activity', sub: 'Calendar', path: '/activity', color: theme.accent2 },
-            { iconName: 'trophy' as const, label: 'Wrapped', sub: 'This week', path: '/wrapped', color: '#FBBF24' },
-          ].map(({ iconName, label, sub, path, color }) => (
-            <motion.div
-              key={path}
-              whileTap={{ scale: 0.93 }}
-              whileHover={{ y: -2 }}
-              onClick={() => navigate(path)}
-              style={{ flex: 1, cursor: 'pointer' }}
-            >
-              <Card style={{ padding: '14px 10px 12px', borderRadius: 18, textAlign: 'center' }}>
-                <div style={{
-                  width: 36, height: 36, borderRadius: 10,
-                  background: `${color}18`, border: `1px solid ${color}25`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  margin: '0 auto 8px',
-                }}>
-                  <Icon name={iconName} size={18} color={color} />
+        {/* ───── Today's workout ───── */}
+        <Reveal index={2}>
+        <div style={{ padding: PAD, marginBottom: GAP }}>
+          <SectionTitle>WORKOUT</SectionTitle>
+          {todaySession ? (
+            <motion.div whileTap={{ scale: 0.97 }} whileHover={{ y: -2 }} onClick={() => navigate('/workout/history')}>
+              <Card style={{ padding: 14, borderRadius: 18, display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 52, height: 52, borderRadius: 14, background: 'rgba(22,163,74,0.14)', border: '1px solid rgba(22,163,74,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Icon name="check" size={24} color="#16A34A" />
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 700, color, letterSpacing: -0.1 }}>{label}</div>
-                <div style={{ fontSize: 9, color: theme.textMute, fontFamily: theme.mono, marginTop: 1, letterSpacing: 0.4 }}>{sub}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2, letterSpacing: -0.2 }}>{todaySession.name}</div>
+                  <div style={{ fontSize: 11, color: theme.textDim, fontFamily: theme.mono }}>
+                    {todaySession.exercises.length} exercises · {todaySession.totalVolume.toLocaleString()} kg volume
+                  </div>
+                </div>
+                <div style={{
+                  fontSize: 10, fontFamily: theme.mono, fontWeight: 800, color: '#16A34A',
+                  background: 'rgba(22,163,74,0.12)', border: '1px solid rgba(22,163,74,0.3)',
+                  borderRadius: 8, padding: '3px 8px', letterSpacing: 0.8,
+                }}>DONE ✓</div>
               </Card>
             </motion.div>
-          ))}
+          ) : (
+            <motion.div whileTap={{ scale: 0.97 }} whileHover={{ y: -2 }} onClick={() => navigate('/workout')}>
+              <Card style={{ padding: 14, borderRadius: 18, display: 'flex', alignItems: 'center', gap: 12, position: 'relative', overflow: 'hidden' }}>
+                <Shimmer color={`${theme.accent}30`} duration={3.2} delay={1.2} />
+                <div style={{ width: 52, height: 52, borderRadius: 14, background: `linear-gradient(135deg, ${theme.accent2}38, ${theme.accent}28)`, border: `1px solid ${theme.accent}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Icon name="dumbbell" size={24} color={theme.accent} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2, letterSpacing: -0.2 }}>Start Today's Workout</div>
+                  <div style={{ fontSize: 11, color: theme.textDim }}>Push · Pull · Legs · Full Body</div>
+                </div>
+                <div style={{
+                  width: 40, height: 40, borderRadius: 12,
+                  background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: `0 4px 12px ${theme.accent}40`, flexShrink: 0,
+                }}>
+                  <svg width="14" height="14" viewBox="0 0 12 12" fill={theme.onAccent}><path d="M3 1.5l7 4.5-7 4.5z" /></svg>
+                </div>
+              </Card>
+            </motion.div>
+          )}
         </div>
+        </Reveal>
 
-        {/* Daily Quests */}
+        {/* ───── Hydration + steps ───── */}
+        <Reveal index={3}>
+        <div style={{ padding: PAD, marginBottom: GAP }}>
+          <SectionTitle>HYDRATION & ACTIVITY</SectionTitle>
+          <WaterTimeline />
+        </div>
+        </Reveal>
+
+        <Reveal index={4}>
+        <StepsCard />
+        </Reveal>
+
+        {/* ───── Daily Quests ───── */}
         <Reveal index={5}>
-        <div style={{ padding: '0 20px', marginBottom: 16 }}>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: 10,
-            }}
+        <div style={{ padding: PAD, marginBottom: GAP }}>
+          <SectionTitle
+            right={
+              <div style={{ fontSize: 11, color: theme.accent, fontFamily: theme.mono, fontWeight: 700, letterSpacing: 0.5 }}>
+                +{quests.filter(q => q.done).reduce((s, q) => s + q.xp, 0)} XP TODAY
+              </div>
+            }
           >
-            <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: -0.2 }}>Daily Quests</div>
-            <div style={{ fontSize: 11, color: theme.accent, fontFamily: theme.mono, fontWeight: 700, letterSpacing: 0.5 }}>
-              +{quests.filter(q => q.done).reduce((s, q) => s + q.xp, 0)} XP TODAY
-            </div>
-          </div>
+            DAILY QUESTS
+          </SectionTitle>
           <Card style={{ borderRadius: 18, overflow: 'hidden' }}>
             {quests.map((q, i, a) => (
               <motion.div
@@ -547,7 +515,7 @@ export function Home() {
                     borderRadius: 6,
                     flexShrink: 0,
                     background: q.done ? theme.accent : 'transparent',
-                    border: q.done ? 'none' : '1.5px solid rgba(255,255,255,0.25)',
+                    border: q.done ? 'none' : '1.5px solid rgba(15,23,42,0.25)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -591,44 +559,94 @@ export function Home() {
         </div>
         </Reveal>
 
-        {/* Calorie deficit / surplus banner */}
-        {todayTotals.calories > 0 && (
+        {/* ───── AI Coach ───── */}
+        <Reveal index={6}>
+        <div style={{ padding: PAD, marginBottom: GAP }}>
+          <SectionTitle>COACH</SectionTitle>
           <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            style={{ padding: '0 20px', marginBottom: 16 }}
+            whileTap={{ scale: 0.97 }}
+            whileHover={{ y: -2 }}
+            onClick={() => navigate('/coach')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              padding: '14px 16px',
+              borderRadius: 18,
+              background: `linear-gradient(135deg, ${theme.accent}18, ${theme.accent2}12)`,
+              border: `1px solid ${theme.accent}30`,
+              boxShadow: `inset 0 1px 0 rgba(15,23,42,0.04)`,
+              cursor: 'pointer',
+            }}
           >
-            <motion.div
-              whileTap={{ scale: 0.97 }}
-              onClick={() => navigate('/food-log')}
+            <div
               style={{
-                display: 'flex', alignItems: 'center', gap: 12,
-                padding: '12px 16px', borderRadius: 16, cursor: 'pointer',
-                background: calTarget - todayTotals.calories >= 0
-                  ? 'rgba(74,222,128,0.08)' : 'rgba(248,113,113,0.08)',
-                border: `1px solid ${calTarget - todayTotals.calories >= 0
-                  ? 'rgba(74,222,128,0.25)' : 'rgba(248,113,113,0.25)'}`,
+                width: 40,
+                height: 40,
+                borderRadius: 12,
+                background: `linear-gradient(135deg, ${theme.accent}30, ${theme.accent2}20)`,
+                border: `1px solid ${theme.accent}30`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
               }}
             >
-              <Icon name={calTarget - todayTotals.calories >= 0 ? 'check' : 'target'} size={20} color={calTarget - todayTotals.calories >= 0 ? '#4ade80' : '#F87171'} />
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 13, fontWeight: 700 }}>
-                  {Math.abs(calTarget - todayTotals.calories)} kcal {calTarget - todayTotals.calories >= 0 ? 'remaining' : 'over target'}
-                </div>
-                <div style={{ fontSize: 11, color: theme.textDim }}>
-                  {todayTotals.calories} eaten · {calTarget} target
-                </div>
+              <Icon name="brain" size={20} color={theme.accent} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2 }}>Ask AI Coach</div>
+              <div style={{ fontSize: 11, color: theme.textDim }}>
+                Powered by Llama 3.1 · Indian nutrition expert
               </div>
-              <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke={theme.textMute} strokeWidth="2" strokeLinecap="round">
-                <path d="M4.5 2.5L8 6l-3.5 3.5" />
-              </svg>
-            </motion.div>
+            </div>
+            <Chevron color={theme.accent} />
           </motion.div>
-        )}
+        </div>
+        </Reveal>
 
-        {/* Body Comp + Strength quick cards */}
+        {/* ───── Explore: quick links 2×2 ───── */}
+        <Reveal index={7}>
+        <div style={{ padding: PAD, marginBottom: GAP }}>
+          <SectionTitle>EXPLORE</SectionTitle>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            {[
+              { iconName: 'utensils' as const, label: 'Meal Plan', sub: 'AI-powered', path: '/meal-plan', color: '#EA580C' },
+              { iconName: 'leaf' as const, label: 'Recipes', sub: '3235 dishes', path: '/recipes', color: '#16A34A' },
+              { iconName: 'calendar' as const, label: 'Routine', sub: 'Schedule · earn XP', path: '/routine', color: '#D97706' },
+              { iconName: 'trophy' as const, label: 'Wrapped', sub: 'This week', path: '/wrapped', color: theme.accent2 },
+            ].map(({ iconName, label, sub, path, color }) => (
+              <motion.div
+                key={path}
+                whileTap={{ scale: 0.95 }}
+                whileHover={{ y: -2 }}
+                onClick={() => navigate(path)}
+                style={{ cursor: 'pointer' }}
+              >
+                <Card style={{ padding: '12px 14px', borderRadius: 18, display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                    background: `${color}18`, border: `1px solid ${color}25`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <Icon name={iconName} size={18} color={color} />
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: -0.1 }}>{label}</div>
+                    <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, marginTop: 1, letterSpacing: 0.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{sub}</div>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+        </Reveal>
+
+        {/* ───── Progress: body comp + strength ───── */}
         {(bodyCompLatest || sessions.length > 0) && (
-          <div style={{ padding: '0 20px', marginBottom: 16 }}>
+          <Reveal index={8}>
+          <div style={{ padding: PAD, marginBottom: GAP }}>
+            <SectionTitle>PROGRESS</SectionTitle>
             <div style={{ display: 'grid', gridTemplateColumns: bodyCompLatest && sessions.length > 0 ? '1fr 1fr' : '1fr', gap: 10 }}>
               {bodyCompLatest && bfCat && (
                 <motion.div whileTap={{ scale: 0.96 }} whileHover={{ y: -2 }} onClick={() => navigate('/body-comp')} style={{ cursor: 'pointer' }}>
@@ -656,55 +674,8 @@ export function Home() {
               )}
             </div>
           </div>
+          </Reveal>
         )}
-
-        {/* Today's workout */}
-        <Reveal index={6}>
-        <div style={{ padding: '0 20px', marginBottom: 16 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, letterSpacing: -0.2 }}>Today's Workout</div>
-          {todaySession ? (
-            <motion.div whileTap={{ scale: 0.97 }} whileHover={{ y: -2 }} onClick={() => navigate('/workout/history')}>
-              <Card style={{ padding: 14, borderRadius: 18, display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 52, height: 52, borderRadius: 14, background: 'rgba(74,222,128,0.14)', border: '1px solid rgba(74,222,128,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Icon name="check" size={24} color="#4ade80" />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2, letterSpacing: -0.2 }}>{todaySession.name}</div>
-                  <div style={{ fontSize: 11, color: theme.textDim, fontFamily: theme.mono }}>
-                    {todaySession.exercises.length} exercises · {todaySession.totalVolume.toLocaleString()} kg volume
-                  </div>
-                </div>
-                <div style={{
-                  fontSize: 10, fontFamily: theme.mono, fontWeight: 800, color: '#4ade80',
-                  background: 'rgba(74,222,128,0.12)', border: '1px solid rgba(74,222,128,0.3)',
-                  borderRadius: 8, padding: '3px 8px', letterSpacing: 0.8,
-                }}>DONE ✓</div>
-              </Card>
-            </motion.div>
-          ) : (
-            <motion.div whileTap={{ scale: 0.97 }} whileHover={{ y: -2 }} onClick={() => navigate('/workout')}>
-              <Card style={{ padding: 14, borderRadius: 18, display: 'flex', alignItems: 'center', gap: 12, position: 'relative', overflow: 'hidden' }}>
-                <Shimmer color={`${theme.accent}30`} duration={3.2} delay={1.2} />
-                <div style={{ width: 52, height: 52, borderRadius: 14, background: `linear-gradient(135deg, ${theme.accent2}38, ${theme.accent}28)`, border: `1px solid ${theme.accent}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Icon name="dumbbell" size={24} color={theme.accent} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2, letterSpacing: -0.2 }}>Start Today's Workout</div>
-                  <div style={{ fontSize: 11, color: theme.textDim }}>Push · Pull · Legs · Full Body</div>
-                </div>
-                <div style={{
-                  width: 40, height: 40, borderRadius: 12,
-                  background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: `0 4px 12px ${theme.accent}40`, flexShrink: 0,
-                }}>
-                  <svg width="14" height="14" viewBox="0 0 12 12" fill={theme.onAccent}><path d="M3 1.5l7 4.5-7 4.5z" /></svg>
-                </div>
-              </Card>
-            </motion.div>
-          )}
-        </div>
-        </Reveal>
       </div>
       <TabBar />
     </Background>
@@ -723,15 +694,15 @@ function StepsCard() {
   const remaining = Math.max(0, user.stepGoal - user.steps);
 
   return (
-    <div style={{ padding: '0 20px', marginBottom: 16 }}>
+    <div style={{ padding: PAD, marginBottom: GAP }}>
       <Card style={{ padding: 16, borderRadius: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
           <div style={{
             width: 38, height: 38, borderRadius: 12,
-            background: done ? 'rgba(74,222,128,0.15)' : `${theme.accent}15`,
+            background: done ? 'rgba(22,163,74,0.15)' : `${theme.accent}15`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            <Icon name="run" size={18} color={done ? '#4ade80' : theme.accent} />
+            <Icon name="run" size={18} color={done ? '#16A34A' : theme.accent} />
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: -0.2 }}>Steps Today</div>
@@ -739,7 +710,7 @@ function StepsCard() {
               {isNative ? 'AUTO-TRACKING · UPDATES LIVE' : 'OPEN ON ANDROID TO AUTO-TRACK'}
             </div>
           </div>
-          <div style={{ fontSize: 10, color: done ? '#4ade80' : theme.textMute, fontFamily: theme.mono, fontWeight: 700, letterSpacing: 0.8 }}>
+          <div style={{ fontSize: 10, color: done ? '#16A34A' : theme.textMute, fontFamily: theme.mono, fontWeight: 700, letterSpacing: 0.8 }}>
             {done ? '✓ GOAL HIT' : `${pct}%`}
           </div>
         </div>
@@ -749,7 +720,7 @@ function StepsCard() {
           <div style={{
             fontSize: 36, fontWeight: 800, letterSpacing: -1.5, lineHeight: 1,
             fontFamily: theme.mono,
-            color: done ? '#4ade80' : theme.text,
+            color: done ? '#16A34A' : theme.text,
           }}>
             {user.steps.toLocaleString()}
           </div>
@@ -759,7 +730,7 @@ function StepsCard() {
         </div>
 
         {/* Progress bar */}
-        <div style={{ height: 10, borderRadius: 5, background: 'rgba(255,255,255,0.07)', overflow: 'hidden', marginBottom: 8 }}>
+        <div style={{ height: 10, borderRadius: 5, background: 'rgba(15,23,42,0.07)', overflow: 'hidden', marginBottom: 8 }}>
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${pct}%` }}
@@ -767,7 +738,7 @@ function StepsCard() {
             style={{
               height: '100%', borderRadius: 5,
               background: done
-                ? 'linear-gradient(90deg, #4ade80, #22d3ee)'
+                ? 'linear-gradient(90deg, #16A34A, #22d3ee)'
                 : `linear-gradient(90deg, ${theme.accent}, ${theme.accent2})`,
             }}
           />

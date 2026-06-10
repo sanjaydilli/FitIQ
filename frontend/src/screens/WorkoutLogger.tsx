@@ -110,7 +110,7 @@ export function WorkoutLogger() {
         <motion.button
           whileTap={{ scale: 0.92 }}
           onClick={() => navigate('/workout')}
-          style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 10, padding: '6px 10px', color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+          style={{ background: 'rgba(15,23,42,0.06)', border: 'none', borderRadius: 10, padding: '6px 10px', color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
         >
           <Icon name="chevron-left" size={16} color={theme.text} />
         </motion.button>
@@ -123,7 +123,7 @@ export function WorkoutLogger() {
         <motion.button
           whileTap={{ scale: 0.92 }}
           onClick={handleDiscard}
-          style={{ background: 'none', border: 'none', color: '#F87171', fontSize: 12, cursor: 'pointer', fontFamily: theme.mono }}
+          style={{ background: 'none', border: 'none', color: '#DC2626', fontSize: 12, cursor: 'pointer', fontFamily: theme.mono }}
         >
           DISCARD
         </motion.button>
@@ -179,21 +179,21 @@ export function WorkoutLogger() {
                               exit={{ opacity: 0 }}
                               style={{
                                 position: 'absolute', inset: 0, zIndex: 2,
-                                background: 'rgba(251,191,36,0.15)',
+                                background: 'rgba(217,119,6,0.15)',
                                 borderRadius: 8,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 pointerEvents: 'none',
                               }}
                             >
                               <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                                <Icon name="trophy" size={14} color="#FBBF24" />
-                                <span style={{ fontSize: 13, fontWeight: 800, color: '#FBBF24', fontFamily: theme.mono }}>PR!</span>
+                                <Icon name="trophy" size={14} color="#D97706" />
+                                <span style={{ fontSize: 13, fontWeight: 800, color: '#D97706', fontFamily: theme.mono }}>PR!</span>
                               </div>
                             </motion.div>
                           )}
                         </AnimatePresence>
 
-                        <div style={{ fontSize: 12, color: s.completed ? '#4ade80' : theme.textDim, fontFamily: theme.mono, fontWeight: 700 }}>
+                        <div style={{ fontSize: 12, color: s.completed ? '#16A34A' : theme.textDim, fontFamily: theme.mono, fontWeight: 700 }}>
                           {s.completed ? '✓' : setIdx + 1}
                         </div>
 
@@ -203,7 +203,7 @@ export function WorkoutLogger() {
                           onChange={e => updateSet(exIdx, setIdx, { weight: parseFloat(e.target.value) || 0 })}
                           placeholder="0"
                           style={{
-                            background: 'rgba(255,255,255,0.06)', border: `1px solid ${theme.cardBorder}`,
+                            background: 'rgba(15,23,42,0.06)', border: `1px solid ${theme.cardBorder}`,
                             borderRadius: 8, padding: '5px 8px', color: theme.text,
                             fontSize: 13, fontFamily: theme.mono, width: '100%', outline: 'none',
                           }}
@@ -215,7 +215,7 @@ export function WorkoutLogger() {
                           onChange={e => updateSet(exIdx, setIdx, { reps: parseInt(e.target.value) || 0 })}
                           placeholder="0"
                           style={{
-                            background: 'rgba(255,255,255,0.06)', border: `1px solid ${theme.cardBorder}`,
+                            background: 'rgba(15,23,42,0.06)', border: `1px solid ${theme.cardBorder}`,
                             borderRadius: 8, padding: '5px 8px', color: theme.text,
                             fontSize: 13, fontFamily: theme.mono, width: '100%', outline: 'none',
                           }}
@@ -233,9 +233,9 @@ export function WorkoutLogger() {
                           style={{
                             width: 34, height: 34, borderRadius: 10, border: s.completed ? 'none' : `1.5px solid ${theme.accent}50`,
                             cursor: 'pointer',
-                            background: s.completed ? 'linear-gradient(135deg, #22c55e, #4ade80)' : 'transparent',
+                            background: s.completed ? 'linear-gradient(135deg, #22c55e, #16A34A)' : 'transparent',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            boxShadow: s.completed ? '0 2px 8px #4ade8050' : 'none',
+                            boxShadow: s.completed ? '0 2px 8px #16A34A50' : 'none',
                           }}
                         >
                           {s.completed
@@ -273,7 +273,7 @@ export function WorkoutLogger() {
                       onClick={() => removeSet(exIdx, ex.sets.length - 1)}
                       style={{
                         padding: '7px 14px', borderRadius: 10, border: 'none',
-                        background: 'rgba(248,113,113,0.1)', color: '#F87171', cursor: 'pointer', fontSize: 12,
+                        background: 'rgba(220,38,38,0.1)', color: '#DC2626', cursor: 'pointer', fontSize: 12,
                       }}
                     >
                       −
@@ -316,7 +316,7 @@ export function WorkoutLogger() {
             </div>
             <div style={{ width: 48, height: 48, position: 'relative' }}>
               <svg width="48" height="48" viewBox="0 0 48 48">
-                <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="3" />
+                <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(15,23,42,0.08)" strokeWidth="3" />
                 <motion.circle
                   cx="24" cy="24" r="20" fill="none" stroke={theme.accent} strokeWidth="3"
                   strokeLinecap="round" strokeDasharray={125.6}
@@ -346,7 +346,7 @@ export function WorkoutLogger() {
             width: '100%', padding: '15px 0', borderRadius: 16, border: 'none', cursor: 'pointer',
             background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
             color: theme.onAccent, fontSize: 16, fontWeight: 800, letterSpacing: -0.3,
-            boxShadow: `0 8px 24px ${theme.accent}38, inset 0 1px 0 rgba(255,255,255,0.18)`,
+            boxShadow: `0 8px 24px ${theme.accent}38, inset 0 1px 0 rgba(15,23,42,0.18)`,
           }}
         >
           Finish Workout · {fmt(elapsed)}

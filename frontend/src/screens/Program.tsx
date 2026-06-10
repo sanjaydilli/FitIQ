@@ -13,10 +13,10 @@ import { DayPlan } from '../services/programPlannerService';
 const PROGRAM_TYPES: ProgramType[] = ['muscle_gain', 'body_recomp', 'fat_loss', 'strength'];
 
 const TYPE_COLOR: Record<ProgramType, string> = {
-  muscle_gain: '#5EEAD4',
-  body_recomp: '#A78BFA',
-  fat_loss:    '#FB923C',
-  strength:    '#FBBF24',
+  muscle_gain: '#0E9384',
+  body_recomp: '#7C3AED',
+  fat_loss:    '#EA580C',
+  strength:    '#D97706',
 };
 
 const TYPE_ICON: Record<ProgramType, React.ComponentProps<typeof Icon>['name']> = {
@@ -52,7 +52,7 @@ function PhaseBar({ phases, currentPhase, daysElapsed }: {
                 height: 6, borderRadius: 3, marginBottom: 4,
                 background: isCurrent
                   ? theme.accent
-                  : isPast ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.08)',
+                  : isPast ? 'rgba(255,255,255,0.3)' : 'rgba(15,23,42,0.08)',
               }} />
               <div style={{ fontSize: 9, color: isCurrent ? theme.text : theme.textMute, fontFamily: theme.mono, textAlign: 'center' }}>
                 {isCurrent ? `PH${p.phase} ●` : `PH${p.phase}`}
@@ -62,7 +62,7 @@ function PhaseBar({ phases, currentPhase, daysElapsed }: {
         })}
       </div>
       {/* Overall bar */}
-      <div style={{ height: 3, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
+      <div style={{ height: 3, background: 'rgba(15,23,42,0.06)', borderRadius: 2, overflow: 'hidden' }}>
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
@@ -101,8 +101,8 @@ function TimelineCard({ projections, color }: {
                 <div style={{ textAlign: 'center', minWidth: 40 }}>
                   <div style={{
                     width: 28, height: 28, borderRadius: '50%', margin: '0 auto 3px',
-                    background: j === 0 ? 'rgba(255,255,255,0.08)' : j <= 3 ? `${color}25` : 'rgba(255,255,255,0.04)',
-                    border: j === 0 ? `1.5px solid rgba(255,255,255,0.2)` : j <= 3 ? `1.5px solid ${color}60` : 'none',
+                    background: j === 0 ? 'rgba(15,23,42,0.08)' : j <= 3 ? `${color}25` : 'rgba(15,23,42,0.04)',
+                    border: j === 0 ? `1.5px solid rgba(15,23,42,0.2)` : j <= 3 ? `1.5px solid ${color}60` : 'none',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     <div style={{ fontSize: 8, fontWeight: 700, fontFamily: theme.mono, color: j === 0 ? theme.textDim : color }}>
@@ -114,7 +114,7 @@ function TimelineCard({ projections, color }: {
                   </div>
                 </div>
                 {j < 3 && (
-                  <div style={{ flex: 1, height: 1.5, background: `linear-gradient(90deg, rgba(255,255,255,0.1), ${color}40)`, margin: '0 2px 12px' }} />
+                  <div style={{ flex: 1, height: 1.5, background: `linear-gradient(90deg, rgba(15,23,42,0.1), ${color}40)`, margin: '0 2px 12px' }} />
                 )}
               </React.Fragment>
             ))}
@@ -191,7 +191,7 @@ function WorkoutDayCard({ day }: { day: DayPlan }) {
                       <span style={{ fontSize: 10, fontFamily: theme.mono, color: theme.accent, background: `${theme.accent}12`, padding: '2px 6px', borderRadius: 5 }}>
                         {ex.sets}×{ex.repsDisplay}
                       </span>
-                      <span style={{ fontSize: 10, fontFamily: theme.mono, color: theme.textMute, background: 'rgba(255,255,255,0.05)', padding: '2px 6px', borderRadius: 5 }}>
+                      <span style={{ fontSize: 10, fontFamily: theme.mono, color: theme.textMute, background: 'rgba(15,23,42,0.05)', padding: '2px 6px', borderRadius: 5 }}>
                         {ex.restSeconds}s rest
                       </span>
                     </div>
@@ -231,7 +231,7 @@ export function Program() {
           borderBottom: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', gap: 12,
         }}>
           <motion.button whileTap={{ scale: 0.92 }} onClick={() => navigate(-1)}
-            style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 10, padding: '6px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+            style={{ background: 'rgba(15,23,42,0.06)', border: 'none', borderRadius: 10, padding: '6px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
             <Icon name="chevron-left" size={16} color={theme.text} />
           </motion.button>
           <div style={{ flex: 1 }}>
@@ -249,7 +249,7 @@ export function Program() {
 
             {/* No body comp warning */}
             {!latest && (
-              <div style={{ padding: '10px 14px', borderRadius: 12, background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.25)', marginBottom: 14, fontSize: 12, color: '#FBBF24' }}>
+              <div style={{ padding: '10px 14px', borderRadius: 12, background: 'rgba(217,119,6,0.08)', border: '1px solid rgba(217,119,6,0.25)', marginBottom: 14, fontSize: 12, color: '#D97706' }}>
                 ⚠ Add a body comp measurement for more accurate timeline projections → Body Comp tab
               </div>
             )}
@@ -270,13 +270,13 @@ export function Program() {
                       padding: '14px 16px', borderRadius: 18, cursor: 'pointer',
                       background: isSelected ? `${color}12` : theme.card,
                       border: `1.5px solid ${isSelected ? color + '60' : theme.cardBorder}`,
-                      boxShadow: isSelected ? `0 6px 18px ${color}22, inset 0 1px 0 rgba(255,255,255,0.05)` : 'inset 0 1px 0 rgba(255,255,255,0.04)',
+                      boxShadow: isSelected ? `0 6px 18px ${color}22, inset 0 1px 0 rgba(15,23,42,0.05)` : 'inset 0 1px 0 rgba(15,23,42,0.04)',
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                       <div style={{
                         width: 44, height: 44, borderRadius: 13, flexShrink: 0,
-                        background: isSelected ? `${color}20` : 'rgba(255,255,255,0.05)',
+                        background: isSelected ? `${color}20` : 'rgba(15,23,42,0.05)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                       }}>
                         <Icon name={TYPE_ICON[type]} size={24} color={isSelected ? color : theme.textDim} />
@@ -326,18 +326,18 @@ export function Program() {
               style={{
                 width: '100%', padding: '16px 0', borderRadius: 16, border: 'none', cursor: 'pointer',
                 marginTop: 22,
-                background: generating ? 'rgba(255,255,255,0.08)' : `linear-gradient(135deg, ${TYPE_COLOR[selectedType]}, ${theme.accent2})`,
+                background: generating ? 'rgba(15,23,42,0.08)' : `linear-gradient(135deg, ${TYPE_COLOR[selectedType]}, ${theme.accent2})`,
                 color: generating ? theme.textMute : '#000',
                 fontSize: 15, fontWeight: 800,
                 letterSpacing: -0.1,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                boxShadow: generating ? 'none' : `0 8px 24px ${TYPE_COLOR[selectedType]}38, inset 0 1px 0 rgba(255,255,255,0.2)`,
+                boxShadow: generating ? 'none' : `0 8px 24px ${TYPE_COLOR[selectedType]}38, inset 0 1px 0 rgba(15,23,42,0.2)`,
               }}
             >
               {generating ? (
                 <>
                   <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                    style={{ width: 18, height: 18, borderRadius: '50%', border: `2px solid rgba(255,255,255,0.2)`, borderTopColor: 'rgba(255,255,255,0.7)' }} />
+                    style={{ width: 18, height: 18, borderRadius: '50%', border: `2px solid rgba(15,23,42,0.2)`, borderTopColor: 'rgba(255,255,255,0.7)' }} />
                   Generating Phase 1…
                 </>
               ) : (
@@ -363,7 +363,7 @@ export function Program() {
         borderBottom: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', gap: 12,
       }}>
         <motion.button whileTap={{ scale: 0.92 }} onClick={() => navigate(-1)}
-          style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 10, padding: '6px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+          style={{ background: 'rgba(15,23,42,0.06)', border: 'none', borderRadius: 10, padding: '6px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
           <Icon name="chevron-left" size={16} color={theme.text} />
         </motion.button>
         <div style={{ flex: 1 }}>
@@ -420,7 +420,7 @@ export function Program() {
 
           {/* Error */}
           {error && (
-            <div style={{ padding: '10px 14px', borderRadius: 12, background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.25)', fontSize: 12, color: '#F87171' }}>
+            <div style={{ padding: '10px 14px', borderRadius: 12, background: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.25)', fontSize: 12, color: '#DC2626' }}>
               {error}
             </div>
           )}
@@ -445,7 +445,7 @@ export function Program() {
                     onClick={() => setActiveTab(tab)}
                     style={{
                       flex: 1, padding: '9px 0', borderRadius: 12, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700, fontFamily: theme.mono, letterSpacing: 1.2,
-                      background: activeTab === tab ? progColor : 'rgba(255,255,255,0.04)',
+                      background: activeTab === tab ? progColor : 'rgba(15,23,42,0.04)',
                       color: activeTab === tab ? '#000' : theme.textMute,
                       textTransform: 'uppercase',
                       boxShadow: activeTab === tab ? `0 4px 12px ${progColor}33` : 'none',
@@ -482,10 +482,10 @@ export function Program() {
                     <div style={{ fontSize: 10, color: theme.textMute, fontFamily: theme.mono, letterSpacing: 1.6, marginBottom: 12, fontWeight: 700, textTransform: 'uppercase' }}>Daily Targets — Phase {currentPhase?.phase}</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                       {[
-                        { l: 'Calories', v: currentPlan.calories, unit: 'kcal', color: '#FB923C' },
+                        { l: 'Calories', v: currentPlan.calories, unit: 'kcal', color: '#EA580C' },
                         { l: 'Protein',  v: currentPlan.protein,  unit: 'g',    color: theme.accent },
                         { l: 'Carbs',    v: currentPlan.carbs,    unit: 'g',    color: theme.accent2 },
-                        { l: 'Fat',      v: currentPlan.fat,      unit: 'g',    color: '#FBBF24' },
+                        { l: 'Fat',      v: currentPlan.fat,      unit: 'g',    color: '#D97706' },
                       ].map(({ l, v, unit, color }) => (
                         <div key={l} style={{ padding: '12px 14px', borderRadius: 14, background: `${color}10`, border: `1px solid ${color}25` }}>
                           <div style={{ fontSize: 9, fontFamily: theme.mono, color, letterSpacing: 1.4, fontWeight: 700 }}>{l.toUpperCase()}</div>
@@ -509,7 +509,7 @@ export function Program() {
                         const isCurrent = currentPhase?.phase === p.phase;
                         return (
                           <div key={p.phase} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: p.phase < 3 ? `1px solid ${theme.cardBorder}` : 'none' }}>
-                            <div style={{ width: 22, height: 22, borderRadius: 6, background: isCurrent ? `${progColor}20` : 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontFamily: theme.mono, color: isCurrent ? progColor : theme.textMute, fontWeight: 700 }}>
+                            <div style={{ width: 22, height: 22, borderRadius: 6, background: isCurrent ? `${progColor}20` : 'rgba(15,23,42,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontFamily: theme.mono, color: isCurrent ? progColor : theme.textMute, fontWeight: 700 }}>
                               {p.phase}
                             </div>
                             <div style={{ flex: 1, fontSize: 12, color: isCurrent ? theme.text : theme.textDim }}>{p.label}</div>
@@ -588,7 +588,7 @@ export function Program() {
               <motion.button
                 whileTap={{ scale: 0.96 }}
                 onClick={() => setConfirmClear(true)}
-                style={{ width: '100%', padding: '10px 0', borderRadius: 12, border: '1px solid rgba(248,113,113,0.2)', background: 'transparent', color: '#F87171', fontSize: 12, cursor: 'pointer' }}
+                style={{ width: '100%', padding: '10px 0', borderRadius: 12, border: '1px solid rgba(220,38,38,0.2)', background: 'transparent', color: '#DC2626', fontSize: 12, cursor: 'pointer' }}
               >
                 Reset Program
               </motion.button>
@@ -599,7 +599,7 @@ export function Program() {
                   Cancel
                 </motion.button>
                 <motion.button whileTap={{ scale: 0.94 }} onClick={() => { clearProgram(); setConfirmClear(false); }}
-                  style={{ flex: 1, padding: '10px 0', borderRadius: 12, border: 'none', background: 'rgba(248,113,113,0.15)', color: '#F87171', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                  style={{ flex: 1, padding: '10px 0', borderRadius: 12, border: 'none', background: 'rgba(220,38,38,0.15)', color: '#DC2626', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
                   Confirm Reset
                 </motion.button>
               </div>

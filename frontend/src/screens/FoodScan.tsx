@@ -39,8 +39,8 @@ export function FoodScan() {
               height: 220,
               borderRadius: 18,
               background:
-                'repeating-linear-gradient(135deg, rgba(255,180,80,0.18), rgba(255,180,80,0.18) 6px, transparent 6px, transparent 14px), rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
+                'repeating-linear-gradient(135deg, rgba(255,180,80,0.18), rgba(255,180,80,0.18) 6px, transparent 6px, transparent 14px), rgba(15,23,42,0.04)',
+              border: '1px solid rgba(15,23,42,0.08)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

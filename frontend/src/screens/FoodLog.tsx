@@ -21,10 +21,10 @@ const MEAL_ICONS: Record<MealType, IconName> = {
   dinner: 'moon',
 };
 const MEAL_COLORS: Record<MealType, string> = {
-  breakfast: '#FBBF24',
-  lunch: '#FB923C',
-  snack: '#4ade80',
-  dinner: '#A78BFA',
+  breakfast: '#D97706',
+  lunch: '#EA580C',
+  snack: '#16A34A',
+  dinner: '#7C3AED',
 };
 
 function formatDate(dateStr: string): string {
@@ -83,7 +83,7 @@ export function FoodLog() {
                 padding: '9px 16px', borderRadius: 12, border: 'none',
                 background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`,
                 color: theme.onAccent, fontSize: 13, fontWeight: 700, cursor: 'pointer',
-                boxShadow: `0 4px 14px ${theme.accent}38, inset 0 1px 0 rgba(255,255,255,0.18)`,
+                boxShadow: `0 4px 14px ${theme.accent}38, inset 0 1px 0 rgba(15,23,42,0.18)`,
               }}
             >
               + Add Food
@@ -129,7 +129,7 @@ export function FoodLog() {
                   {totals.calories > 0 && (
                     <div style={{
                       fontSize: 11, fontFamily: theme.mono, fontWeight: 700, marginTop: 2,
-                      color: deficit >= 0 ? '#4ade80' : '#F87171',
+                      color: deficit >= 0 ? '#16A34A' : '#DC2626',
                     }}>
                       {deficit >= 0 ? `${deficit} kcal under target` : `${Math.abs(deficit)} kcal over target`}
                     </div>
@@ -138,13 +138,13 @@ export function FoodLog() {
 
                 {/* Macro bars */}
                 {[
-                  { l: 'Carbs', v: totals.carbs, color: '#FB923C' },
-                  { l: 'Protein', v: totals.protein, target: targetProtein, color: '#A78BFA' },
-                  { l: 'Fat', v: totals.fat, color: '#5EEAD4' },
+                  { l: 'Carbs', v: totals.carbs, color: '#EA580C' },
+                  { l: 'Protein', v: totals.protein, target: targetProtein, color: '#7C3AED' },
+                  { l: 'Fat', v: totals.fat, color: '#0E9384' },
                 ].map(({ l, v, target, color }) => (
                   <div key={l} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
                     <div style={{ width: 42, fontSize: 10, color: theme.textMute, fontFamily: theme.mono }}>{l}</div>
-                    <div style={{ flex: 1, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.06)' }}>
+                    <div style={{ flex: 1, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.06)' }}>
                       <motion.div
                         animate={{ width: target ? `${Math.min(100, (v / target) * 100)}%` : '30%' }}
                         transition={{ duration: 0.6 }}
@@ -212,13 +212,13 @@ export function FoodLog() {
                             P:{entry.protein}g · C:{entry.carbs}g · F:{entry.fat}g
                           </div>
                         </div>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: '#FB923C', fontFamily: theme.mono }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: '#EA580C', fontFamily: theme.mono }}>
                           {entry.calories}
                         </div>
                         <motion.button
                           whileTap={{ scale: 0.88 }}
                           onClick={() => removeEntry(entry.id)}
-                          style={{ background: 'none', border: 'none', color: 'rgba(248,113,113,0.6)', cursor: 'pointer', fontSize: 18, padding: '0 4px', lineHeight: 1 }}
+                          style={{ background: 'none', border: 'none', color: 'rgba(220,38,38,0.6)', cursor: 'pointer', fontSize: 18, padding: '0 4px', lineHeight: 1 }}
                         >
                           ×
                         </motion.button>

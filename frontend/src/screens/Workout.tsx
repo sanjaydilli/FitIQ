@@ -11,10 +11,10 @@ import { useWorkoutLog } from '../hooks/useWorkoutLog';
 import { PUSH_DAY, PULL_DAY, LEG_DAY, FULL_BODY } from '../data/exercises';
 
 const PRESETS: { id: string; name: string; subtitle: string; icon: IconName; color: string; exerciseIds: string[] }[] = [
-  { id: 'push', name: 'Push Day', subtitle: 'Chest · Shoulders · Triceps', icon: 'muscle', color: '#A78BFA', exerciseIds: PUSH_DAY },
-  { id: 'pull', name: 'Pull Day', subtitle: 'Back · Biceps', icon: 'barbell', color: '#5EEAD4', exerciseIds: PULL_DAY },
-  { id: 'legs', name: 'Leg Day', subtitle: 'Quads · Hamstrings · Calves', icon: 'legs', color: '#FB923C', exerciseIds: LEG_DAY },
-  { id: 'full', name: 'Full Body', subtitle: 'All muscle groups', icon: 'lightning', color: '#FBBF24', exerciseIds: FULL_BODY },
+  { id: 'push', name: 'Push Day', subtitle: 'Chest · Shoulders · Triceps', icon: 'muscle', color: '#7C3AED', exerciseIds: PUSH_DAY },
+  { id: 'pull', name: 'Pull Day', subtitle: 'Back · Biceps', icon: 'barbell', color: '#0E9384', exerciseIds: PULL_DAY },
+  { id: 'legs', name: 'Leg Day', subtitle: 'Quads · Hamstrings · Calves', icon: 'legs', color: '#EA580C', exerciseIds: LEG_DAY },
+  { id: 'full', name: 'Full Body', subtitle: 'All muscle groups', icon: 'lightning', color: '#D97706', exerciseIds: FULL_BODY },
 ];
 
 export function Workout() {
@@ -58,14 +58,14 @@ export function Workout() {
                 padding: '14px 16px', borderRadius: 16,
                 background: `linear-gradient(135deg, ${theme.accent}20, ${theme.accent2}15)`,
                 border: `1px solid ${theme.accent}40`,
-                boxShadow: `inset 0 1px 0 rgba(255,255,255,0.04)`,
+                boxShadow: `inset 0 1px 0 rgba(15,23,42,0.04)`,
                 cursor: 'pointer',
               }}
             >
               <motion.div
                 animate={{ opacity: [0.6, 1, 0.6] }}
                 transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-                style={{ width: 10, height: 10, borderRadius: '50%', background: '#F87171', boxShadow: '0 0 8px #F87171', flexShrink: 0 }}
+                style={{ width: 10, height: 10, borderRadius: '50%', background: '#DC2626', boxShadow: '0 0 8px #DC2626', flexShrink: 0 }}
               />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: -0.2 }}>{active.name} in progress</div>
@@ -105,7 +105,7 @@ export function Workout() {
                       width: 48, height: 48, borderRadius: 14,
                       background: `${preset.color}28`, border: `1px solid ${preset.color}50`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      position: 'relative', boxShadow: `0 4px 14px ${preset.color}30, inset 0 1px 0 rgba(255,255,255,0.15)`,
+                      position: 'relative', boxShadow: `0 4px 14px ${preset.color}30, inset 0 1px 0 rgba(15,23,42,0.15)`,
                     }}>
                       <Icon name={preset.icon} size={24} color={preset.color} strokeWidth={1.6} />
                     </div>
@@ -117,10 +117,10 @@ export function Workout() {
                       whileTap={{ scale: 0.95 }}
                       onClick={() => handleStartPreset(preset.name, preset.exerciseIds)}
                       style={{
-                        width: '100%', padding: '9px 0', borderRadius: 10, border: 'none',
+                        width: '100%', padding: '10px 0', borderRadius: 11, border: 'none',
                         background: `linear-gradient(135deg, ${preset.color}, ${preset.color}cc)`,
-                        color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer',
-                        boxShadow: `0 2px 8px ${preset.color}40, inset 0 1px 0 rgba(255,255,255,0.2)`,
+                        color: '#0a0612', fontSize: 12, fontWeight: 800, cursor: 'pointer',
+                        boxShadow: `0 2px 8px ${preset.color}40, inset 0 1px 0 rgba(15,23,42,0.2)`,
                         letterSpacing: 0.3,
                       }}
                     >
@@ -144,7 +144,7 @@ export function Workout() {
                 display: 'flex', alignItems: 'center', gap: 12,
                 padding: '14px 16px', borderRadius: 16,
                 background: theme.card, border: `1px solid ${theme.cardBorder}`,
-                boxShadow: `inset 0 1px 0 rgba(255,255,255,0.04)`,
+                boxShadow: `inset 0 1px 0 rgba(15,23,42,0.04)`,
                 cursor: 'pointer',
               }}
             >
@@ -174,7 +174,7 @@ export function Workout() {
             </div>
             <motion.div whileTap={{ scale: 0.97 }} whileHover={{ y: -2 }} onClick={() => navigate('/workout/history')} style={{ cursor: 'pointer' }}>
               <Card style={{ borderRadius: 18, padding: '16px', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at top right, ${todaySession ? '#4ade8020' : theme.accent + '15'}, transparent 60%)`, pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at top right, ${todaySession ? '#16A34A20' : theme.accent + '15'}, transparent 60%)`, pointerEvents: 'none' }} />
                 <div style={{ position: 'relative' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
                     <div>
@@ -182,7 +182,7 @@ export function Workout() {
                       <div style={{ fontSize: 11, color: theme.textMute, fontFamily: theme.mono, marginTop: 2 }}>{displaySession.date}</div>
                     </div>
                     {todaySession && (
-                      <div style={{ fontSize: 10, fontFamily: theme.mono, fontWeight: 800, color: '#4ade80', background: 'rgba(74,222,128,0.12)', border: '1px solid rgba(74,222,128,0.3)', borderRadius: 8, padding: '3px 8px', letterSpacing: 0.8 }}>
+                      <div style={{ fontSize: 10, fontFamily: theme.mono, fontWeight: 800, color: '#16A34A', background: 'rgba(22,163,74,0.12)', border: '1px solid rgba(22,163,74,0.3)', borderRadius: 8, padding: '3px 8px', letterSpacing: 0.8 }}>
                         DONE ✓
                       </div>
                     )}

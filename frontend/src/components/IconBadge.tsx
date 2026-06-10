@@ -15,7 +15,7 @@ export function IconBadge({
   name,
   size = 40,
   color = 'white',
-  bg = 'rgba(255,255,255,0.08)',
+  bg = 'rgba(15,23,42,0.08)',
   radius,
   iconSize,
   strokeWidth = 1.8,
