@@ -20,7 +20,8 @@ const MAX_ENTRIES  = 52; // ~1 year of weekly entries
 function load(): Measurement[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as Measurement[]) : [];
+    const data = raw ? (JSON.parse(raw) as Measurement[]) : [];
+    return data.sort((a, b) => a.date.localeCompare(b.date));
   } catch { return []; }
 }
 

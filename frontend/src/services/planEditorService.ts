@@ -35,7 +35,11 @@ function sanitizeExercise(raw: any): PlannedExercise | null {
     name: tmpl.name,
     sets: clamp(Number(raw.sets) || tmpl.defaultSets, 1, 10),
     repsDisplay: String(raw.repsDisplay ?? raw.reps ?? tmpl.defaultReps).slice(0, 16),
-    restSeconds: clamp(Number(raw.restSeconds) || tmpl.restSeconds, 15, 300),
+    restSeconds: clamp(
+      raw.restSeconds != null ? Number(raw.restSeconds) : tmpl.restSeconds,
+      tmpl.category === 'cardio' ? 0 : 15,
+      300
+    ),
     cue: String(raw.cue ?? tmpl.why).slice(0, 140),
   };
 }
@@ -160,7 +164,7 @@ ${exerciseList}
 
 RULES:
 - Return the COMPLETE revised plan, all days included
-- sets: 1-10, restSeconds: 15-300
+- sets: 1-10, restSeconds: 0-300 (0 for cardio, minimum 15 for strength exercises)
 - Compounds first within each day
 - Return ONLY valid JSON in this exact format, no markdown:
 {"weeklyPlan":[{"day":"Monday","focus":"...","estimatedMinutes":60,"exercises":[{"exerciseId":"bench_bb","name":"Barbell Bench Press","sets":4,"repsDisplay":"8-10","restSeconds":90,"cue":"..."}]}]}`;

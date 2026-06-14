@@ -34,7 +34,7 @@ export function useCustomRecipes() {
   const addRecipe = useCallback((recipe: Omit<SavedRecipe, 'id' | 'createdAt'>) => {
     const full: SavedRecipe = {
       ...recipe,
-      id: `recipe_${Date.now()}`,
+      id: `recipe_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
       createdAt: Date.now(),
     };
     setRecipes(prev => {

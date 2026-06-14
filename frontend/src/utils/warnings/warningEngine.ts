@@ -300,6 +300,7 @@ function checkW15(s: UserStats): Warning | null {
   const ironTarget = s.gender === 'male' ? 8 : 18;
   if (
     !(
+      s.teaLoggedMinutesAgo > 0 &&
       s.teaLoggedMinutesAgo < 60 &&
       s.ironRichMealLogged &&
       s.ironIntake < ironTarget
