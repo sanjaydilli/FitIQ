@@ -1,6 +1,6 @@
 # FitIQ — Project Manager Brief
 # Claude Code reads this every session
-# Last updated: May 2026
+# Last updated: July 2, 2026
 
 ═══════════════════════════════════
 ## PRODUCT VISION
@@ -25,48 +25,64 @@ Market: India first → Global Indian diaspora → World
 ## CORE FEATURES (Build Priority)
 ═══════════════════════════════════
 
-MUST HAVE (MVP):
-P1. Indian food database + calorie tracking
-P2. AI fitness coach (Ollama + RAG)
-P3. Personalized workout + diet plan
-P4. Smart health warnings (15 warnings)
-P5. Body fat % estimation
-P6. Daily quest system + XP points
+MUST HAVE (MVP): ✅ ALL BUILT
+P1. Indian food database + calorie tracking ✅
+P2. AI fitness coach (Groq cloud LLM) ✅
+P3. Personalized workout + diet plan ✅
+P4. Smart health warnings ✅
+P5. Body fat % estimation ✅
+P6. Achievements + streaks ✅
 
 SHOULD HAVE (V2):
-P7. Friends leaderboard
-P8. Instagram sharing
-P9. 3-month wrapped
-P10. Avatar customization
+P7. Friends leaderboard (UI ✅, backend ❌)
+P8. Instagram sharing ❌
+P9. Weekly wrapped ✅
+P10. Avatar customization ❌ (FitAvatar removed)
 
 NICE TO HAVE (V3):
-P11. Wearable integration
-P12. Doctor connect
-P13. Supplement guidance
-P14. Regional language support
+P11. Wearable integration ❌
+P12. Doctor connect ❌
+P13. Supplement guidance ❌
+P14. Regional language support ❌
 
 ═══════════════════════════════════
-## ARCHITECTURE DECISIONS
+## ARCHITECTURE (as actually built)
 ═══════════════════════════════════
 
 FRONTEND:
-- React + TypeScript
+- React + TypeScript (CRA / react-scripts)
 - Framer Motion (animations)
+- Tailwind CSS 4
+- react-router-dom 7
+- Capacitor 8 → Android APK
+  (haptics, keyboard, local notifications,
+   splash screen, status bar, step counter)
 - Mobile first (390px)
 - 3 themes: Aurora, Graphite, Neon
 
-AI LAYER:
-- Ollama (local LLM - Llama 3.1 8B)
-- ChromaDB (vector database for RAG)
-- LlamaIndex (RAG framework)
+AI LAYER (CHANGED from original plan):
+- ❌ NOT Ollama/ChromaDB/LlamaIndex anymore
+- ✅ Express backend on Railway
+  https://fitiq-production-60af.up.railway.app
+- ✅ Groq API, model: llama-3.3-70b-versatile
+- Routes: /chat (AI coach), /mealPlan
+- helmet + CORS + express-rate-limit
+- Meal plan macros re-verified with pure math
+  regardless of model output
+- Legacy RAG experiments live in scripts/
+  (buildRAG.py, ragServer.py, chroma_db/)
 - AI ONLY for: advice, plans, explanations
 - NEVER use AI for: calculations, warnings
 
 DATABASE:
-- Firebase Firestore (user data)
-- IFCT 2017 (542 Indian ingredients)
-- Traditional recipes (200 dishes)
-- Custom recipes (user created)
+- Firebase Auth + Firestore (auth, user data sync)
+- indianFoods.ts: 565 foods (IFCT 2017 + custom X-entries)
+  ⚠ Macros cleaned July 2, 2026: 26 fixes
+  (oils 0→900 kcal, chicken leg 384→191,
+   lemon carbs, USDA fiber double-count in
+   X-entries, crab kcal recomputed)
+- recipes.ts: ~3,420 dishes with verified macros
+- exercises.ts: exercise database
 
 CALCULATIONS (Pure Math - No AI):
 - BMR: Mifflin St Jeor equation
@@ -75,66 +91,74 @@ CALCULATIONS (Pure Math - No AI):
 - Body fat: Navy formula
 - Warnings: If/else logic only
 
+TESTS:
+- 27 suites, 600 tests, all passing (July 2, 2026)
+- `cd frontend && CI=true npx react-scripts test --watchAll=false`
+
 ═══════════════════════════════════
 ## WHAT'S BUILT ✅
 ═══════════════════════════════════
 
-UI/SCREENS:
-✅ ThemeSelector (3 themes)
-✅ OnboardingFlow (4 steps)
-✅ AIAnalysis (loading screen)
-✅ Home Dashboard
-✅ Workout screen
-✅ FoodSearch screen
-✅ FoodDetail screen
-✅ CustomRecipe builder
-✅ Leaderboard
-✅ Profile screen
+SCREENS (frontend/src/screens/):
+✅ ThemeSelector, OnboardingFlow, AIAnalysis
+✅ Home, Workout, WorkoutLogger, StrengthHistory
+✅ FoodSearch, FoodDetail, FoodLog, FoodScan
+✅ Recipes, DishDetail, CustomRecipe
+✅ MealPlanner, PlanEditor, Program
+✅ AICoach, ScienceTour
+✅ BodyComp, ActivityScreen, DailyRoutine
+✅ Achievements, WeeklyWrapped, Leaderboard
+✅ Profile, Settings
+✅ auth/ (Login, Signup)
 
 COMPONENTS:
-✅ FitAvatar (SVG, 7 stages)
-✅ RingMeter (health score)
-✅ Spark (charts)
-✅ TabBar (navigation)
-✅ WarningCard (15 warnings)
+✅ ActivityCalendar, Background, Card, Icon,
+   IconBadge, LineChart, MacroRing, PhoneFrame,
+   Reveal, RingMeter, Spark, TabBar,
+   WaterTimeline, warnings/WarningCard
+
+SERVICES:
+✅ aiService (backend client)
+✅ mealPlannerService (real-dish planner)
+✅ planEditorService
+✅ programPlannerService + programPhaseEngine
+✅ notificationService (local notifications)
+
+HOOKS:
+✅ useAICoach, useAchievements, useAndroidBack,
+   useBodyComp, useCustomPlan, useCustomRecipes,
+   useDailyRoutine, useFoodLog, useNotifications,
+   useProgram, useStepCounter, useWarnings,
+   useWorkoutLog
+
+BACKEND (backend/):
+✅ Express + Groq, deployed on Railway
+✅ routes/chat.ts, routes/mealPlan.ts
+✅ nutrition-context.ts (coach context)
 
 DATA:
-✅ 542 IFCT ingredients (indianFoods.ts)
-✅ Food calculator (pure math)
-✅ Warning engine (15 warnings)
-✅ Theme system (3 themes)
-✅ Food search service
+✅ 565 foods, ~3,420 recipes, exercises
+✅ Warning engine + cooldowns
+✅ Firebase auth + Firestore sync
 
 ═══════════════════════════════════
 ## IN PROGRESS 🔄
 ═══════════════════════════════════
 
-→ Traditional recipes database
-  Script: scripts/scrapeRecipes.py
-  Running: Scraping tarladalal.com
-  Status: In progress
-
-→ Ollama + RAG integration
-  Status: Not started
-  Next task
+→ Uncommitted: indianFoods.ts macro cleanup
+  (26 fixes, tests green — ready to commit)
 
 ═══════════════════════════════════
-## TODO ❌
+## TODO ❌ (confirm priorities with Sanjay)
 ═══════════════════════════════════
 
-IMMEDIATE (this week):
-1. Ollama integration
-2. RAG pipeline (ChromaDB)
-3. AI coach service
-4. Firebase setup
-5. Deploy to Netlify
-
-NEXT WEEK:
-6. Connect food log to AI
-7. Real plan generation
-8. Body fat estimation
-9. Progress tracking
-10. Beta user testing
+- Commit + push macro cleanup
+- Leaderboard backend (friends, real data)
+- Play Store release build + listing
+- Beta user testing
+- Instagram sharing (V2)
+- Regional languages (V3)
+- Wearables (V3)
 
 ═══════════════════════════════════
 ## FILE STRUCTURE
@@ -143,47 +167,30 @@ NEXT WEEK:
 FitIQ/
 ├── frontend/
 │   ├── src/
-│   │   ├── components/
-│   │   │   ├── FitAvatar.tsx
-│   │   │   ├── RingMeter.tsx
-│   │   │   ├── Spark.tsx
-│   │   │   ├── TabBar.tsx
-│   │   │   └── warnings/
-│   │   │       └── WarningCard.tsx
-│   │   ├── screens/
-│   │   │   ├── ThemeSelector.tsx
-│   │   │   ├── OnboardingFlow.tsx
-│   │   │   ├── AIAnalysis.tsx
-│   │   │   ├── Home.tsx
-│   │   │   ├── Workout.tsx
-│   │   │   ├── FoodSearch.tsx
-│   │   │   ├── FoodDetail.tsx
-│   │   │   ├── CustomRecipe.tsx
-│   │   │   ├── Leaderboard.tsx
-│   │   │   └── Profile.tsx
+│   │   ├── components/ (14 + warnings/)
+│   │   ├── screens/ (27 + auth/)
 │   │   ├── data/
-│   │   │   ├── indianFoods.ts (542 foods)
-│   │   │   └── traditionalRecipes.ts
+│   │   │   ├── indianFoods.ts (565 foods)
+│   │   │   ├── recipes.ts (~3,420 dishes)
+│   │   │   └── exercises.ts
 │   │   ├── utils/
 │   │   │   ├── foodCalculator.ts
+│   │   │   ├── bodyComposition.ts
+│   │   │   ├── date.ts
 │   │   │   └── warnings/
-│   │   │       ├── warningEngine.ts
-│   │   │       ├── warningTypes.ts
-│   │   │       └── warningCooldowns.ts
-│   │   ├── services/
-│   │   │   └── foodSearchService.ts
-│   │   ├── context/
-│   │   │   ├── ThemeContext.tsx
-│   │   │   └── UserContext.tsx
-│   │   └── themes/
-│   │       └── tokens.ts
-├── design/ (Claude Design files)
-├── scripts/
-│   ├── scrapeRecipes.py
-│   └── buildRecipeDB.ts
+│   │   ├── services/ (6 services)
+│   │   ├── hooks/ (13 hooks)
+│   │   ├── context/ (Auth, Theme, User)
+│   │   ├── firebase.ts
+│   │   └── __tests__/ (27 suites, 600 tests)
+│   ├── android/ (Capacitor)
+│   └── capacitor.config.ts
+├── backend/ (Express + Groq, Railway)
+│   └── src/routes/ (chat, mealPlan)
+├── ai-engine/ (formulas, prompts — empty)
+├── docs/ (product-spec, research tiers 1-4)
+├── scripts/ (RAG experiments, recipe macros)
 ├── ifct-data/
-├── indb-data/
-├── CLAUDE.md
 └── PROJECT_MANAGER.md
 
 ═══════════════════════════════════
@@ -200,6 +207,8 @@ FitIQ/
 8. Indian context in everything
 9. Science backed warnings only
 10. Pure TypeScript, no any types
+11. Run the test suite before committing
+12. Keep this file updated each session
 
 ═══════════════════════════════════
 ## CURRENT SESSION TASK
@@ -207,28 +216,14 @@ FitIQ/
 
 Update this section each session:
 
-Session: June 2026 — Test-hardening sprint (COMPLETE)
-Test suite: 582 tests / 26 suites, all green.
-Bug fixes landed this sprint:
-- W15 warning false-fired with no tea logged (missing >0 guard)
-- Body-comp entries now sorted by date on load
-- Custom recipe IDs could collide (added random suffix)
-- Cardio rest-seconds clamp allowed 0; strength min 15
-New coverage: warningEngine W05–W15, program fallback
-invariant, generateProgramPhase happy path, useCustomPlan.
-
-⚠ OPEN FINDINGS (surfaced, not yet fixed):
-1. DEAD WARNINGS — useWarnings.ts buildStats() hardcodes
-   placeholder constants, so ~9 of 15 warnings can NEVER
-   fire in production (W04, W07–W09, W11–W15). Pinned by
-   warningReachability.test.ts. Needs real tracked data
-   wired into buildStats.
-2. generateProgramPhase trusts AI weeklyPlan verbatim — no
-   sanitization (bogus exerciseIds / out-of-range sets pass
-   through). planEditorService does sanitize. Product call.
-
-Next task (was queued): Ollama + RAG integration
-- src/services/ollamaService.ts, ragService.ts, useAICoach.ts
+Session: July 2, 2026
+Done:
+- Cleaned indianFoods.ts macros (26 fixes,
+  verified against official IFCT 2017 corpus)
+- Full test suite run: 27/27 suites,
+  600/600 tests passing
+- Updated this brief to actual project state
+Next: commit macro cleanup, then pick from TODO
 
 ═══════════════════════════════════
 ## PROMPTS THAT WORK WELL
