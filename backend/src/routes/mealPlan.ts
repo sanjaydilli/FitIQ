@@ -5,7 +5,9 @@ import { NUTRITION_CONTEXT } from '../nutrition-context';
 const router = Router();
 const groq = new Groq();
 
-const MODEL = 'llama-3.3-70b-versatile';
+// gpt-oss-120b: Groq's recommended replacement for llama-3.3-70b-versatile
+// (deprecated June 2026). Reasoning tokens count toward max_tokens.
+const MODEL = 'openai/gpt-oss-120b';
 
 interface Meal {
   meal: string;
@@ -116,7 +118,7 @@ The 4 meal calories MUST sum to exactly ${targetCalories}. Protein MUST sum to $
   try {
     const response = await groq.chat.completions.create({
       model: MODEL,
-      max_tokens: 900,
+      max_tokens: 2048,
       temperature: 0.3,
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },

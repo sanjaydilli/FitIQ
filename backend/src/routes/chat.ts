@@ -5,7 +5,10 @@ import { NUTRITION_CONTEXT } from '../nutrition-context';
 const router = Router();
 const groq = new Groq();
 
-const MODEL = 'llama-3.3-70b-versatile';
+// gpt-oss-120b: Groq's recommended replacement for llama-3.3-70b-versatile
+// (deprecated June 2026). Reasoning model — reasoning tokens count toward
+// max_tokens, so the budget is higher than the old 350.
+const MODEL = 'openai/gpt-oss-120b';
 
 interface ChatBody {
   message: string;
@@ -74,7 +77,7 @@ USER QUESTION: ${message}`;
   try {
     const response = await groq.chat.completions.create({
       model: MODEL,
-      max_tokens: 350,
+      max_tokens: 1024,
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user',   content: userContext },
