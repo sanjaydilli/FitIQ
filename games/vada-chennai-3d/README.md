@@ -26,6 +26,15 @@ Explore a 480×360 m low-poly world — harbour piers over the sea, the fish mar
 the carrom club, the tea kadai, a temple with a gopuram, market stalls and Guna's
 den — on foot or behind the handlebar of an auto-rickshaw.
 
+### Remastered visuals
+
+- Physically-based materials (PBR) with procedural weathered-plaster and palm-frond textures
+- Real-time sun shadows (soft PCF, frustum follows the player)
+- ACES filmic tone mapping + sRGB output, exposure that dips with the sun
+- Shader sky dome with a visible sun disc, dusk tints and a night starfield
+- Animated ocean shader — real waves, fresnel color, sun glints, distance fog
+- Cinematic vignette, curved palms with 3D fronds, higher-detail terrain texture
+
 ### GTA-style systems
 
 - **Third-person camera** that follows you walking and swings back wider while driving
