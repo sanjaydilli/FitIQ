@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vada Chennai 3D: Streets of the North</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:100%; height:100%; overflow:hidden; background:#0a0f1e; font-family:'Segoe UI',Arial,sans-serif; }
+  canvas#game { display:block; }
+  .overlay { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(4,8,20,.88); z-index:50; }
+  .panel { background:#141b2e; border:2px solid #e8a33d; border-radius:12px; padding:28px 36px; max-width:640px; color:#e8e2d0; text-align:center; box-shadow:0 10px 60px rgba(0,0,0,.6); }
+  .panel h1 { font-size:34px; color:#e8a33d; letter-spacing:2px; margin-bottom:4px; text-transform:uppercase; }
+  .panel h2 { font-size:15px; color:#7fb4d8; font-weight:normal; margin-bottom:16px; }
+  .panel p { font-size:14px; line-height:1.6; margin-bottom:12px; color:#c9c2ad; }
+  .panel .controls { text-align:left; display:inline-block; font-size:13px; line-height:1.9; color:#9fb8c9; margin-bottom:14px; }
+  .panel .controls b { color:#e8a33d; display:inline-block; width:120px; }
+  .btn { background:#e8a33d; color:#1a1408; border:none; padding:12px 34px; font-size:16px; font-weight:bold; border-radius:8px; cursor:pointer; letter-spacing:1px; }
+  .btn:hover { background:#ffc35c; }
+  .disclaimer { font-size:11px; color:#6b7688; margin-top:14px; }
+  #hud { position:fixed; top:12px; left:12px; z-index:10; color:#fff; text-shadow:0 1px 3px #000; font-size:14px; pointer-events:none; }
+  #hpbarWrap { width:180px; height:14px; background:rgba(0,0,0,.55); border:1px solid #000; border-radius:7px; overflow:hidden; margin-bottom:6px; }
+  #hpbar { height:100%; width:100%; background:linear-gradient(90deg,#d33,#f66); transition:width .2s; }
+  #stats { background:rgba(0,0,0,.45); padding:4px 10px; border-radius:6px; display:inline-block; }
+  #quest { position:fixed; top:12px; right:12px; z-index:10; max-width:320px; background:rgba(10,16,32,.75); border-left:3px solid #e8a33d; color:#f0e8d0; padding:10px 14px; border-radius:6px; font-size:13px; line-height:1.5; }
+  #quest b { color:#e8a33d; display:block; font-size:11px; letter-spacing:1px; text-transform:uppercase; margin-bottom:3px; }
+  #dialog { position:fixed; left:50%; bottom:28px; transform:translateX(-50%); width:min(680px,92vw); background:rgba(8,12,26,.93); border:2px solid #4a6a8a; border-radius:10px; padding:14px 20px; color:#e8e2d0; z-index:20; display:none; }
+  #dialog .who { color:#e8a33d; font-weight:bold; font-size:13px; letter-spacing:1px; margin-bottom:4px; text-transform:uppercase; }
+  #dialog .txt { font-size:15px; line-height:1.55; }
+  #dialog .hint { color:#7fb4d8; font-size:11px; margin-top:8px; text-align:right; }
+  #prompt { position:fixed; left:50%; bottom:120px; transform:translateX(-50%); background:rgba(0,0,0,.6); color:#ffe9b0; padding:5px 14px; border-radius:16px; font-size:13px; z-index:10; display:none; }
+  #toast { position:fixed; left:50%; top:70px; transform:translateX(-50%); background:rgba(232,163,61,.95); color:#221806; padding:8px 20px; border-radius:20px; font-weight:bold; font-size:14px; z-index:30; display:none; box-shadow:0 4px 20px rgba(0,0,0,.5); }
+  #minimap { position:fixed; right:12px; bottom:12px; border:2px solid rgba(232,163,61,.7); border-radius:6px; z-index:10; background:#000; }
+  #speedo { position:fixed; left:12px; bottom:12px; z-index:10; background:rgba(0,0,0,.55); color:#ffe9b0; padding:6px 14px; border-radius:8px; font-size:15px; font-weight:bold; display:none; }
+  #minigame { display:none; }
+  #minigame .panel { max-width:560px; }
+  #carromCanvas { border-radius:8px; display:block; margin:0 auto 12px; cursor:crosshair; }
+  #mgInfo { font-size:14px; color:#ffe9b0; margin-bottom:10px; }
+  #fishZone { position:relative; width:60px; height:300px; background:#12263a; border:2px solid #4a6a8a; border-radius:8px; margin:0 auto 14px; overflow:hidden; }
+  #fishGreen { position:absolute; left:0; width:100%; background:rgba(60,200,110,.55); border-top:1px solid #3c8; border-bottom:1px solid #3c8; }
+  #fishMarker { position:absolute; left:0; width:100%; height:6px; background:#ffd75c; box-shadow:0 0 8px #ffd75c; }
+</style>
+</head>
+<body>
+<canvas id="minimap" width="180" height="135"></canvas>
+
+<div id="hud">
+  <div id="hpbarWrap"><div id="hpbar"></div></div>
+  <div id="stats">₹ <span id="money">0</span> &nbsp;|&nbsp; RESPECT <span id="respect">0</span></div>
+</div>
+<div id="quest"><b>Objective</b><span id="questTxt"></span></div>
+<div id="prompt"></div>
+<div id="toast"></div>
+<div id="speedo">0 km/h</div>
+
+<div id="dialog">
+  <div class="who" id="dWho"></div>
+  <div class="txt" id="dTxt"></div>
+  <div class="hint">Press E / Enter to continue</div>
+</div>
+
+<div class="overlay" id="startScreen">
+  <div class="panel">
+    <h1>Vada Chennai 3D</h1>
+    <h2>Streets of the North — an open-world fan game</h2>
+    <p>North Madras, by the sea. You are <b style="color:#e8a33d">Anbu</b>, a young carrom champion from the
+       fishing settlement. Walk the streets, drive the auto, and write your own story.</p>
+    <div class="controls">
+      <div><b>W / S</b> Walk · drive forward / back</div>
+      <div><b>A / D</b> Turn left / right</div>
+      <div><b>F</b> Enter / exit the auto-rickshaw</div>
+      <div><b>E / Enter</b> Talk · interact</div>
+      <div><b>Space</b> Punch</div>
+      <div><b>H</b> Help</div>
+    </div><br>
+    <button class="btn" id="startBtn">ENTER THE SETTLEMENT</button>
+    <div class="disclaimer">A non-commercial, fan-made tribute inspired by the film <i>Vada Chennai</i> (2018).<br>
+    All art and code are original. No assets from the film are used. Built with three.js (MIT).</div>
+  </div>
+</div>
+
+<div class="overlay" id="minigame">
+  <div class="panel">
+    <h1 id="mgTitle" style="font-size:24px"></h1>
+    <div id="mgInfo"></div>
+    <canvas id="carromCanvas" width="460" height="460"></canvas>
+    <div id="fishZone"><div id="fishGreen"></div><div id="fishMarker"></div></div>
+    <button class="btn" id="mgBtn">QUIT</button>
+  </div>
+</div>
+
+<div class="overlay" id="endScreen" style="display:none">
+  <div class="panel">
+    <h1>Thalaivan</h1>
+    <h2>The settlement looks to you now</h2>
+    <p id="endText">You fought for these streets. Guna's men are broken, the market is safe, and every
+       fisherman from the pier to the rail line knows your name. What kind of leader will Anbu be?</p>
+    <div id="endChoices">
+      <button class="btn" id="endGood">PROTECT THE PEOPLE</button>
+      <button class="btn" id="endBad" style="background:#c04a3a;color:#fff">RULE BY FEAR</button>
+    </div>
+  </div>
+</div>
+
+<script src="three.min.js"></script>
+<script>
+'use strict';
+/* ============================================================
+   VADA CHENNAI 3D: STREETS OF THE NORTH
+   A fan-made GTA-style open-world game. three.js + vanilla JS.
+   ============================================================ */
+
+// ---------- Tile map (logical city plan; also drives the ground texture) ----------
+const TILE = 4, MW = 120, MH = 90;              // 4 world units per tile → 480 x 360 world
+const T = { GRASS:0, ROAD:1, SAND:2, WATER:3, PIER:4, BLDG:5, RAIL:6, DIRT:7 };
+const map = new Uint8Array(MW * MH);
+const tileAt = (tx,ty) => (tx<0||ty<0||tx>=MW||ty>=MH) ? T.WATER : map[ty*MW+tx];
+const solidTile = t => t === T.WATER || t === T.BLDG;
+const tileAtWorld = (x,z) => tileAt((x/TILE)|0, (z/TILE)|0);
+
+function paintT(tx,ty,tw,th,t){
+  for(let y=ty;y<ty+th;y++) for(let x=tx;x<tx+tw;x++)
+    if(x>=0&&y>=0&&x<MW&&y<MH) map[y*MW+x]=t;
+}
+let seed = 7;
+const rnd = () => (seed = (seed*16807)%2147483647) / 2147483647;
+
+paintT(0,0,MW,MH,T.GRASS);
+for(let i=0;i<260;i++){ paintT((rnd()*MW)|0,(rnd()*MH)|0, 2+(rnd()*4)|0, 2+(rnd()*3)|0, T.DIRT); }
+paintT(104,0,MW-104,MH,T.WATER);
+paintT(96,0,8,MH,T.SAND);
+for(let y=0;y<MH;y++){ if((y*7)%13<4) paintT(95,y,1,1,T.SAND); }
+paintT(4,0,2,MH,T.RAIL);
+paintT(24,0,3,MH,T.ROAD);
+paintT(5,20,92,3,T.ROAD);
+paintT(5,45,92,3,T.ROAD);
+paintT(5,70,92,3,T.ROAD);
+paintT(60,22,3,24,T.ROAD);
+paintT(44,47,3,24,T.ROAD);
+paintT(96,34,19,4,T.PIER);
+paintT(96,60,13,3,T.PIER);
+
+// buildings: [tx,ty,tw,th,name,wall,roof,height]
+const buildings = [
+  [30,50,5,4,"ANBU'S HOME",'#b58a5a','#7a4f2a',7],
+  [44,24,8,6,"NORTH MADRAS CARROM CLUB",'#4a7c94','#2e5468',10],
+  [36,40,5,3,"TEA KADAI",'#9a6f43','#6b4423',6],
+  [14,60,7,5,"GUNA'S DEN",'#6e4a4a','#472c2c',8],
+  [58,12,7,5,"KAALIAMMAN TEMPLE",'#c9803a','#8f5a20',9],
+  [84,33,6,4,"FISH MARKET",'#5a8a6e','#3a5f4a',7],
+  [56,49,3,3,"STALL",'#8a6a9a','#5f4470',4],
+  [61,49,3,3,"STALL",'#9a8a4a','#6f6230',4],
+  [66,49,3,3,"STALL",'#4a8a8a','#306060',4],
+  [56,54,3,3,"STALL",'#8a5a5a','#603a3a',4],
+  [12,10,4,3,"HUT",'#a08050','#6f5530',5],[18,12,4,3,"HUT",'#a08050','#6f5530',5],
+  [12,28,4,3,"HUT",'#a08050','#6f5530',5],[34,10,4,3,"HUT",'#a08050','#6f5530',5],
+  [78,10,4,3,"HUT",'#a08050','#6f5530',5],[86,14,4,3,"HUT",'#a08050','#6f5530',5],
+  [78,58,4,3,"HUT",'#a08050','#6f5530',5],[86,62,4,3,"HUT",'#a08050','#6f5530',5],
+  [12,78,4,3,"HUT",'#a08050','#6f5530',5],[34,78,4,3,"HUT",'#a08050','#6f5530',5],
+  [70,78,4,3,"HUT",'#a08050','#6f5530',5],[52,64,4,3,"HUT",'#a08050','#6f5530',5],
+];
+for(const b of buildings) paintT(b[0],b[1],b[2],b[3],T.BLDG);
+
+// palms (world coords), kept clear of key spots
+const palms = [];
+for(let i=0;i<90;i++){
+  const tx = (rnd()*94)|0, ty = (rnd()*MH)|0;
+  const t = tileAt(tx,ty);
+  if(t===T.GRASS||t===T.SAND||t===T.DIRT) palms.push({x:tx*TILE+2, z:ty*TILE+2});
+}
+const KEEPOUT = [[130,222],[136,224],[192,124],[344,152],[68,264],[448,144],[152,176],[140,232],[216,184]];
+for(let i=palms.length-1;i>=0;i--){
+  if(KEEPOUT.some(k=>Math.hypot(palms[i].x-k[0],palms[i].z-k[1])<10)) palms.splice(i,1);
+}
+
+// shells on the beach
+const shells = [];
+while(shells.length<8) shells.push({x:(96+rnd()*7)*TILE, z:(6+rnd()*78)*TILE, got:false});
+
+// ---------- three.js scene ----------
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.domElement.id = 'game';
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, .1, 900);
+camera.position.set(130, 8, 235); // behind Anbu's starting spot
+scene.fog = new THREE.Fog(0x87b5e0, 140, 420);
+addEventListener('resize', ()=>{
+  camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+const hemi = new THREE.HemisphereLight(0xbfd8ff, 0x6a7a4a, .75); scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xfff2d8, 1); sun.position.set(150,200,80); scene.add(sun);
+
+// ground: the tile map painted onto one big texture
+const gcan = document.createElement('canvas');
+gcan.width = MW*8; gcan.height = MH*8;
+{
+  const g = gcan.getContext('2d');
+  const cols = {[T.GRASS]:'#5a7a3e',[T.DIRT]:'#8a7048',[T.ROAD]:'#6e6a62',[T.SAND]:'#d8c48a',
+                [T.WATER]:'#255a7c',[T.PIER]:'#82633e',[T.RAIL]:'#7a7468'};
+  for(let y=0;y<MH;y++) for(let x=0;x<MW;x++){
+    const t = map[y*MW+x];
+    g.fillStyle = cols[t];
+    if(t===T.GRASS && (x+y)%2) g.fillStyle = '#587a3c';
+    g.fillRect(x*8,y*8,8,8);
+    if(t===T.ROAD && (x===25||y===21||y===46||y===71) && (x+y)%3===0){
+      g.fillStyle='rgba(240,230,180,.5)'; g.fillRect(x*8+3,y*8+3,3,1);
+    }
+    if(t===T.RAIL){ g.fillStyle='#4a443a'; g.fillRect(x*8,y*8+1,8,1); g.fillRect(x*8,y*8+6,8,1); }
+  }
+}
+const groundTex = new THREE.CanvasTexture(gcan);
+groundTex.magFilter = THREE.NearestFilter;
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(MW*TILE, MH*TILE),
+  new THREE.MeshLambertMaterial({ map: groundTex })
+);
+ground.rotation.x = -Math.PI/2;
+ground.position.set(MW*TILE/2, 0, MH*TILE/2);
+scene.add(ground);
+
+// shimmering sea plane above the painted water
+const sea = new THREE.Mesh(
+  new THREE.PlaneGeometry((MW-104)*TILE+40, MH*TILE),
+  new THREE.MeshLambertMaterial({ color:0x2e688c, transparent:true, opacity:.8 })
+);
+sea.rotation.x = -Math.PI/2;
+sea.position.set(104*TILE + ((MW-104)*TILE+40)/2, .1, MH*TILE/2);
+scene.add(sea);
+
+// helpers
+const box = (w,h,d,color) => new THREE.Mesh(new THREE.BoxGeometry(w,h,d), new THREE.MeshLambertMaterial({color}));
+function textSprite(txt, scale=6, bg='rgba(0,0,0,.55)', fg='#ffe9b0'){
+  const c = document.createElement('canvas'); c.width=512; c.height=128;
+  const g = c.getContext('2d');
+  let fs = 48;
+  g.font = `bold ${fs}px Arial`;
+  while(g.measureText(txt).width > 470 && fs > 16){ fs -= 2; g.font = `bold ${fs}px Arial`; }
+  g.textAlign='center'; g.textBaseline='middle';
+  const w = Math.min(500, g.measureText(txt).width+30);
+  g.fillStyle = bg; g.fillRect(256-w/2, 24, w, 80);
+  g.fillStyle = fg; g.fillText(txt, 256, 66);
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map:new THREE.CanvasTexture(c), transparent:true }));
+  s.scale.set(scale, scale/4, 1);
+  return s;
+}
+function blobShadow(r){
+  const m = new THREE.Mesh(new THREE.CircleGeometry(r, 16),
+    new THREE.MeshBasicMaterial({ color:0x000000, transparent:true, opacity:.28 }));
+  m.rotation.x = -Math.PI/2; m.position.y = .03;
+  return m;
+}
+
+// buildings in 3D
+const windowMat = new THREE.MeshBasicMaterial({ color:0x22303c });
+for(const b of buildings){
+  const [tx,ty,tw,th,name,wall,roof,h] = b;
+  const w = tw*TILE, d = th*TILE, cx = tx*TILE+w/2, cz = ty*TILE+d/2;
+  const g = new THREE.Group();
+  const body = box(w, h, d, wall); body.position.y = h/2; g.add(body);
+  if(name==='HUT' || name==='STALL'){
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(Math.max(w,d)*.72, 2.6, 4),
+      new THREE.MeshLambertMaterial({ color:roof }));
+    cone.position.y = h+1.3; cone.rotation.y = Math.PI/4; g.add(cone);
+  } else {
+    const slab = box(w+1.2, 1, d+1.2, roof); slab.position.y = h+.5; g.add(slab);
+  }
+  if(name==='KAALIAMMAN TEMPLE'){ // gopuram tiers
+    const t1 = box(w*.6, 3, d*.6, '#d89048'); t1.position.y = h+2.5; g.add(t1);
+    const t2 = box(w*.35, 2.5, d*.35, '#e8a858'); t2.position.y = h+5.2; g.add(t2);
+    const kalasam = new THREE.Mesh(new THREE.SphereGeometry(.8, 8, 8),
+      new THREE.MeshLambertMaterial({ color:0xffd75c })); kalasam.position.y = h+7.2; g.add(kalasam);
+  }
+  // door + windows on the south (+z) face
+  const door = box(2.2, 3.2, .3, '#2e2018'); door.position.set(0, 1.6, d/2+.1); g.add(door);
+  for(const wx of (w>16 ? [-w/3, w/3] : [w/4])){
+    const win = new THREE.Mesh(new THREE.PlaneGeometry(1.8,1.8), windowMat);
+    win.position.set(wx, h*.55, d/2+.12); g.add(win);
+  }
+  if(name!=='HUT' && name!=='STALL'){
+    const sign = textSprite(name, Math.min(15, name.length*.7+5));
+    sign.position.set(0, h+3, 0); g.add(sign);
+  }
+  g.position.set(cx, 0, cz);
+  scene.add(g);
+}
+
+// piers as raised wooden decks
+for(const [tx,ty,tw,th] of [[96,34,19,4],[96,60,13,3]]){
+  const w=tw*TILE, d=th*TILE;
+  const deck = box(w, .5, d, '#82633e');
+  deck.position.set(tx*TILE+w/2, .25, ty*TILE+d/2);
+  scene.add(deck);
+  for(let i=0;i<=tw;i+=3){
+    for(const zz of [ty*TILE+.4, ty*TILE+d-.4]){
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(.25,.25,2.4,6),
+        new THREE.MeshLambertMaterial({ color:0x5a422a }));
+      post.position.set(tx*TILE+i*TILE, -.5, zz);
+      scene.add(post);
+    }
+  }
+}
+const pierY = (x,z) => tileAtWorld(x,z)===T.PIER ? .5 : 0;
+
+// palms
+for(const p of palms){
+  const g = new THREE.Group();
+  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.22,.32,5,6),
+    new THREE.MeshLambertMaterial({ color:0x6b4a2a }));
+  trunk.position.y = 2.5; g.add(trunk);
+  const leaves = new THREE.Mesh(new THREE.SphereGeometry(2.4, 7, 5),
+    new THREE.MeshLambertMaterial({ color:0x3e6e2e }));
+  leaves.scale.set(1, .45, 1); leaves.position.y = 5.2; g.add(leaves);
+  g.add(blobShadow(1.4));
+  g.position.set(p.x, 0, p.z);
+  g.rotation.y = rnd()*6.28;
+  scene.add(g);
+}
+
+// boats
+const boatBobs = [];
+for(const [bx,bz,onWater] of [[394,58,0],[390,102,0],[420,204,1],[390,314,0],[428,274,1]]){
+  const g = new THREE.Group();
+  const hull = box(3, 1.4, 8, '#7a4a2a'); hull.position.y = .7; g.add(hull);
+  const bow = box(2.2, 1, 1.6, '#5a3a20'); bow.position.set(0,.9,4.4); g.add(bow);
+  const mast = new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,5,6),
+    new THREE.MeshLambertMaterial({ color:0xc8b890 }));
+  mast.position.y = 3.5; g.add(mast);
+  g.position.set(bx, onWater?.1:0, bz);
+  g.rotation.y = rnd()*6.28;
+  scene.add(g);
+  if(onWater) boatBobs.push(g);
+}
+
+// street lamps (lit at night)
+const lamps = [];
+for(const [lx,lz] of [[102,80],[102,200],[102,300],[180,186],[300,186],[248,86]]){
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(.15,.2,6,6),
+    new THREE.MeshLambertMaterial({ color:0x3a3f46 }));
+  pole.position.set(lx, 3, lz); scene.add(pole);
+  const bulb = new THREE.Mesh(new THREE.SphereGeometry(.4,8,8),
+    new THREE.MeshBasicMaterial({ color:0x555b60 }));
+  bulb.position.set(lx, 6.1, lz); scene.add(bulb);
+  const light = new THREE.PointLight(0xffcf80, 0, 42);
+  light.position.set(lx, 6, lz); scene.add(light);
+  lamps.push({ light, bulb });
+}
+
+// shells
+const shellMeshes = shells.map(s=>{
+  const m = new THREE.Mesh(new THREE.SphereGeometry(.55,8,8),
+    new THREE.MeshBasicMaterial({ color:0xffe9a0 }));
+  m.position.set(s.x, .6, s.z); scene.add(m); return m;
+});
+
+// ---------- People ----------
+function makePerson(shirt, skin='#8a5a3a'){
+  const g = new THREE.Group();
+  const mSkin = new THREE.MeshLambertMaterial({ color:skin });
+  const mShirt = new THREE.MeshLambertMaterial({ color:shirt });
+  const mLegs = new THREE.MeshLambertMaterial({ color:0xe8e0d0 });
+  const legL = new THREE.Mesh(new THREE.BoxGeometry(.5,1.6,.5), mLegs);
+  const legR = legL.clone();
+  legL.position.set(-.35,.8,0); legR.position.set(.35,.8,0);
+  // pivot legs at hip
+  legL.geometry = legL.geometry.clone(); legL.geometry.translate(0,-.8,0); legL.position.y = 1.6;
+  legR.geometry = legL.geometry; legR.position.y = 1.6;
+  const torso = new THREE.Mesh(new THREE.BoxGeometry(1.5,1.8,.8), mShirt); torso.position.y = 2.5;
+  const armL = new THREE.Mesh(new THREE.BoxGeometry(.4,1.5,.4), mSkin);
+  const armR = armL.clone();
+  armL.geometry = armL.geometry.clone(); armL.geometry.translate(0,-.6,0);
+  armR.geometry = armL.geometry;
+  armL.position.set(-1.0,3.2,0); armR.position.set(1.0,3.2,0);
+  const head = new THREE.Mesh(new THREE.BoxGeometry(.9,.9,.9), mSkin); head.position.y = 3.9;
+  const hair = new THREE.Mesh(new THREE.BoxGeometry(.95,.35,.95),
+    new THREE.MeshLambertMaterial({ color:0x1a1210 })); hair.position.y = 4.35;
+  g.add(legL, legR, torso, armL, armR, head, hair, blobShadow(1));
+  g.userData = { legL, legR, armL, armR };
+  return g;
+}
+function animPerson(g, walk, moving, punching){
+  const u = g.userData;
+  const s = moving ? Math.sin(walk)*.7 : 0;
+  u.legL.rotation.x = s; u.legR.rotation.x = -s;
+  u.armL.rotation.x = -s*.8;
+  u.armR.rotation.x = punching ? -1.7 : s*.8;
+}
+
+const player = {
+  x:130, z:222, heading:Math.PI, r:1.2, hp:100, money:150, respect:0,
+  walk:0, punchT:0, moving:false, driving:null,
+  mesh: makePerson('#e8a33d')
+};
+scene.add(player.mesh);
+// parcel above head
+const parcelMesh = box(1.4,1,1.4,'#b08040'); parcelMesh.position.y = 5.2; parcelMesh.visible = false;
+player.mesh.add(parcelMesh);
+
+function makeNPC(name,tx,ty,shirt,skin,wander){
+  const n = { name, x:tx*TILE, z:ty*TILE, hx:tx*TILE, hz:ty*TILE, r:1.2,
+              wander:!!wander, wt:rnd()*4, wx:0, wz:0, walk:0,
+              mesh: makePerson(shirt, skin||'#8a5a3a') };
+  const tag = textSprite(name, Math.max(4.5, Math.min(9, name.length*.6)));
+  tag.position.y = 5.4; n.mesh.add(tag);
+  n.mesh.position.set(n.x, 0, n.z);
+  scene.add(n.mesh);
+  return n;
+}
+const npcs = [
+  makeNPC('Padma', 34, 56, '#3a6ac0'),
+  makeNPC('Senthil', 48, 31, '#c05a2a'),
+  makeNPC('Chandra', 86, 38, '#a03a7a'),
+  makeNPC('Velu', 17, 66, '#603a3a'),
+  makeNPC('Kumar the Boatman', 112, 36, '#2a7a6a'),
+  makeNPC('Tea Master', 38, 44, '#7a6a3a'),
+  makeNPC('Fisherman', 98, 20, '#4a6a3a', null, true),
+  makeNPC('Fisherman', 99, 44, '#4a6a3a', null, true),
+  makeNPC('Fisherman', 97, 72, '#4a6a3a', null, true),
+  makeNPC('Vendor', 59, 53, '#8a3a8a', null, true),
+  makeNPC('Vendor', 64, 47, '#3a8a8a', null, true),
+  makeNPC('Kid', 62, 19, '#d0c040', '#9a6a4a', true),
+  makeNPC('Kid', 64, 18, '#40c0d0', '#9a6a4a', true),
+  makeNPC('Old Man', 33, 46, '#c0c0c0', null, true),
+];
+const N = {}; for(const n of npcs) if(!N[n.name]) N[n.name]=n;
+
+// ---------- Auto-rickshaws ----------
+function makeAuto(){
+  const g = new THREE.Group();
+  const body = box(2.6, 1.6, 4.4, '#e8c020'); body.position.y = 1.3; g.add(body);
+  const cabin = box(2.4, 1.5, 2.6, '#2a6a3a'); cabin.position.set(0, 2.6, -.3); g.add(cabin);
+  const shield = new THREE.Mesh(new THREE.PlaneGeometry(2, 1.2),
+    new THREE.MeshLambertMaterial({ color:0x9fc8e0, side:THREE.DoubleSide }));
+  shield.position.set(0, 2.5, 1.15); shield.rotation.x = -.2; g.add(shield);
+  const wheelM = new THREE.MeshLambertMaterial({ color:0x1a1a1a });
+  for(const [wx,wz] of [[0,1.8],[-1.1,-1.4],[1.1,-1.4]]){
+    const w = new THREE.Mesh(new THREE.CylinderGeometry(.55,.55,.4,10), wheelM);
+    w.rotation.z = Math.PI/2; w.position.set(wx,.55,wz); g.add(w);
+  }
+  const head = new THREE.Mesh(new THREE.SphereGeometry(.22,8,8),
+    new THREE.MeshBasicMaterial({ color:0xfff2c0 }));
+  head.position.set(0, 1.6, 2.25); g.add(head);
+  g.add(blobShadow(2.2));
+  return g;
+}
+const autos = [
+  { x:140, z:232, heading:.6, speed:0, mesh:makeAuto() },
+  { x:216, z:182, heading:Math.PI/2, speed:0, mesh:makeAuto() },
+];
+for(const a of autos){ a.mesh.position.set(a.x,0,a.z); a.mesh.rotation.y = a.heading; scene.add(a.mesh); }
+
+// ---------- Quests / dialogue (same story as the 2D game) ----------
+let stage = 0, carrying = false;
+let enemies = [], patrols = [];
+const STAGES = [
+  "Talk to Padma outside your home.",
+  "Meet Senthil at the North Madras Carrom Club.",
+  "Win the carrom match. Talk to Senthil to play.",
+  "Talk to Chandra at the Fish Market.",
+  "Meet Velu at Guna's Den, in the south-west.",
+  "Deliver the parcel to Kumar at the pier. AVOID the gang in red!",
+  "Rival thugs are storming the market! Defeat all 4 of them.",
+  "The market is safe. Return to Padma.",
+  "Your story is written. Roam the settlement — it's yours now.",
+];
+function questTarget(){
+  switch(stage){
+    case 0: return N['Padma'];
+    case 1: case 2: return N['Senthil'];
+    case 3: return N['Chandra'];
+    case 4: return N['Velu'];
+    case 5: return N['Kumar the Boatman'];
+    case 6: return enemies.find(e=>e.hp>0) || null;
+    case 7: return N['Padma'];
+  }
+  return null;
+}
+
+const dlgEl = document.getElementById('dialog');
+let dlg = null;
+function say(who, lines, onDone){
+  dlg = { who, lines, i:0, onDone };
+  document.getElementById('dWho').textContent = who;
+  document.getElementById('dTxt').textContent = lines[0];
+  dlgEl.style.display = 'block';
+}
+function advanceDlg(){
+  if(!dlg) return;
+  dlg.i++;
+  if(dlg.i >= dlg.lines.length){
+    dlgEl.style.display='none';
+    const cb = dlg.onDone; dlg = null;
+    if(cb) cb();
+  } else document.getElementById('dTxt').textContent = dlg.lines[dlg.i];
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display='block';
+  clearTimeout(t._h); t._h = setTimeout(()=>t.style.display='none', 2600);
+}
+const pick = a => a[(Math.random()*a.length)|0];
+
+function talkTo(n){
+  sfx(340,.06,'sine');
+  switch(n.name){
+    case 'Padma':
+      if(stage===0) say('Padma',[
+        "Anbu! You slept till noon again. The whole settlement is talking about the carrom tournament.",
+        "Senthil is waiting for you at the club, up past the market road. Take the auto if you're lazy!",
+        "Be careful, kanna. Guna's boys have been circling the streets since morning."
+      ], ()=>{ stage=1; toast('New objective!'); });
+      else if(stage===7) say('Padma',[
+        "Anbu... I saw what you did at the market. The whole of North Madras saw it.",
+        "The fishermen, the vendors, the kids by the temple — they all say your name like a prayer now.",
+        "So tell me. What kind of man will you become?"
+      ], ()=>{ document.getElementById('endScreen').style.display='flex'; });
+      else if(stage>=8) say('Padma',["The sea is calm today, Anbu. Like it finally trusts you."]);
+      else say('Padma',["Go on, Anbu. The streets won't wait."]);
+      break;
+    case 'Senthil':
+      if(stage===1) say('Senthil',[
+        "Dei Anbu! Finally. The board is set, the whole club is betting on you.",
+        "Win this match and even the big men will know your name. Ready to play?"
+      ], ()=>{ stage=2; startCarrom(); });
+      else if(stage===2) say('Senthil',["The board is waiting, champion. Say the word."], ()=>startCarrom());
+      else say('Senthil',["Nobody in North Madras flicks a striker like you, Anbu."]);
+      break;
+    case 'Chandra':
+      if(stage===3) say('Chandra',[
+        "Anbu-vaa? The carrom king himself at my fish market!",
+        "Listen — my boat crew didn't show up and the catch is rotting. Help me haul in some fish?",
+        "Watch the line, strike when the float dips into the green water. Five good fish will do."
+      ], ()=>startFishing());
+      else if(stage>3) say('Chandra',["Best catch this month, thanks to you. The sea remembers its friends."]);
+      else say('Chandra',["Fresh vanjaram! Straight from the morning boats!"]);
+      break;
+    case 'Velu':
+      if(stage===4) say('Velu',[
+        "So the carrom boy walks into Guna's den himself. Bold.",
+        "Relax. Today we have the same enemy. Thambi's gang — the ones in red — are muscling in on OUR harbour.",
+        "Take this parcel to Kumar the boatman at the long pier. Papers that will finish Thambi's smuggling racket.",
+        "But listen — if his red-shirts spot you carrying it, they WILL take it back. Stay off the open road."
+      ], ()=>{ stage=5; carrying=true; parcelMesh.visible=true; spawnPatrols(); toast('Parcel acquired — avoid the red gang!'); });
+      else if(stage===5) say('Velu',["Why are you still here? Kumar. Long pier. Go — and stay away from the red-shirts."]);
+      else if(stage>5) say('Velu',["Thambi's racket is ash. You did that, carrom boy. Guna won't forget it."]);
+      else say('Velu',["This den isn't for wandering kids. Walk on."]);
+      break;
+    case 'Kumar the Boatman':
+      if(stage===5 && carrying) say('Kumar the Boatman',[
+        "The parcel! Quick, hand it over — my boat leaves with the tide.",
+        "...These papers will sink Thambi for good. You have guts, Anbu.",
+        "Wait — do you hear that? Thambi's thugs... they're heading for the market! GO!"
+      ], ()=>{
+        carrying=false; parcelMesh.visible=false; clearPatrols(); stage=6;
+        player.money+=400; player.respect+=25; spawnThugs();
+        toast('+₹400  +25 respect — the market is under attack!');
+      });
+      else say('Kumar the Boatman',["The sea gives and the sea takes, thambi. Respect her."]);
+      break;
+    case 'Tea Master':
+      if(player.hp>=100) say('Tea Master',["One strong tea? You look healthy as a bull. Come back when the streets rough you up."]);
+      else if(player.money>=20) say('Tea Master',[
+        "Sit, sit. One special tea coming up... extra ginger for the fighter.",
+        "(You feel your strength return.)"
+      ], ()=>{ player.money-=20; player.hp=100; sfx(520,.12,'sine'); toast('Tea! HP restored (−₹20)'); });
+      else say('Tea Master',["No coins, no tea. Even kindness has a price in Vada Chennai."]);
+      break;
+    case 'Fisherman': say(n.name,[pick([
+        "The catch is thin these days. The big trawlers eat everything.",
+        "Guna and Thambi fight over the harbour while our nets stay empty.",
+        "You're Anbu, no? The carrom boy. Your father was a good man."])]); break;
+    case 'Vendor': say(n.name,[pick([
+        "Fresh greens! Kerosene! Everything for the settlement!",
+        "Business is bad when gangs walk the market road, thambi.",
+        "Buy something or make way, the crowd is coming!"])]); break;
+    case 'Kid': say(n.name,[pick([
+        "Anna! Teach us that striker trick! Pleeease!",
+        "When I grow up I'll play carrom like Anbu-anna!",
+        "Anna, your auto! Give us one ride, just one!"])]); break;
+    case 'Old Man': say(n.name,[pick([
+        "I have drunk tea on this street for fifty years. I have seen every gang rise and fall.",
+        "The sea was here before Guna, before Thambi. It will be here after.",
+        "Sit, boy. The tea here is the only honest thing left in North Madras."])]); break;
+    default: say(n.name,["..."]);
+  }
+}
+
+document.getElementById('endGood').onclick = ()=>{
+  finishEnding("You kept the harbour open for every boat, the market safe for every vendor. " +
+    "They don't call you 'boss' in Vada Chennai — they call you 'anna'. Big brother. " +
+    "The settlement finally belongs to its people.  (+60 respect)", 60);
+};
+document.getElementById('endBad').onclick = ()=>{
+  finishEnding("Fear is a currency and you are rich. The streets go quiet when you pass. " +
+    "Guna's throne is yours now — but thrones in North Madras are made of salt, and the tide always comes in.  (+₹2000)", 0, 2000);
+};
+function finishEnding(txt, resp=0, cash=0){
+  document.getElementById('endChoices').style.display='none';
+  document.getElementById('endText').textContent = txt;
+  player.respect += resp; player.money += cash;
+  stage = 8;
+  setTimeout(()=>{
+    document.getElementById('endScreen').style.display='none';
+    document.getElementById('endChoices').style.display='block';
+    toast('Free roam unlocked — the settlement is yours.');
+  }, 6000);
+}
+
+// ---------- Enemies ----------
+function makeEnemy(x,z,red){
+  const e = { x, z, r:1.2, hp:40, max:40, cool:0, hurtT:0, speed:12, walk:0,
+              mesh: makePerson(red?'#c03028':'#8a2a2a', '#7a4a30') };
+  e.mesh.position.set(x,0,z);
+  // hp bar
+  const bar = textSprite('▮▮▮▮▮▮', 4, 'rgba(0,0,0,0)', '#e04030');
+  bar.position.y = 5.2; e.mesh.add(bar); e.bar = bar;
+  scene.add(e.mesh);
+  return e;
+}
+function spawnPatrols(){
+  patrols = [
+    { wp:[[50,46],[80,46],[80,21],[50,21]] },
+    { wp:[[70,46],[44,46],[44,60],[70,60]] },
+    { wp:[[90,40],[90,58],[80,58],[80,40]] },
+  ].map(p=>{
+    const e = { x:p.wp[0][0]*TILE, z:p.wp[0][1]*TILE, pi:1, wp:p.wp, speed:9.5, walk:0,
+                mesh: makePerson('#c03028','#7a4a30') };
+    e.mesh.position.set(e.x,0,e.z);
+    const ring = new THREE.Mesh(new THREE.RingGeometry(13.4, 14, 40),
+      new THREE.MeshBasicMaterial({ color:0xdc3c28, transparent:true, opacity:.3, side:THREE.DoubleSide }));
+    ring.rotation.x = -Math.PI/2; ring.position.y = .06;
+    e.mesh.add(ring);
+    scene.add(e.mesh);
+    return e;
+  });
+}
+function clearPatrols(){ for(const p of patrols) scene.remove(p.mesh); patrols = []; }
+function spawnThugs(){
+  enemies = [[58,47],[64,52],[68,47],[60,55]].map(s=>makeEnemy(s[0]*TILE, s[1]*TILE, false));
+}
+
+// ---------- Input ----------
+const keys = {};
+addEventListener('keydown', e=>{
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault();
+  keys[e.key.toLowerCase()] = true;
+  if(mg.mode==='fish' && e.key===' '){ fishStrike(); return; }
+  if(mg.mode) return;
+  if(e.key==='e' || e.key==='E' || e.key==='Enter'){
+    if(dlg) advanceDlg(); else if(!player.driving) tryInteract();
+  }
+  if((e.key==='f'||e.key==='F') && !dlg) toggleDrive();
+  if(e.key===' ' && !dlg && !player.driving) punch();
+  if(e.key==='h' || e.key==='H') document.getElementById('startScreen').style.display='flex';
+});
+addEventListener('keyup', e=>{ keys[e.key.toLowerCase()] = false; });
+document.getElementById('startBtn').onclick = ()=>{
+  document.getElementById('startScreen').style.display='none';
+  initAudio();
+};
+
+// ---------- Audio ----------
+let ac = null;
+function initAudio(){ try{ ac = ac || new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+function sfx(freq, dur, type='square', vol=.08){
+  if(!ac) return;
+  try{
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime+dur);
+    o.connect(g); g.connect(ac.destination);
+    o.start(); o.stop(ac.currentTime+dur);
+  }catch(e){}
+}
+
+// ---------- Collision ----------
+function blockedAt(x,z,skipPalms){
+  if(solidTile(tileAtWorld(x,z))) return true;
+  if(!skipPalms) for(const p of palms){
+    const dx=x-p.x, dz=z-p.z; if(dx*dx+dz*dz < 1.8*1.8) return true;
+  }
+  return false;
+}
+function carBlocked(a, nx, nz, nh){
+  const c = Math.cos(nh), s = Math.sin(nh);
+  for(const [ox,oz] of [[-1.4,2.4],[1.4,2.4],[-1.4,-2.4],[1.4,-2.4]]){
+    const wx = nx + ox*c + oz*s, wz = nz - ox*s + oz*c;
+    if(blockedAt(wx,wz)) return true;
+  }
+  return false;
+}
+
+// ---------- Driving ----------
+function toggleDrive(){
+  if(player.driving){
+    const a = player.driving;
+    // step out to the side
+    const sx = a.x + Math.cos(a.heading)*3.2, sz = a.z - Math.sin(a.heading)*3.2;
+    if(!blockedAt(sx,sz)){ player.x=sx; player.z=sz; }
+    else { player.x=a.x - Math.cos(a.heading)*3.2; player.z=a.z + Math.sin(a.heading)*3.2; }
+    player.driving = null;
+    player.mesh.visible = true;
+    document.getElementById('speedo').style.display='none';
+    sfx(180,.1,'triangle');
+  } else {
+    let best=null, bd=7;
+    for(const a of autos){
+      const d = Math.hypot(a.x-player.x, a.z-player.z);
+      if(d<bd){ bd=d; best=a; }
+    }
+    if(best){
+      player.driving = best; best.speed = 0;
+      player.mesh.visible = false;
+      document.getElementById('speedo').style.display='block';
+      sfx(90,.25,'sawtooth',.1);
+    }
+  }
+}
+
+// ---------- Combat ----------
+function punch(){
+  if(player.punchT > 0) return;
+  player.punchT = .28;
+  sfx(140,.08,'square',.1);
+  const fx = Math.sin(player.heading), fz = Math.cos(player.heading);
+  for(const en of enemies){
+    if(en.hp<=0) continue;
+    const dx = en.x-player.x, dz = en.z-player.z, d = Math.hypot(dx,dz);
+    if(d < 6){
+      const dot = (dx/d)*fx + (dz/d)*fz;
+      if(dot > .2 || d < 2.5) hitEnemy(en, 15, dx/d, dz/d);
+    }
+  }
+}
+function hitEnemy(en, dmg, nx, nz){
+  en.hp -= dmg; en.hurtT = .2;
+  en.x += nx*2; en.z += nz*2;
+  en.bar.scale.x = 4*Math.max(0,en.hp/en.max)+.01;
+  sfx(90,.1,'sawtooth',.12);
+  if(en.hp<=0){
+    scene.remove(en.mesh);
+    toast('Thug down!'); sfx(60,.25,'sawtooth',.12);
+    if(enemies.every(x=>x.hp<=0) && stage===6){
+      stage=7; player.respect+=40;
+      setTimeout(()=>say('Anbu',["(The market goes quiet. Vendors peek out from behind their stalls...)",
+        "(Somewhere near the tea kadai, someone starts clapping.)"]), 400);
+      toast('+40 respect — the market is safe!');
+    }
+  }
+}
+function damagePlayer(dmg){
+  player.hp -= dmg;
+  sfx(110,.12,'triangle',.12);
+  if(player.hp <= 0){
+    player.hp = 100;
+    player.money = Math.max(0, player.money-100);
+    player.x = 130; player.z = 222; player.driving = null; player.mesh.visible = true;
+    document.getElementById('speedo').style.display='none';
+    say('Padma',["Anbu! They carried you home half-dead... you lost ₹100 to the street.",
+      "Drink some tea, get your strength back, and be smarter out there."]);
+  }
+}
+
+// ---------- Interaction ----------
+function nearestNPC(){
+  let best=null, bd=6.5;
+  for(const n of npcs){
+    const d = Math.hypot(n.x-player.x, n.z-player.z);
+    if(d<bd){ bd=d; best=n; }
+  }
+  return best;
+}
+function tryInteract(){ const n = nearestNPC(); if(n) talkTo(n); }
+
+// ---------- Minigames (identical to the 2D version) ----------
+const mg = { mode:null };
+const mgEl = document.getElementById('minigame');
+const mgTitle = document.getElementById('mgTitle');
+const mgInfo = document.getElementById('mgInfo');
+const mgBtn = document.getElementById('mgBtn');
+const cc = document.getElementById('carromCanvas');
+const cctx = cc.getContext('2d');
+const fishZone = document.getElementById('fishZone');
+mgBtn.onclick = ()=>closeMinigame(false);
+function closeMinigame(){ mg.mode=null; mgEl.style.display='none'; cc.style.display='none'; fishZone.style.display='none'; }
+
+const car = {};
+function startCarrom(){
+  mg.mode = 'carrom';
+  mgEl.style.display = 'flex'; cc.style.display = 'block'; fishZone.style.display = 'none';
+  mgTitle.textContent = 'Carrom — Club Match';
+  mgBtn.textContent = 'FORFEIT';
+  car.strikes = 12; car.pocketed = 0; car.need = 6;
+  car.phase = 'place';
+  car.balls = [];
+  car.striker = { x:230, y:392, vx:0, vy:0, r:13, m:1.5, striker:true, dead:false };
+  car.balls.push(car.striker);
+  for(let i=0;i<8;i++){
+    const a = i/8*Math.PI*2;
+    car.balls.push({ x:230+Math.cos(a)*26, y:230+Math.sin(a)*26, vx:0, vy:0, r:10, m:1,
+                     col: i%2 ? '#2b2b2b' : '#e8dcc0', dead:false });
+  }
+  car.balls.push({ x:230, y:230, vx:0, vy:0, r:10, m:1, col:'#c03a3a', dead:false });
+  car.aim = null;
+  updateCarromInfo();
+}
+function updateCarromInfo(){
+  mgInfo.innerHTML = `Pocket <b>${car.need}</b> coins to win &nbsp;·&nbsp; Pocketed: <b>${car.pocketed}</b> &nbsp;·&nbsp; Strikes left: <b>${car.strikes}</b><br><span style="color:#9fb8c9;font-size:12px">Move mouse to place the striker · drag back &amp; release to shoot (slingshot)</span>`;
+}
+const POCKETS = [[38,38],[422,38],[38,422],[422,422]];
+const PR = 21, BOARD_MIN = 24, BOARD_MAX = 436;
+cc.addEventListener('mousemove', e=>{
+  if(mg.mode!=='carrom') return;
+  const r = cc.getBoundingClientRect();
+  const mx = (e.clientX-r.left)*(cc.width/r.width), my = (e.clientY-r.top)*(cc.height/r.height);
+  if(car.phase==='place'){ car.striker.x = Math.max(80, Math.min(380, mx)); }
+  if(car.phase==='aim'){ car.aim = {mx,my}; }
+});
+cc.addEventListener('mousedown', e=>{
+  if(mg.mode!=='carrom' || car.phase!=='place') return;
+  car.phase='aim';
+  const r = cc.getBoundingClientRect();
+  car.aim = { mx:(e.clientX-r.left)*(cc.width/r.width), my:(e.clientY-r.top)*(cc.height/r.height) };
+});
+addEventListener('mouseup', ()=>{
+  if(mg.mode!=='carrom' || car.phase!=='aim' || !car.aim) return;
+  const dx = car.striker.x - car.aim.mx, dy = car.striker.y - car.aim.my;
+  const len = Math.hypot(dx,dy);
+  if(len < 8){ car.phase='place'; car.aim=null; return; }
+  const pow = Math.min(len, 180) / 180 * 17;
+  car.striker.vx = dx/len*pow; car.striker.vy = dy/len*pow;
+  car.phase = 'moving'; car.aim = null;
+  sfx(220,.06,'square',.09);
+});
+function stepCarrom(){
+  if(car.phase==='moving'){
+    let anyMoving = false;
+    for(const b of car.balls){
+      if(b.dead) continue;
+      b.x += b.vx; b.y += b.vy;
+      b.vx *= .972; b.vy *= .972;
+      if(Math.abs(b.vx)<.06 && Math.abs(b.vy)<.06){ b.vx=0; b.vy=0; } else anyMoving=true;
+      if(b.x-b.r < BOARD_MIN){ b.x=BOARD_MIN+b.r; b.vx*=-.85; }
+      if(b.x+b.r > BOARD_MAX){ b.x=BOARD_MAX-b.r; b.vx*=-.85; }
+      if(b.y-b.r < BOARD_MIN){ b.y=BOARD_MIN+b.r; b.vy*=-.85; }
+      if(b.y+b.r > BOARD_MAX){ b.y=BOARD_MAX-b.r; b.vy*=-.85; }
+      for(const [px,py] of POCKETS){
+        if(Math.hypot(b.x-px,b.y-py) < PR){
+          b.dead = true; b.vx=b.vy=0;
+          if(b.striker){ sfx(120,.2,'triangle',.1); }
+          else { car.pocketed++; sfx(600,.12,'sine',.1); }
+        }
+      }
+    }
+    const live = car.balls.filter(b=>!b.dead);
+    for(let i=0;i<live.length;i++) for(let j=i+1;j<live.length;j++){
+      const a=live[i], b=live[j];
+      const dx=b.x-a.x, dy=b.y-a.y, d=Math.hypot(dx,dy), min=a.r+b.r;
+      if(d>0 && d<min){
+        const nx=dx/d, ny=dy/d, push=(min-d)/2;
+        a.x-=nx*push; a.y-=ny*push; b.x+=nx*push; b.y+=ny*push;
+        const p = 2*((a.vx-b.vx)*nx + (a.vy-b.vy)*ny) / (a.m+b.m);
+        if(p>0){
+          a.vx -= p*b.m*nx; a.vy -= p*b.m*ny;
+          b.vx += p*a.m*nx; b.vy += p*a.m*ny;
+          if(p>1) sfx(300+Math.random()*80,.04,'square',.05);
+        }
+      }
+    }
+    if(!anyMoving){
+      car.strikes--;
+      if(car.striker.dead){ car.striker.dead=false; }
+      car.striker.x=230; car.striker.y=392; car.striker.vx=car.striker.vy=0;
+      updateCarromInfo();
+      if(car.pocketed >= car.need){
+        closeMinigame();
+        player.money += 500; player.respect += 20; stage = 3;
+        sfx(700,.3,'sine',.12);
+        say('Senthil',["POCKETED! Did you all SEE that?! Anbu of Vada Chennai, ladies and gentlemen!",
+          "Here — your winnings, ₹500. And Anbu... Chandra at the fish market was asking for you."],
+          ()=>toast('+₹500  +20 respect'));
+      } else if(car.strikes <= 0){
+        closeMinigame();
+        say('Senthil',["Aiyo, so close! Don't worry, champion — the board never leaves. Talk to me to play again."]);
+      } else car.phase='place';
+    }
+  }
+  drawCarrom();
+}
+function drawCarrom(){
+  const c = cctx;
+  c.fillStyle = '#5a3a1e'; c.fillRect(0,0,460,460);
+  c.fillStyle = '#e6cfa0'; c.fillRect(BOARD_MIN-4,BOARD_MIN-4,BOARD_MAX-BOARD_MIN+8,BOARD_MAX-BOARD_MIN+8);
+  c.strokeStyle = 'rgba(120,70,30,.5)'; c.lineWidth = 2;
+  c.strokeRect(72,72,316,316);
+  c.beginPath(); c.arc(230,230,42,0,7); c.stroke();
+  c.beginPath(); c.moveTo(80,392); c.lineTo(380,392); c.stroke();
+  c.beginPath(); c.moveTo(80,68); c.lineTo(380,68); c.stroke();
+  for(const [px,py] of POCKETS){ c.fillStyle = '#1a0f06'; c.beginPath(); c.arc(px,py,PR,0,7); c.fill(); }
+  if(car.phase==='aim' && car.aim){
+    const dx = car.striker.x-car.aim.mx, dy = car.striker.y-car.aim.my;
+    const len = Math.min(Math.hypot(dx,dy),180);
+    if(len>4){
+      const a = Math.atan2(dy,dx);
+      c.strokeStyle = 'rgba(200,60,40,.8)'; c.lineWidth = 3; c.setLineDash([8,6]);
+      c.beginPath(); c.moveTo(car.striker.x,car.striker.y);
+      c.lineTo(car.striker.x+Math.cos(a)*len*1.4, car.striker.y+Math.sin(a)*len*1.4);
+      c.stroke(); c.setLineDash([]);
+    }
+  }
+  for(const b of car.balls){
+    if(b.dead) continue;
+    c.beginPath(); c.arc(b.x,b.y,b.r,0,7);
+    if(b.striker){
+      const g = c.createRadialGradient(b.x-4,b.y-4,2,b.x,b.y,b.r);
+      g.addColorStop(0,'#fff'); g.addColorStop(1,'#b0c4de');
+      c.fillStyle = g;
+    } else c.fillStyle = b.col;
+    c.fill();
+    c.strokeStyle = 'rgba(0,0,0,.4)'; c.lineWidth=1.5; c.stroke();
+  }
+}
+
+const fish = {};
+function startFishing(){
+  mg.mode = 'fish';
+  mgEl.style.display = 'flex'; cc.style.display = 'none'; fishZone.style.display = 'block';
+  mgTitle.textContent = 'Fishing with Chandra';
+  mgBtn.textContent = 'GIVE UP';
+  fish.caught = 0; fish.casts = 10; fish.t = 0; fish.speed = 2.1;
+  newZone(); updateFishInfo();
+}
+function newZone(){
+  fish.zoneY = 30 + Math.random()*190; fish.zoneH = 70;
+  const g = document.getElementById('fishGreen');
+  g.style.top = fish.zoneY+'px'; g.style.height = fish.zoneH+'px';
+}
+function updateFishInfo(){
+  mgInfo.innerHTML = `Fish caught: <b>${fish.caught}/5</b> &nbsp;·&nbsp; Casts left: <b>${fish.casts}</b><br><span style="color:#9fb8c9;font-size:12px">Press SPACE when the float is in the green water</span>`;
+}
+function fishStrike(){
+  if(mg.mode!=='fish' || fish.casts<=0) return;
+  fish.casts--;
+  const y = markerY();
+  if(y+6 > fish.zoneY && y < fish.zoneY+fish.zoneH){
+    fish.caught++; sfx(560,.12,'sine',.1); fish.speed += .35; newZone();
+  } else sfx(130,.15,'triangle',.1);
+  updateFishInfo();
+  if(fish.caught>=5){
+    closeMinigame();
+    player.money += 300; player.respect += 10; stage = 4;
+    say('Chandra',["Five beauties! You have fisherman's blood in you after all, carrom boy.",
+      "Here's ₹300 for the haul. And Anbu — Velu from Guna's den was here looking for you. South-west, past the rail line.",
+      "Be careful with those people, kanna. Whatever they offer, the price is always higher."],
+      ()=>toast('+₹300  +10 respect'));
+  } else if(fish.casts<=0){
+    closeMinigame();
+    say('Chandra',["Aiyo, the shoal has moved on. Catch your breath and talk to me to try again."]);
+  }
+}
+function markerY(){ return 147 + Math.sin(fish.t*fish.speed)*145; }
+
+// ---------- Quest arrow ----------
+const arrow = new THREE.Group();
+const arrowCone = new THREE.Mesh(new THREE.ConeGeometry(.8, 2.2, 8),
+  new THREE.MeshBasicMaterial({ color:0xffd75c }));
+arrowCone.rotation.x = Math.PI/2;
+arrow.add(arrowCone);
+scene.add(arrow);
+
+// ---------- Update ----------
+let last = performance.now(), gameT = 60; // start at midday
+function update(dt){
+  gameT += dt;
+
+  if(mg.mode==='carrom'){ stepCarrom(); return; }
+  if(mg.mode==='fish'){
+    fish.t += dt;
+    document.getElementById('fishMarker').style.top = markerY()+'px';
+    return;
+  }
+  if(dlg){ player.moving=false; animPerson(player.mesh, player.walk, false, false); return; }
+
+  const fwd = (keys['w']||keys['arrowup']?1:0) - (keys['s']||keys['arrowdown']?1:0);
+  const turn = (keys['a']||keys['arrowleft']?1:0) - (keys['d']||keys['arrowright']?1:0);
+
+  if(player.driving){
+    const a = player.driving;
+    a.speed += fwd * 28 * dt;
+    a.speed -= a.speed * 1.1 * dt;                       // drag
+    a.speed = Math.max(-14, Math.min(48, a.speed));
+    if(Math.abs(a.speed) > .5){
+      a.heading += turn * 1.9 * dt * Math.max(-1, Math.min(1, a.speed/16));
+      const nx = a.x + Math.sin(a.heading)*a.speed*dt;
+      const nz = a.z + Math.cos(a.heading)*a.speed*dt;
+      if(carBlocked(a, nx, nz, a.heading)){
+        a.speed = -a.speed*.3;
+        sfx(70,.15,'sawtooth',.1);
+      } else { a.x = nx; a.z = nz; }
+    }
+    // run over thugs
+    if(Math.abs(a.speed) > 12){
+      for(const en of enemies){
+        if(en.hp<=0) continue;
+        const dx = en.x-a.x, dz = en.z-a.z, d = Math.hypot(dx,dz);
+        if(d < 3.6){ hitEnemy(en, 40, dx/d, dz/d); a.speed *= .5; }
+      }
+    }
+    a.mesh.position.set(a.x, 0, a.z);
+    a.mesh.rotation.y = a.heading;
+    player.x = a.x; player.z = a.z;
+    document.getElementById('speedo').textContent = Math.abs(a.speed*3.1).toFixed(0)+' km/h';
+  } else {
+    player.heading += turn * 2.6 * dt;
+    player.moving = fwd !== 0;
+    if(fwd){
+      const sp = fwd>0 ? 20 : 12;
+      const mx = player.x + Math.sin(player.heading)*sp*(fwd>0?1:-1)*dt;
+      const mz = player.z + Math.cos(player.heading)*sp*(fwd>0?1:-1)*dt;
+      if(!blockedAt(mx, player.z)) player.x = mx;
+      if(!blockedAt(player.x, mz)) player.z = mz;
+      player.walk += dt*11;
+    }
+    if(player.punchT>0) player.punchT-=dt;
+    player.mesh.position.set(player.x, pierY(player.x,player.z), player.z);
+    player.mesh.rotation.y = player.heading;
+    animPerson(player.mesh, player.walk, player.moving, player.punchT>.1);
+  }
+
+  // shells
+  for(let i=0;i<shells.length;i++){
+    const s = shells[i];
+    if(!s.got && Math.hypot(s.x-player.x, s.z-player.z)<3){
+      s.got=true; scene.remove(shellMeshes[i]);
+      player.money+=50; sfx(660,.1,'sine',.09); toast('Found a rare shell! +₹50');
+    }
+    if(!s.got) shellMeshes[i].scale.setScalar(1+.25*Math.sin(gameT*4+i));
+  }
+
+  // wandering NPCs
+  for(const n of npcs){
+    if(n.wander){
+      n.wt -= dt;
+      if(n.wt<=0){ n.wt = 2+Math.random()*3;
+        const a = Math.random()*Math.PI*2;
+        n.wx = Math.cos(a); n.wz = Math.sin(a);
+        if(Math.random()<.4){ n.wx=0; n.wz=0; }
+      }
+      if(n.wx||n.wz){
+        if(Math.hypot(n.x-n.hx,n.z-n.hz) > 11){ const dx=n.hx-n.x, dz=n.hz-n.z, d=Math.hypot(dx,dz); n.wx=dx/d; n.wz=dz/d; }
+        const nx = n.x+n.wx*5*dt, nz = n.z+n.wz*5*dt;
+        if(!blockedAt(nx,nz)){ n.x=nx; n.z=nz; }
+        n.walk += dt*8;
+        n.mesh.rotation.y = Math.atan2(n.wx, n.wz);
+      }
+      animPerson(n.mesh, n.walk, !!(n.wx||n.wz), false);
+    } else {
+      // face the player when close
+      const dx = player.x-n.x, dz = player.z-n.z;
+      if(dx*dx+dz*dz < 150) n.mesh.rotation.y = Math.atan2(dx, dz);
+    }
+    n.mesh.position.set(n.x, pierY(n.x,n.z), n.z);
+  }
+
+  // delivery patrols
+  if(stage===5 && carrying){
+    for(const p of patrols){
+      const wp = p.wp[p.pi];
+      const tx = wp[0]*TILE, tz = wp[1]*TILE;
+      const dx = tx-p.x, dz = tz-p.z, d = Math.hypot(dx,dz);
+      if(d<1){ p.pi = (p.pi+1)%p.wp.length; }
+      else { p.x += dx/d*p.speed*dt; p.z += dz/d*p.speed*dt; p.mesh.rotation.y = Math.atan2(dx,dz); }
+      p.walk += dt*8;
+      animPerson(p.mesh, p.walk, true, false);
+      p.mesh.position.set(p.x, 0, p.z);
+      if(Math.hypot(p.x-player.x, p.z-player.z) < 14){
+        carrying=false; parcelMesh.visible=false; clearPatrols(); stage=4;
+        sfx(100,.3,'sawtooth',.14);
+        say('Red-shirt',["Well well. Guna's little courier, out in the open.",
+          "(They snatch the parcel and vanish into the alleys...)",
+          "(Go back to Velu at the den for another copy — and stay off the main roads this time.)"]);
+        break;
+      }
+    }
+  }
+
+  // thugs
+  for(const en of enemies){
+    if(en.hp<=0) continue;
+    en.cool -= dt; en.hurtT -= dt;
+    const dx = player.x-en.x, dz = player.z-en.z, d = Math.hypot(dx,dz);
+    if(d < 34 && d > 2.6){
+      const nx = en.x + dx/d*en.speed*dt, nz = en.z + dz/d*en.speed*dt;
+      if(!blockedAt(nx,nz)){ en.x=nx; en.z=nz; }
+      en.walk += dt*9;
+      en.mesh.rotation.y = Math.atan2(dx,dz);
+    }
+    animPerson(en.mesh, en.walk, d<34, false);
+    en.mesh.position.set(en.x, 0, en.z);
+    if(d < 3.2 && en.cool<=0 && !player.driving){
+      en.cool = .8;
+      damagePlayer(8);
+    }
+  }
+
+  // prompts
+  const pr = document.getElementById('prompt');
+  if(!player.driving){
+    const n = nearestNPC();
+    let auto=null, ad=7;
+    for(const a of autos){ const d=Math.hypot(a.x-player.x,a.z-player.z); if(d<ad){ad=d;auto=a;} }
+    if(n && !dlg){ pr.style.display='block'; pr.textContent = `E — Talk to ${n.name}`; }
+    else if(auto && !dlg){ pr.style.display='block'; pr.textContent = 'F — Drive the auto'; }
+    else pr.style.display='none';
+  } else { pr.style.display='block'; pr.textContent = 'F — Get out'; }
+
+  // quest arrow
+  const tgt = questTarget();
+  if(tgt && stage<8){
+    const dx = tgt.x-player.x, dz = tgt.z-player.z, d = Math.hypot(dx,dz);
+    arrow.visible = d > 35;
+    arrow.position.set(player.x, 7.5+Math.sin(gameT*4)*.4, player.z);
+    arrow.rotation.y = Math.atan2(dx,dz);
+  } else arrow.visible = false;
+
+  // ambient animation
+  for(let i=0;i<boatBobs.length;i++) boatBobs[i].position.y = .1 + Math.sin(gameT*1.2+i*2)*.15;
+  sea.position.y = .1 + Math.sin(gameT*.9)*.05;
+
+  // day/night
+  const cyc = (gameT % 240)/240;
+  const sunA = cyc*Math.PI*2;
+  const sunI = Math.max(0, Math.sin(sunA));
+  sun.position.set(Math.cos(sunA)*220, Math.max(25, Math.sin(sunA)*220), 100);
+  sun.intensity = .2 + sunI*.9;
+  hemi.intensity = .32 + sunI*.45;
+  const day = new THREE.Color(0x87b5e0), night = new THREE.Color(0x0a1030);
+  const sky = night.clone().lerp(day, sunI);
+  renderer.setClearColor(sky);
+  scene.fog.color.copy(sky);
+  const lampI = Math.max(0, 1-sunI*1.6);
+  for(const l of lamps){
+    l.light.intensity = lampI*1.4;
+    l.bulb.material.color.setHex(lampI>.3 ? 0xffd780 : 0x555b60);
+  }
+  windowMat.color.setHex(lampI>.3 ? 0xffd870 : 0x22303c);
+
+  // camera follow
+  const dist = player.driving ? 19 : 13, ht = player.driving ? 10 : 8;
+  const hd = player.driving ? player.driving.heading : player.heading;
+  const tx = player.x - Math.sin(hd)*dist, tz = player.z - Math.cos(hd)*dist;
+  const k = 1 - Math.exp(-5*dt);
+  camera.position.x += (tx-camera.position.x)*k;
+  camera.position.y += (ht-camera.position.y)*k;
+  camera.position.z += (tz-camera.position.z)*k;
+  camera.lookAt(player.x, 3.5, player.z);
+
+  renderMinimap();
+  updateHUD();
+}
+
+// ---------- Minimap ----------
+const mmBase = document.createElement('canvas');
+mmBase.width = MW; mmBase.height = MH;
+{
+  const m = mmBase.getContext('2d');
+  const cols = {[T.GRASS]:'#4a6a34',[T.DIRT]:'#7a6040',[T.ROAD]:'#8a867e',[T.SAND]:'#d0bc82',
+                [T.WATER]:'#2e688c',[T.PIER]:'#8a6a42',[T.RAIL]:'#5a544a',[T.BLDG]:'#c8a060'};
+  for(let y=0;y<MH;y++) for(let x=0;x<MW;x++){ m.fillStyle = cols[map[y*MW+x]]; m.fillRect(x,y,1,1); }
+}
+const mm = document.getElementById('minimap').getContext('2d');
+function renderMinimap(){
+  mm.imageSmoothingEnabled = false;
+  mm.drawImage(mmBase, 0, 0, 180, 135);
+  const sx = 180/(MW*TILE), sz = 135/(MH*TILE);
+  const tgt = questTarget();
+  if(tgt && stage<8){
+    mm.fillStyle = '#ffd75c';
+    mm.beginPath(); mm.arc(tgt.x*sx, tgt.z*sz, 3+Math.sin(gameT*6), 0, 7); mm.fill();
+  }
+  for(const p of patrols){ mm.fillStyle='#e04030'; mm.fillRect(p.x*sx-1.5, p.z*sz-1.5, 3, 3); }
+  for(const en of enemies){ if(en.hp>0){ mm.fillStyle='#e04030'; mm.fillRect(en.x*sx-1.5, en.z*sz-1.5, 3, 3); } }
+  mm.fillStyle = '#fff';
+  mm.fillRect(player.x*sx-2, player.z*sz-2, 4, 4);
+}
+function updateHUD(){
+  document.getElementById('hpbar').style.width = Math.max(0,player.hp)+'%';
+  document.getElementById('money').textContent = player.money;
+  document.getElementById('respect').textContent = player.respect;
+  document.getElementById('questTxt').textContent = STAGES[Math.min(stage,8)];
+}
+
+// ---------- Main loop ----------
+function loop(now){
+  const dt = Math.min(.05, (now-last)/1000);
+  last = now;
+  update(dt);
+  renderer.render(scene, camera);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
